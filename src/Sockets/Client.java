@@ -14,8 +14,6 @@ import java.net.Socket;
 public class Client {
     private int port;
     private String host;
-    private DataInputStream is;
-    private DataOutputStream os;
     private Socket clientSocket;
 
     /**
@@ -48,7 +46,7 @@ public class Client {
      */
     private void sendData(String message) {
         try {
-            this.os = new DataOutputStream(this.clientSocket.getOutputStream());
+            DataOutputStream os = new DataOutputStream(this.clientSocket.getOutputStream());
             os.writeUTF(message);
         } catch (IOException e) {
             System.out.println("Error sending data: " + e.getMessage());
@@ -61,7 +59,7 @@ public class Client {
      */
     private String getData() {
         try {
-            this.is = new DataInputStream(this.clientSocket.getInputStream());
+            DataInputStream is = new DataInputStream(this.clientSocket.getInputStream());
             return is.readUTF();
         } catch (IOException e) {
             System.out.println("Error getting data: " + e.getMessage());
