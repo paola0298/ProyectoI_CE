@@ -1,7 +1,6 @@
 package Sockets;
 
 import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -20,7 +19,6 @@ public class Server {
 
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-    private int i = 1;
 
 
     /**
