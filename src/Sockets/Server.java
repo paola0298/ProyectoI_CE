@@ -1,7 +1,6 @@
 package Sockets;
 
 import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -11,7 +10,7 @@ import java.net.Socket;
 
 
 /**
- * @author paola
+ * @author Paola
  * @version 1.0
  *
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
@@ -20,7 +19,6 @@ public class Server {
 
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-    private int i = 1;
 
 
     /**
@@ -81,20 +79,28 @@ public class Server {
      * Escucha las conexiones del cliente
      */
     public void connectionListener(){
+        //Posible thread
+//        Runnable task = () -> {
+//            //codigo a ejecutar
+//        };
+//
+//        Thread worker = new Thread(task);
+//        worker.setDaemon(true);
+//        worker.start();
+//
+//        Thread thread = new Thread(() -> {
+//            //codigo a ejecutar
+//        });
+//        thread.setDaemon(true); // para que termine de ejecutarse, al terminar ejecucion principal que lo llama
+//        thread.start();
+//
 
         while (this.isRunning){
 
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
 
             JSONObject jsonMessage = new JSONObject(receiveDataFromClient(con));
-
 
             System.out.println("JSON received: " + jsonMessage.toString());
 
