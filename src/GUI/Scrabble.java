@@ -7,12 +7,12 @@ import javafx.stage.Stage;
 
 public class Scrabble extends Application {
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
 
-        Scene scene = new Scene(mainLayout, 800, 600);
+        Scene scene = new Scene(mainLayout, 1280, 720);
         stage.setMinWidth(640);
         stage.setMinHeight(480);
         stage.setScene(scene);
