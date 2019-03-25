@@ -37,29 +37,36 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Error opening socket ");
         }
-        //Opening connection streams
+
+        sendData(message);
+        return getData();
+    }
+
+    /**
+     * Este método se usa para enviar información al servidor.
+     * @param message Mensaje a enviar al servidor.
+     */
+    private void sendData(String message) {
         try {
             this.os = new DataOutputStream(this.clientSocket.getOutputStream());
-            this.is = new DataInputStream(this.clientSocket.getInputStream());
+            os.writeUTF(message);
         } catch (IOException e) {
-            System.out.println("Error opening streams");
+            System.out.println("Error sending data: " + e.getMessage());
         }
-        //Reading and sending in connection streams
-        try {
-            if (os != null && is != null) {
-                if (message != null) {
-                    os.writeUTF(message);
-                    return is.readUTF();
-                } else {
-                    System.out.println("Message must not be null");
-                    os.writeUTF("null");
-                }
+    }
 
-            }
+    /**
+     * Este método recibe la información enviada del servidor.
+     * @return Información enviada del servidor.
+     */
+    private String getData() {
+        try {
+            this.is = new DataInputStream(this.clientSocket.getInputStream());
+            return is.readUTF();
         } catch (IOException e) {
-            System.out.println("Error handling streams");
+            System.out.println("Error getting data: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public static void main(String[] args) {
