@@ -1,5 +1,7 @@
 package Sockets;
 
+import org.json.JSONObject;
+
 import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,6 +17,7 @@ public class Client {
     private int port;
     private String host;
     private Socket clientSocket;
+    private JSONObject defaultjson;
 
     /**
      * @param host Dirección IP del servidor.
@@ -23,6 +26,8 @@ public class Client {
     public Client(String host, int port) {
         this.port = port;
         this.host = host;
+        this.defaultjson = new JSONObject();
+        this.defaultjson.put("player_id", "-");
     }
 
     /**
@@ -33,11 +38,16 @@ public class Client {
         try {
             this.clientSocket = new Socket(this.host, this.port);
         } catch (IOException e) {
-            System.out.println("Error opening socket ");
+            System.out.println("Error opening socket: " + e.getMessage());
         }
-
-        sendData(message);
-        return getData();
+        if (this.clientSocket != null) {
+            sendData(message);
+            return getData();
+        } else {
+            JSONObject obj = new JSONObject();
+            obj.put("status", "CONNECTION_REFUSED");
+            return obj.toString();
+        }
     }
 
     /**
@@ -69,7 +79,6 @@ public class Client {
 
     public static void main(String[] args) {
         Client client = new Client("192.168.100.24", 6307);
-        Client client1 = new Client("192.168.100.24", 6307);
         boolean flag = true;
         while (flag) {
             String msg = JOptionPane.showInputDialog(null, "Message");
