@@ -17,7 +17,6 @@ public class Client {
     private int port;
     private String host;
     private Socket clientSocket;
-    private JSONObject defaultjson;
 
     /**
      * @param host Dirección IP del servidor.
@@ -26,27 +25,25 @@ public class Client {
     public Client(String host, int port) {
         this.port = port;
         this.host = host;
-        this.defaultjson = new JSONObject();
-        this.defaultjson.put("player_id", "-");
     }
 
     /**
      * @param message Mensaje a enviar al servidor.
      * @return Mensaje recibido del servidor.
      */
-    public String connect(String message) {
+    public JSONObject connect(JSONObject message) {
         try {
             this.clientSocket = new Socket(this.host, this.port);
         } catch (IOException e) {
             System.out.println("Error opening socket: " + e.getMessage());
         }
         if (this.clientSocket != null) {
-            sendData(message);
+            sendData(message.toString());
             return getData();
         } else {
             JSONObject obj = new JSONObject();
             obj.put("status", "CONNECTION_REFUSED");
-            return obj.toString();
+            return obj;
         }
     }
 
@@ -67,32 +64,32 @@ public class Client {
      * Este método recibe la información enviada del servidor.
      * @return Información enviada del servidor.
      */
-    private String getData() {
+    private JSONObject getData() {
         try {
             DataInputStream is = new DataInputStream(this.clientSocket.getInputStream());
-            return is.readUTF();
+            return new JSONObject(is.readUTF());
         } catch (IOException e) {
             System.out.println("Error getting data: " + e.getMessage());
-            return null;
+            return new JSONObject();
         }
     }
 
     public static void main(String[] args) {
-        Client client = new Client("192.168.100.24", 6307);
-        boolean flag = true;
-        while (flag) {
-            String msg = JOptionPane.showInputDialog(null, "Message");
-            String response = client.connect(msg);
-            if (response == null) {
-                flag = false;
-                System.out.println(1);
-            } else if (response.equals("")) {
-                flag = false;
-                System.out.println("2");
-            } else {
-                System.out.println(response);
-            }
-        }
+//        Client client = new Client("192.168.100.24", 6307);
+//        boolean flag = true;
+//        while (flag) {
+//            String msg = JOptionPane.showInputDialog(null, "Message");
+//            String response = client.connect(msg);
+//            if (response == null) {
+//                flag = false;
+//                System.out.println(1);
+//            } else if (response.equals("")) {
+//                flag = false;
+//                System.out.println("2");
+//            } else {
+//                System.out.println(response);
+//            }
+//        }
     }
 
 }

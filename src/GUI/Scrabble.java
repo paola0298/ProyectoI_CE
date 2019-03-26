@@ -26,7 +26,6 @@ public class Scrabble extends Application {
 
         //Pantalla de unión a partida existente.
         VBox joinMatchContainer = new VBox();
-        joinMatchContainer.setStyle("-fx-background-color: gray;");
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
@@ -39,7 +38,6 @@ public class Scrabble extends Application {
         joinResponse.setId("join_message");
         joinButton.setOnAction(event -> {
             //Decirle a controller que envie un request al servidor.
-            controller.doAction(ACTIONS.CREATE_MATCH);
         });
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextFiel, joinButton, joinResponse);
 
