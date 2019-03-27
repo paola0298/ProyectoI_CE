@@ -1,6 +1,8 @@
 package Logic;
 
-import org.apache.commons.lang.RandomStringUtils;
+//TODO actualizar la librería a la última versión
+//import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 public class Player {
     String Player_ID;

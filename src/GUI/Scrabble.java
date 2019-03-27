@@ -172,8 +172,7 @@ public class Scrabble extends Application {
     private Image imageLoader(String path){
         try{
             FileInputStream i = new FileInputStream(path);
-            Image img = new Image(i);
-            return img;
+            return new Image(i);
         }catch (FileNotFoundException e){
             System.out.println("Couldn't load images!");
         }
