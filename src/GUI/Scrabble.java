@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
 
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
@@ -181,6 +182,11 @@ public class Scrabble extends Application {
         }
         System.out.println("Returning null");
         return null;
+    }
+
+    private void userLoader(){
+
+
     }
 
 }
