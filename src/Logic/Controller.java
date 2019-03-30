@@ -17,7 +17,7 @@ public class Controller {
     private Scrabble gui;
 
     private String player_id = "-";
-    private String match_id = "-";
+    private String current_match_id = "-";
 
     public Controller(Scrabble gui) {
         this.gui = gui;
@@ -56,7 +56,7 @@ public class Controller {
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
-            this.match_id = match_id;
+            this.current_match_id = match_id;
         } else {
             System.out.println("Could not join match");
         }
@@ -68,13 +68,13 @@ public class Controller {
     public void leave_match() {
         message = prepare();
         message.put("action", "DISCONNECT");
-        message.put("match_id", match_id);
+        message.put("match_id", current_match_id);
 
         response = client.connect(message);
 
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Disconnected successfully");
-            this.match_id = "-";
+            this.current_match_id = "-";
         } else {
             System.out.println("An error ocurred");
         }
@@ -86,7 +86,7 @@ public class Controller {
      */
     public void check_word(String word) {
         message = prepare();
-        message.put("match_id", match_id);
+        message.put("match_id", current_match_id);
         message.put("word", word);
 
         response = client.connect(message);
@@ -103,6 +103,7 @@ public class Controller {
      */
     public void check_turn() {
         message = prepare();
+        message.put("match_id", current_match_id);
         response = client.connect(message);
 
     }
@@ -112,7 +113,7 @@ public class Controller {
      * Este método prepara un nuevo objeto JSON para usar en los pedidos al servidor.
      * @return Objeto JSON base para generar cada pedido al servidor.
      */
-    public JSONObject prepare() {
+    private JSONObject prepare() {
         JSONObject object = new JSONObject();
         object.put("player_id", player_id);
         return object;
