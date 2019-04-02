@@ -1,0 +1,11 @@
+.button {
+    -fx-font-size: 15px;
+}
+
+.label {
+    -fx-font-size: 16px;
+    -fx-text-alignment: center;
+}
+#join_message {
+    -fx-text-fill: red;
+}
