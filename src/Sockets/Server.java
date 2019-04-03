@@ -1,5 +1,7 @@
 package Sockets;
 
+import Logic.Token;
+import Structures.LinkedList;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,15 +18,20 @@ import java.net.Socket;
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
  */
 public class Server {
-
+    protected LinkedList<Token> TokenList;
     private ServerSocket serverSocket;
     private boolean isRunning = true;
 
+    public LinkedList<Token> getTokenList() {
+        TokenList.printList();
+        return TokenList;
+    }
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
     public Server(int port){
+        fillTokenList();
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -141,11 +148,90 @@ public class Server {
         }
 
     }
+    private void fillTokenList(){
+
+        Token A = new Token("*****", 1, "A");
+        Token E = new Token("*****", 1, "E");
+        Token O = new Token("*****", 1, "O");
+        Token I = new Token("*****", 1, "I");
+        Token S = new Token("*****", 1, "S");
+        Token N = new Token("*****", 1, "N");
+        Token R = new Token("*****", 1, "R");
+        Token U = new Token("*****", 1, "U");
+        Token D = new Token("*****", 2, "D");
+        Token L = new Token("*****", 1, "L");
+        Token T = new Token("*****", 1, "T");
+        Token C = new Token("*****", 3, "C");
+        Token G = new Token("*****", 2, "G");
+        Token B = new Token("*****", 3, "B");
+        Token M = new Token("*****", 3, "M");
+        Token P = new Token("*****", 3, "P");
+        Token H = new Token("*****", 4, "H");
+        Token F = new Token("*****", 4, "F");
+        Token V = new Token("*****", 4, "V");
+        Token Y = new Token("*****", 4, "Y");
+        Token CH = new Token("*****", 5, "CH");
+        Token Q = new Token("*****", 5, "Q");
+        Token J = new Token("*****", 8, "J");
+        Token LL = new Token("*****", 8, "LL");
+        Token Ñ = new Token("*****", 8, "Ñ");
+        Token RR = new Token("*****", 8, "RR");
+        Token X = new Token("*****", 8, "X");
+        Token Z = new Token("*****", 10, "Z");
+
+
+
+        //Se añaden las fichas A y E a la lista
+        for (int ae = 0;ae <= 12; ae++){
+            this.TokenList.addFirst(A);
+            this.TokenList.addFirst(E);
+        }
+        //Se añade la ficha O a la lista
+        for (int o = 0;o <= 9;o++){
+            this.TokenList.addFirst(O);
+        }
+        //Se añaden las fichas I y S a la lista
+        for (int is = 0;is <= 6;is++){
+            this.TokenList.addFirst(I);
+            this.TokenList.addFirst(S);
+        }
+        //Se añaden las fichas N,R,U,D a la lista
+        for (int nrud = 0;nrud <= 5;nrud++){
+            this.TokenList.addFirst(N);
+            this.TokenList.addFirst(R);
+            this.TokenList.addFirst(U);
+            this.TokenList.addFirst(D);
+        }
+        //Se añaden las fichas L,T,C a la lista
+        for (int ltc = 0;ltc <= 4;ltc++){
+            this.TokenList.addFirst(L);
+            this.TokenList.addFirst(T);
+            this.TokenList.addFirst(C);
+        }
+        //Se añaden las fichas G,B,M,P,H a la lista
+        for (int gbmph = 0;gbmph <= 2;gbmph++){
+            this.TokenList.addFirst(G);
+            this.TokenList.addFirst(B);
+            this.TokenList.addFirst(M);
+            this.TokenList.addFirst(P);
+            this.TokenList.addFirst(H);
+        }
+        //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
+        for (int fvychqjllñrrxz = 0;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
+            this.TokenList.addFirst(G);
+            this.TokenList.addFirst(B);
+            this.TokenList.addFirst(M);
+            this.TokenList.addFirst(P);
+            this.TokenList.addFirst(H);
+        }
+
+    }
 
     public static void main(String[] args) {
 
         Server server = new Server(6307);
         System.out.println("Servidor iniciado...");
         server.connectionListener();
+
     }
 }
