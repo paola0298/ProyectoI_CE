@@ -54,10 +54,6 @@ public class Scrabble extends Application {
         initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
 
 
-
-
-
-
         //Pantalla de unión a partida existente.
         VBox joinMatchContainer = new VBox();
         joinMatchContainer.setStyle("-fx-background-color: gray;");
@@ -181,7 +177,34 @@ public class Scrabble extends Application {
         return null;
     }
 
-    private void userLoader(){
+    private void playerLoader(String actualUserScore){
+        //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
+
+        // instanciar widgets;
+        Image userImage;
+        ImageView addUserImage;
+
+        Text userScoreText;
+        Text userScore;
+
+
+        //Right and left users
+        //imagen del usuario
+        VBox rightLeftPlayers = new VBox();
+        userImage = imageLoader(cwd + "/res/userIcon2.png");
+        addUserImage = new ImageView(userImage);
+        addUserImage.setFitHeight(120);
+        addUserImage.setFitWidth(120);
+
+
+        //puntuacion del usuario
+        HBox userScoreBox = new HBox();
+        userScoreBox.setSpacing(10);
+        userScoreBox.setAlignment(Pos.CENTER);
+        userScoreText = new Text("Puntos obtenidos: ");
+        userScore = new Text(actualUserScore);
+        userScoreBox.getChildren().addAll(userScoreText, userScore);
+
 
 
     }
