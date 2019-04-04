@@ -3,12 +3,12 @@ package Logic;
 public class Token {
     String imagePath;
     int score;
-    String words;
+    String letter;
 
-    public Token(String imagePath, int score, String words) {
+    public Token(String imagePath, int score, String letter) {
         this.imagePath = imagePath;
         this.score = score;
-        this.words = words;
+        this.letter = letter;
     }
 
     public String getImagePath() {
@@ -20,6 +20,6 @@ public class Token {
     }
 
     public String getWords() {
-        return words;
+        return letter;
     }
 }
