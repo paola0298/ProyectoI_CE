@@ -482,4 +482,6 @@ public class Scrabble extends Application {
         letterSelected = null;
     }
 
+    //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
+
 }
