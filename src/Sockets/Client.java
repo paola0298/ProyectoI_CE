@@ -78,7 +78,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        Client client = new Client("192.168.100.24", 6307);
+        Client client = new Client("192.168.02.6", 6307);
         boolean flag = true;
         while (flag) {
             String msg = JOptionPane.showInputDialog(null, "Message");

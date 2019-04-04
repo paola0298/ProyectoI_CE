@@ -18,7 +18,7 @@ import java.net.Socket;
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
  */
 public class Server {
-    protected LinkedList<Token> TokenList;
+    public LinkedList<Token> TokenList = new LinkedList<Token>();
     private ServerSocket serverSocket;
     private boolean isRunning = true;
 
@@ -148,7 +148,7 @@ public class Server {
         }
 
     }
-    private void fillTokenList(){
+    public void fillTokenList(){
 
         Token A = new Token("*****", 1, "A");
         Token E = new Token("*****", 1, "E");
@@ -180,11 +180,10 @@ public class Server {
         Token Z = new Token("*****", 10, "Z");
 
 
-
         //Se añaden las fichas A y E a la lista
         for (int ae = 0;ae <= 12; ae++){
-            this.TokenList.addFirst(A);
-            this.TokenList.addFirst(E);
+            TokenList.addLast(A);
+            TokenList.addFirst(E);
         }
         //Se añade la ficha O a la lista
         for (int o = 0;o <= 9;o++){
@@ -224,10 +223,15 @@ public class Server {
             this.TokenList.addFirst(P);
             this.TokenList.addFirst(H);
         }
+        TokenList.printList();
+
+
 
     }
 
     public static void main(String[] args) {
+
+
 
         Server server = new Server(6307);
         System.out.println("Servidor iniciado...");
