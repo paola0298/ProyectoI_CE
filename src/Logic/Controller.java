@@ -1,6 +1,5 @@
 package Logic;
 
-import EnumTypes.ACTIONS;
 import GUI.Scrabble;
 import Sockets.Client;
 import org.json.JSONObject;

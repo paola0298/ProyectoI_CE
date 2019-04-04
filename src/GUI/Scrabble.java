@@ -189,4 +189,6 @@ public class Scrabble extends Application {
 
     }
 
+    //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
+
 }
