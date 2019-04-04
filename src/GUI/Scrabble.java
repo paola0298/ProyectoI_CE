@@ -2,6 +2,8 @@ package GUI;
 
 import EnumTypes.ACTIONS;
 import Logic.Controller;
+import Structures.LinkedList;
+import Structures.Node;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,11 +19,15 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
+
 
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
     private Controller controller;
+    private VBox rightPlayerInfoContainer;
+    private VBox leftPlayerInfoContainer;
+    private VBox upPlayerInfoContainer;
+    private HBox actualPlayerInfoContainer;
 
     @Override
     public void start(Stage stage) {
@@ -78,22 +84,22 @@ public class Scrabble extends Application {
 
         BorderPane gameScreenContainer = new BorderPane();
 
-        //Imagen del usuario
-        Image userImage = imageLoader(cwd + "/res/userIcon.png");
-        ImageView addUserImage = new ImageView(userImage);
-        addUserImage.setFitHeight(120);
-        addUserImage.setFitWidth(120);
-
-        //puntuacion del usuario
-        HBox userScoreBox = new HBox();
-        userScoreBox.setSpacing(10);
-        userScoreBox.setAlignment(Pos.CENTER);
-
-
-        Text userScoreText = new Text("Mi puntuación es: ");
-        Text userScore = new Text("50");
-
-        userScoreBox.getChildren().addAll(userScoreText, userScore);
+//        //Imagen del usuario
+//        Image userImage = imageLoader(cwd + "/res/userIcon.png");
+//        ImageView addUserImage = new ImageView(userImage);
+//        addUserImage.setFitHeight(120);
+//        addUserImage.setFitWidth(120);
+//
+//        //puntuacion del usuario
+//        HBox userScoreBox = new HBox();
+//        userScoreBox.setSpacing(10);
+//        userScoreBox.setAlignment(Pos.CENTER);
+//
+//
+//        Text userScoreText = new Text("Mi puntuación es: ");
+//        Text userScore = new Text("50");
+//
+//        userScoreBox.getChildren().addAll(userScoreText, userScore);
 
         //Fichas
 
@@ -115,31 +121,34 @@ public class Scrabble extends Application {
 
         // contenedores
 
-        VBox scoreAndToken = new VBox();
-        scoreAndToken.setAlignment(Pos.CENTER);
-        scoreAndToken.setSpacing(10);
-        scoreAndToken.getChildren().addAll(userScoreBox, tokenImage); //agregar las fichas
+        VBox tokenBox = new VBox();
+        tokenBox.setAlignment(Pos.CENTER);
+        tokenBox.setSpacing(10);
+        tokenBox.getChildren().addAll(tokenImage); //agregar las fichas
 
-        HBox actualPlayerInfoContainer = new HBox();
+        actualPlayerInfoContainer = new HBox();
         actualPlayerInfoContainer.setStyle("-fx-background-color: white");
         actualPlayerInfoContainer.setAlignment(Pos.CENTER);
         actualPlayerInfoContainer.setSpacing(15);
         actualPlayerInfoContainer.setPrefHeight(210);
-        actualPlayerInfoContainer.getChildren().addAll(addUserImage, scoreAndToken, scrabbleImageButton);
+        actualPlayerInfoContainer.getChildren().addAll(tokenBox, scrabbleImageButton);
 
-        VBox upPlayerInfoContainer = new VBox();
+        upPlayerInfoContainer = new VBox();
         upPlayerInfoContainer.setStyle("-fx-background-color: green");
+        upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
         GridPane matrixContainer = new GridPane();
         matrixContainer.setStyle("-fx-background-color: purple");
 
-        VBox rightPlayerInfoContainer = new VBox();
+        rightPlayerInfoContainer = new VBox();
         rightPlayerInfoContainer.setStyle("-fx-background-color: red");
+        rightPlayerInfoContainer.setAlignment(Pos.CENTER);
         rightPlayerInfoContainer.setPrefWidth(170);
 
-        VBox leftPlayerInfoContainer = new VBox();
+        leftPlayerInfoContainer = new VBox();
         leftPlayerInfoContainer.setStyle("-fx-background-color: orange");
+        leftPlayerInfoContainer.setAlignment(Pos.CENTER);
         leftPlayerInfoContainer.setPrefWidth(170);
 
         gameScreenContainer.setTop(upPlayerInfoContainer);
@@ -148,12 +157,15 @@ public class Scrabble extends Application {
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
 
+        playerLoader();
+
 
 
         //Aquí añaden su panel al contenedor principal.
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow);
+        gameScreenContainer.toFront();
         Scene scene = new Scene(mainLayout, 1280, 720);
-        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
+//        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
         stage.setMinWidth(640);
         stage.setMinHeight(480);
         stage.setScene(scene);
@@ -177,7 +189,7 @@ public class Scrabble extends Application {
         return null;
     }
 
-    private void playerLoader(String actualUserScore){
+    private void playerLoader(){
         //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
 
         // instanciar widgets;
@@ -186,24 +198,57 @@ public class Scrabble extends Application {
 
         Text userScoreText;
         Text userScore;
+        Text userName;
 
+        // playersList
+        // temporal, mientras se genera la lista de jugadores
+        LinkedList<String> players =  new LinkedList<>();
+        players.addLast("Hazel");
+        players.addLast("Brayan");
+        players.addLast("Marlon");
+        players.addLast("Paola");
+        Node<String> temp = players.getHead();
 
-        //Right and left users
-        //imagen del usuario
-        VBox rightLeftPlayers = new VBox();
-        userImage = imageLoader(cwd + "/res/userIcon2.png");
-        addUserImage = new ImageView(userImage);
-        addUserImage.setFitHeight(120);
-        addUserImage.setFitWidth(120);
+        int cont = 0;
 
+        while(temp!=null){
 
-        //puntuacion del usuario
-        HBox userScoreBox = new HBox();
-        userScoreBox.setSpacing(10);
-        userScoreBox.setAlignment(Pos.CENTER);
-        userScoreText = new Text("Puntos obtenidos: ");
-        userScore = new Text(actualUserScore);
-        userScoreBox.getChildren().addAll(userScoreText, userScore);
+            if (cont==0){
+                userImage = imageLoader(cwd + "/res/userIcon.png");
+            } else {
+                userImage = imageLoader(cwd + "/res/userIcon2.png");
+            }
+
+            VBox playersBox = new VBox();
+            playersBox.setAlignment(Pos.CENTER);
+            addUserImage = new ImageView(userImage);
+            addUserImage.setFitHeight(120);
+            addUserImage.setFitWidth(120);
+            userName = new Text(temp.getValue());
+
+            //puntuacion del usuario
+            HBox userScoreBox = new HBox();
+            userScoreBox.setAlignment(Pos.CENTER);
+            userScoreBox.setSpacing(10);
+            userScoreBox.setAlignment(Pos.CENTER);
+            userScoreText = new Text("Puntos obtenidos: ");
+            userScore = new Text("50");
+            userScoreBox.getChildren().addAll(userScoreText, userScore);
+            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+
+            if (cont==0){
+                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else if (cont==1){
+                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else if (cont == 2){
+                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else {
+                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+            }
+
+            temp = temp.getNext();
+            cont++;
+        }
 
 
 
