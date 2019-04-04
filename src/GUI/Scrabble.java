@@ -7,11 +7,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -31,7 +34,7 @@ public class Scrabble extends Application {
         StackPane mainLayout = new StackPane();
         /////////////////////////////Pantalla de Inicio//////////////////////
         /* Pantalla inicial donde el jugador puede elegir entre ingresar a un partida, o crear una propia
-        Cuando se crea una parida nueva se genera un código con el que se puede invitar a otros jugadores
+        Cuando se crea una partida nueva se genera un código con el que se puede invitar a otros jugadores
         En esta ventana se especifíca cuantos jugadores tendrá la partida
          */
         VBox initialWindow = new VBox();
@@ -147,17 +150,62 @@ public class Scrabble extends Application {
         gameScreenContainer.setCenter(matrixContainer);
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
+/**Window for create a new game
+ *displays an comboBox for choose the number of players in the game
+ *
+ * @author Hazel ML
+ * @version 1.0
+ * @since 2019-27-03
+ */
+        BorderPane root = new BorderPane();
 
+        root.setPadding(new Insets(15, 20, 10, 10));
+        root.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
+        //espacio del border pane al boton
 
+        Label numberPlayers = new Label("Number of Players");
+        numberPlayers.setPadding(new Insets(2,2,2,2));
+        numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143,188,143), CornerRadii.EMPTY, Insets.EMPTY)));
+        numberPlayers.setTextFill(Color.rgb(34,139,34));
+        numberPlayers.setFont(new Font("Serif",30));
+        numberPlayers.setAlignment(Pos.CENTER);
+        HBox hBox = new HBox();
+        hBox.getChildren().add(numberPlayers);
+
+        //Create a ComboBox
+        ComboBox comboBox = new ComboBox();
+        comboBox.getItems().add("Two Players");
+        comboBox.getItems().add("Three Players");
+        comboBox.getItems().add("Four Players");
+        comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46,139,87), CornerRadii.EMPTY,Insets.EMPTY)));
+        comboBox.setStyle("-fx-font: 30px \"Serif\";");
+        hBox.getChildren().add(comboBox);
+
+        hBox.setSpacing(20);
+        hBox.setAlignment(Pos.CENTER);
+        root.setCenter(hBox);
+        Button startButton = new Button("Start Game");
+        startButton.setPadding(new Insets(20, 10, 10, 20));
+        startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72,209,204), CornerRadii.EMPTY, Insets.EMPTY)));
+        startButton.setTextFill(Color.rgb(0,100,0));
+        startButton.setFont(new Font("Serif", 30));
+        startButton.setAlignment(Pos.CENTER_RIGHT);
+        root.setBottom(startButton);
+        // Alignment.
+        BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
+
+        // Set margin for bottom area.
+        BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
 
         //Aquí añaden su panel al contenedor principal.
-        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow);
+        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
         Scene scene = new Scene(mainLayout, 1280, 720);
         scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
         stage.setMinWidth(640);
         stage.setMinHeight(480);
         stage.setScene(scene);
         stage.setTitle("Scrabble TEC");
+        root.toFront();
         stage.show();
     }
 
