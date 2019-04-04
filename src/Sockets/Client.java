@@ -75,21 +75,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-//        Client client = new Client("192.168.100.24", 6307);
-//        boolean flag = true;
-//        while (flag) {
-//            String msg = JOptionPane.showInputDialog(null, "Message");
-//            String response = client.connect(msg);
-//            if (response == null) {
-//                flag = false;
-//                System.out.println(1);
-//            } else if (response.equals("")) {
-//                flag = false;
-//                System.out.println("2");
-//            } else {
-//                System.out.println(response);
-//            }
-//        }
+
     }
 
 }
