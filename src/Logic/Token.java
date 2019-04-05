@@ -19,7 +19,7 @@ public class Token {
         return score;
     }
 
-    public String getWords() {
+    public String getLetter() {
         return letter;
     }
 }

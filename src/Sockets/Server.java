@@ -1,5 +1,6 @@
 package Sockets;
 
+import Logic.Player;
 import Logic.Token;
 import Structures.LinkedList;
 import org.json.JSONObject;
@@ -23,9 +24,10 @@ public class Server {
     private boolean isRunning = true;
 
     public LinkedList<Token> getTokenList() {
-        TokenList.printList();
+        //TokenList.printList();
         return TokenList;
     }
+
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
@@ -178,37 +180,38 @@ public class Server {
         Token RR = new Token("*****", 8, "RR");
         Token X = new Token("*****", 8, "X");
         Token Z = new Token("*****", 10, "Z");
+        Token Bonus = new Token("*****", 0, "");
 
 
         //Se añaden las fichas A y E a la lista
-        for (int ae = 0;ae <= 12; ae++){
+        for (int ae = 1;ae <= 12; ae++){
             TokenList.addLast(A);
             TokenList.addFirst(E);
         }
         //Se añade la ficha O a la lista
-        for (int o = 0;o <= 9;o++){
+        for (int o = 1;o <= 9;o++){
             this.TokenList.addFirst(O);
         }
         //Se añaden las fichas I y S a la lista
-        for (int is = 0;is <= 6;is++){
+        for (int is = 1;is <= 6;is++){
             this.TokenList.addFirst(I);
             this.TokenList.addFirst(S);
         }
         //Se añaden las fichas N,R,U,D a la lista
-        for (int nrud = 0;nrud <= 5;nrud++){
+        for (int nrud = 1;nrud <= 5;nrud++){
             this.TokenList.addFirst(N);
             this.TokenList.addFirst(R);
             this.TokenList.addFirst(U);
             this.TokenList.addFirst(D);
         }
         //Se añaden las fichas L,T,C a la lista
-        for (int ltc = 0;ltc <= 4;ltc++){
+        for (int ltc = 1;ltc <= 4;ltc++){
             this.TokenList.addFirst(L);
             this.TokenList.addFirst(T);
             this.TokenList.addFirst(C);
         }
         //Se añaden las fichas G,B,M,P,H a la lista
-        for (int gbmph = 0;gbmph <= 2;gbmph++){
+        for (int gbmph = 1;gbmph <= 2;gbmph++){
             this.TokenList.addFirst(G);
             this.TokenList.addFirst(B);
             this.TokenList.addFirst(M);
@@ -216,14 +219,18 @@ public class Server {
             this.TokenList.addFirst(H);
         }
         //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
-        for (int fvychqjllñrrxz = 0;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
+        for (int fvychqjllñrrxz = 1;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
             this.TokenList.addFirst(G);
             this.TokenList.addFirst(B);
             this.TokenList.addFirst(M);
             this.TokenList.addFirst(P);
             this.TokenList.addFirst(H);
         }
-        TokenList.printList();
+        for (int bonus = 1;bonus <= 2;bonus++){
+            this.TokenList.addFirst(Bonus);
+        }
+
+        //TokenList.printList();
 
 
 
@@ -233,7 +240,12 @@ public class Server {
 
 
 
+
         Server server = new Server(6307);
+        Player p = new Player("Brayan");
+        System.out.println(server.getTokenList());
+        p.create_ID();
+        p.assign_tokens(server.getTokenList());
         System.out.println("Servidor iniciado...");
         server.connectionListener();
 
