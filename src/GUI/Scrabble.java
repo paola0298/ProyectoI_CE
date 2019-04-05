@@ -160,13 +160,8 @@ public class Scrabble extends Application {
         gameScreenContainer.setCenter(matrixContainer);
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
-/**Window for create a new game
- *displays an comboBox for choose the number of players in the game
- *
- * @author Hazel ML
- * @version 1.0
- * @since 2019-27-03
- */
+
+        /* Window for create a new game displays an comboBox for choose the number of players in the game */
         BorderPane root = new BorderPane();
 
         root.setPadding(new Insets(15, 20, 10, 10));
@@ -183,7 +178,7 @@ public class Scrabble extends Application {
         hBox.getChildren().add(numberPlayers);
 
         //Create a ComboBox
-        ComboBox comboBox = new ComboBox();
+        ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().add("Two Players");
         comboBox.getItems().add("Three Players");
         comboBox.getItems().add("Four Players");
