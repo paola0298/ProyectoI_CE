@@ -2,14 +2,15 @@ package Logic;
 
 
 import Structures.LinkedList;
+import Structures.Node;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Random;
 
-public class Player {
+public class Player{
     String Player_ID;
     String Name;
-    LinkedList<Token> tokenlist;
+    LinkedList tokenlist = new LinkedList();
 
     public Player(String name) {
         create_ID();
@@ -20,18 +21,22 @@ public class Player {
         this.Player_ID = RandomStringUtils.randomAlphanumeric(6);
 
     }
-    public void assign_tokens(LinkedList<Token> tokensList){
+    public void assign_tokens(LinkedList<Token> tokens){
         int ind;
         Random random = new Random();
-        ind = random.nextInt(100)+1;
-        System.out.println(ind);
+
+        for(int i = 0; i <= 6; i++){
+            ind = random.nextInt(100);
+            Node<Token> random_token = tokens.acces_index(ind);
+            tokenlist.addLast(random_token.getValue());
+
+        }
+
 
     }
     public static void main(String [] args ){
-        int ind;
-        Random random = new Random();
-        ind = random.nextInt(100)+1;
-        System.out.println(ind);
+
+
 
 
 
