@@ -14,4 +14,27 @@ public class Player {
 
     }
 
+    public String getPlayer_ID() {
+        return Player_ID;
+    }
+
+    public void setPlayer_ID(String player_ID) {
+        Player_ID = player_ID;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public int getPlayer_Number() {
+        return Player_Number;
+    }
+
+    public void setPlayer_Number(int player_Number) {
+        Player_Number = player_Number;
+    }
 }

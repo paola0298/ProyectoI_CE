@@ -76,12 +76,12 @@ public class LinkedList<T> {
     public void printList(){
         Node<T> temp = this.head;
         while (temp!=null){
-            System.out.println(temp.getValue());
+            //System.out.println(temp.getValue());
             temp = temp.getNext();
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         LinkedList<Integer> list = new LinkedList<>();
         list.addLast(1);
         list.addLast(2);
@@ -91,5 +91,5 @@ public class LinkedList<T> {
         list.addFirst(200);
         list.deleteElement(100);
         list.printList();
-    }
+    }*/
 }

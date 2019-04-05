@@ -1,5 +1,8 @@
 package Sockets;
 
+import Logic.Game;
+import Logic.Player;
+import Structures.Lista;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +22,7 @@ public class Server {
 
     private ServerSocket serverSocket;
     private boolean isRunning = true;
+    private Lista<Game> gameList = new Lista<Game>(); //Lista de partidas
 
 
     /**
@@ -142,7 +146,33 @@ public class Server {
 
     }
 
-    public static void main(String[] args) {
+    public Lista<Game> getGameList() {
+        /**
+         *
+         */
+        return gameList;
+    }
+
+    public void setGameList(Lista<Game> gameList) {
+        this.gameList = gameList;
+    }
+
+    public void addPlayerToExistingGame(Player player, String idGame){
+        /**
+         * Add a new player to a existing game
+         *
+         * @author HazelMartinez
+         * @version 1.0
+         * @since 2019/05/04
+         */
+        for(int index = 0; index < gameList.getSize(); index++){
+            if(gameList.retornarValor(index).getIdGame() == idGame){
+                gameList.retornarValor(index).getPlayersList().insertar(player);
+            }
+        }
+    }
+
+    public static void main(String[] args){
 
         Server server = new Server(6307);
         System.out.println("Servidor iniciado...");
