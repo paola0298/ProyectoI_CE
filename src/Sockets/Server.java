@@ -22,7 +22,7 @@ public class Server {
 
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-    private Lista<Game> gameList = new Lista<Game>(); //Lista de partidas
+    private Lista<Game> gameList = new Lista<Game>(); //Lista de partidas, Hazel
 
 
     /**

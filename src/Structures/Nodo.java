@@ -1,5 +1,12 @@
 package Structures;
 
+/**
+ * @author HazelMartinez
+ * @since 22/03/2019
+ * @version 1.0
+ * @param <T>
+ */
+
     public class Nodo<T> {
         private T dato;
         private Nodo<T> next = null;

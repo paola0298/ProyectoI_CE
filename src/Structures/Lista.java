@@ -1,4 +1,13 @@
 package Structures;
+
+/**
+ * Lista doblemente enlanzada
+ *
+ * @author HazelMartinez
+ * @version 1.0
+ * @since 22/03/2019
+ * @param <T>
+ */
     public class Lista<T> {
         private int size;
         private Nodo<T> head;
