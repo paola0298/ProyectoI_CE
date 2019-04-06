@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Handler;
 
 
 public class Scrabble extends Application {
@@ -28,6 +29,7 @@ public class Scrabble extends Application {
     private VBox leftPlayerInfoContainer;
     private VBox upPlayerInfoContainer;
     private HBox actualPlayerInfoContainer;
+    private HBox tokenBox;
 
     @Override
     public void start(Stage stage) {
@@ -101,12 +103,12 @@ public class Scrabble extends Application {
 //
 //        userScoreBox.getChildren().addAll(userScoreText, userScore);
 
-        //Fichas
-
-        Image token = imageLoader(cwd + "/res/token.png");
-        ImageView tokenImage = new ImageView(token);
-        tokenImage.setFitWidth(501);
-        tokenImage.setFitHeight(82);
+//        //Fichas
+//
+//        Image token = imageLoader(cwd + "/res/token.png");
+//        ImageView tokenImage = new ImageView(token);
+//        tokenImage.setFitWidth(501);
+//        tokenImage.setFitHeight(82);
 
 
         //Boton para enviar la palabra
@@ -121,35 +123,42 @@ public class Scrabble extends Application {
 
         // contenedores
 
-        VBox tokenBox = new VBox();
+        tokenBox = new HBox();
         tokenBox.setAlignment(Pos.CENTER);
-        tokenBox.setSpacing(10);
-        tokenBox.getChildren().addAll(tokenImage); //agregar las fichas
+        tokenBox.setSpacing(5);
+        tokenLoader();
+
 
         actualPlayerInfoContainer = new HBox();
         actualPlayerInfoContainer.setStyle("-fx-background-color: white");
         actualPlayerInfoContainer.setAlignment(Pos.CENTER);
         actualPlayerInfoContainer.setSpacing(15);
-        actualPlayerInfoContainer.setPrefHeight(210);
+        actualPlayerInfoContainer.setPrefHeight(200);
         actualPlayerInfoContainer.getChildren().addAll(tokenBox, scrabbleImageButton);
 
         upPlayerInfoContainer = new VBox();
-        upPlayerInfoContainer.setStyle("-fx-background-color: green");
+        upPlayerInfoContainer.setStyle("-fx-background-color: white");
         upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
         GridPane matrixContainer = new GridPane();
-        matrixContainer.setStyle("-fx-background-color: purple");
+        matrixContainer.setStyle("-fx-background-color: white;\n" +
+                "    -fx-background-radius: 5.0;\n" +
+                "    -fx-background-insets: 5.0 5.0 5.0 5.0;\n" +
+                "    -fx-padding: 10;\n" +
+                "    -fx-hgap: 10;\n" +
+                "    -fx-vgap: 10;");
+
 
         rightPlayerInfoContainer = new VBox();
-        rightPlayerInfoContainer.setStyle("-fx-background-color: red");
+        rightPlayerInfoContainer.setStyle("-fx-background-color: white");
         rightPlayerInfoContainer.setAlignment(Pos.CENTER);
-        rightPlayerInfoContainer.setPrefWidth(170);
+        rightPlayerInfoContainer.setPrefWidth(150);
 
         leftPlayerInfoContainer = new VBox();
-        leftPlayerInfoContainer.setStyle("-fx-background-color: orange");
+        leftPlayerInfoContainer.setStyle("-fx-background-color: white");
         leftPlayerInfoContainer.setAlignment(Pos.CENTER);
-        leftPlayerInfoContainer.setPrefWidth(170);
+        leftPlayerInfoContainer.setPrefWidth(150);
 
         gameScreenContainer.setTop(upPlayerInfoContainer);
         gameScreenContainer.setBottom(actualPlayerInfoContainer);
@@ -164,7 +173,7 @@ public class Scrabble extends Application {
         //Aquí añaden su panel al contenedor principal.
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow);
         gameScreenContainer.toFront();
-        Scene scene = new Scene(mainLayout, 1280, 720);
+        Scene scene = new Scene(mainLayout, 1280, 900);
 //        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
         stage.setMinWidth(640);
         stage.setMinHeight(480);
@@ -215,15 +224,18 @@ public class Scrabble extends Application {
 
             if (cont==0){
                 userImage = imageLoader(cwd + "/res/userIcon.png");
+                addUserImage = new ImageView(userImage);
+                addUserImage.setFitHeight(120);
+                addUserImage.setFitWidth(120);
             } else {
                 userImage = imageLoader(cwd + "/res/userIcon2.png");
+                addUserImage = new ImageView(userImage);
+                addUserImage.setFitHeight(100);
+                addUserImage.setFitWidth(100);
             }
 
             VBox playersBox = new VBox();
             playersBox.setAlignment(Pos.CENTER);
-            addUserImage = new ImageView(userImage);
-            addUserImage.setFitHeight(120);
-            addUserImage.setFitWidth(120);
             userName = new Text(temp.getValue());
 
             //puntuacion del usuario
@@ -231,7 +243,7 @@ public class Scrabble extends Application {
             userScoreBox.setAlignment(Pos.CENTER);
             userScoreBox.setSpacing(10);
             userScoreBox.setAlignment(Pos.CENTER);
-            userScoreText = new Text("Puntos obtenidos: ");
+            userScoreText = new Text("Puntos:");
             userScore = new Text("50");
             userScoreBox.getChildren().addAll(userScoreText, userScore);
             playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
@@ -252,6 +264,30 @@ public class Scrabble extends Application {
 
 
 
+    }
+
+    private void tokenLoader(){
+
+        ImageView aLetter = loadImageView("/res/tokenImages/A.png");
+        ImageView bLetter = loadImageView("/res/tokenImages/B.png");
+        ImageView cLetter = loadImageView("/res/tokenImages/C.png");
+        ImageView dLetter = loadImageView("/res/tokenImages/D.png");
+        ImageView eLetter = loadImageView("/res/tokenImages/R.png");
+        ImageView fLetter = loadImageView("/res/tokenImages/F.png");
+        ImageView gLetter = loadImageView("/res/tokenImages/G.png");
+
+        tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
+                eLetter, fLetter, gLetter); //agregar las fichas
+
+    }
+
+    private ImageView loadImageView(String path){
+        Image tokenImage = imageLoader(cwd + path);
+        ImageView addTokenImage = new ImageView(tokenImage);
+        addTokenImage.setFitHeight(80);
+        addTokenImage.setFitWidth(80);
+
+        return addTokenImage;
     }
 
 }
