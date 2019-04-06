@@ -1,5 +1,4 @@
 package Structures;
-
 /**
  * @author HazelMartinez
  * @since 22/03/2019
@@ -11,6 +10,7 @@ package Structures;
         private T dato;
         private Nodo<T> next = null;
         private Nodo<T> previous = null;
+
 
         public Nodo<T> getPrevious() {
             return previous;
@@ -36,6 +36,14 @@ package Structures;
 
             return this.dato;
         }
-    }
+
+        public Nodo<T> getNext() {
+            return next;
+        }
+
+        public void setNext(Nodo<T> next) {
+            this.next = next;
+        }
+}
 
 

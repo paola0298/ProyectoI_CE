@@ -60,11 +60,16 @@ public class Game {
         PlayersList.insertar(player); //add player
     }
 
-    /*
-    public void DeletePlayer(Player player){
 
+    public void DeletePlayer(Player player){
+        for(int index = 0; index < PlayersList.getSize(); index++){
+            if(PlayersList.retornarValor(index).getName() == player.getName()){
+                //PlayersList.retornarValor(index).getPlayersList().insertar(player);
+                PlayersList.eliminar();
+            }
+        }
     }
-    */
+
     public boolean VerifyPlayerTurn(String userName){
         return PlayersList.retornarValor(userInTurn).getName().equals(userName);
 

@@ -5,7 +5,7 @@ package Structures;
  *
  * @author HazelMartinez
  * @version 1.0
- * @since 22/03/2019
+ * @since 22/03/02019
  * @param <T>
  */
     public class Lista<T> {
@@ -38,6 +38,21 @@ package Structures;
             temp = null;
             size--;
         }
+
+        public void deleteNode(T player){
+            Nodo<T> temp = new Nodo<T>();
+            temp = this.head;
+            Nodo<T> temp2;
+            while(temp != player){
+                if(temp.siguiente()==null){
+                    return;
+                }
+                temp = temp.siguiente();
+            }temp2 = temp.getPrevious();
+            temp2.setNext(temp2.siguiente().siguiente());
+
+        }
+
         public void print(){
             int i;
             i= 0;
