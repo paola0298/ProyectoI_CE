@@ -64,8 +64,7 @@ public class Game {
     public void DeletePlayer(Player player){
         for(int index = 0; index < PlayersList.getSize(); index++){
             if(PlayersList.retornarValor(index).getName() == player.getName()){
-                //PlayersList.retornarValor(index).getPlayersList().insertar(player);
-                PlayersList.eliminar();
+                PlayersList.deleteNode(player);
             }
         }
     }
