@@ -1,11 +1,9 @@
 package GUI;
 
-import EnumTypes.ACTIONS;
 import Logic.Controller;
 import Structures.LinkedList;
 import Structures.Node;
 import javafx.application.Application;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -40,6 +38,12 @@ public class Scrabble extends Application {
     public void start(Stage stage) {
         controller = new Controller(this);
 
+
+
+        VBox joinMatchContainer = new VBox();
+
+
+
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
         /////////////////////////////Pantalla de Inicio//////////////////////
@@ -59,16 +63,18 @@ public class Scrabble extends Application {
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
         Button Join = new Button("Unirme a una partida existente");
+        Join.setOnAction(event -> {
+            joinMatchContainer.toFront();
+        });
         Button New_Game = new Button("Crear una nueva partida");
         Join.setTranslateY(30);
         New_Game.setTranslateY(50);
 
-
         initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
 
 
-        //Pantalla de unión a partida existente.
-        VBox joinMatchContainer = new VBox();
+        ///////////////////Pantalla de unión a partida existente//////////////////////
+        joinMatchContainer.setStyle("-fx-background-color: white");
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
@@ -85,7 +91,6 @@ public class Scrabble extends Application {
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
 
         /////////////////////////////Pantalla de Juego//////////////////////
-
 
         BorderPane gameScreenContainer = new BorderPane();
 
@@ -202,7 +207,7 @@ public class Scrabble extends Application {
         stage.setMinHeight(480);
         stage.setScene(scene);
         stage.setTitle("Scrabble TEC");
-        root.toFront();
+        initialWindow.toFront();
         stage.show();
     }
 
