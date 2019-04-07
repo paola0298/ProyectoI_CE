@@ -12,7 +12,12 @@ package Structures;
         private int size;
         private Nodo<T> head;
 
-        public void insertar(T valor){
+    /**
+     *
+     * @param valor
+     */
+    public void insertar(T valor){
+        //This method adds a object in the list
             Nodo<T> nuevoNodo = new Nodo<T>();
             nuevoNodo.guardarDato(valor);
             if(this.head == null){
@@ -39,7 +44,12 @@ package Structures;
             size--;
         }
 
-        public void deleteNode(T player){
+    /**
+     *
+     * @param player
+     */
+    public void deleteNode(T player){
+        //This method deletes a player in the playersList
             Nodo<T> temp = new Nodo<T>();
             temp = this.head;
             Nodo<T> temp2;
