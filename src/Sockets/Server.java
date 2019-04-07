@@ -8,9 +8,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.*;
+import Structures.LinkedList;
+import Structures.Lista;
+import org.json.JSONObject;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.lang.reflect.GenericArrayType;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.Random; //This Library is for choose and player for start the game
 
 /**
  * @author Paola
@@ -24,11 +32,13 @@ public class Server {
     private LinkedList<Game> gamesList = new LinkedList<>();
     private LinkedList<Token> TokenList = new LinkedList<>();
 
+
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
-    public Server(int port){
-        fillTokenList();
+
+    public Server(int port) {
+
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -39,7 +49,7 @@ public class Server {
     /**
      * @return La conexion con el cliente
      */
-    public Socket clientConnection(){
+    public Socket clientConnection() {
         Socket con = null;
         try {
             con = serverSocket.accept();
@@ -52,7 +62,7 @@ public class Server {
     /**
      * @return El mensaje recibido del cliente
      */
-    public String receiveDataFromClient(Socket con){
+    public String receiveDataFromClient(Socket con) {
         String actualMessage = "";
         try {
             DataInputStream inputStream = new DataInputStream(con.getInputStream());
@@ -67,9 +77,9 @@ public class Server {
 
     /**
      * @param response Respuesta para el cliente
-     * @param con Conexion con el cliente
+     * @param con      Conexion con el cliente
      */
-    public void sendResponse(String response, Socket con){
+    public void sendResponse(String response, Socket con) {
         try {
             DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
             outputStream.writeUTF(response);
@@ -82,7 +92,7 @@ public class Server {
     /**
      * Escucha las conexiones del cliente
      */
-    public void connectionListener(){
+    public void connectionListener() {
         //Posible thread
 //        Runnable task = () -> {
 //            //codigo a ejecutar
@@ -99,7 +109,7 @@ public class Server {
 //        thread.start();
 //
 
-        while (this.isRunning){
+        while (this.isRunning) {
 
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
@@ -136,12 +146,6 @@ public class Server {
 //                    response.put("YOUR_TURN", "NO");
 //                    sendResponse(response.toString(), con);
                     break;
-                case "GET_GAME":
-                    // send the actual game
-                    String match = msg.getString("match_id");
-                    response = getActualGame(match);
-                    sendResponse(response.toString(), con);
-                    break;
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
@@ -156,53 +160,21 @@ public class Server {
 
     }
 
-    private JSONObject getActualGame(String matchID){
-        JSONObject jsonObject = new JSONObject();
-        Game actualGame = null;
-        String result = "";
-        for (int i=0; i<gamesList.getSize(); i++) {
-            if (gamesList.get(i).getGameID().equals(matchID)) {
-                actualGame = gamesList.get(i);
-            }
-        }
-
-        ObjectMapper objectMapper =  new ObjectMapper();
-        try {
-
-            result = objectMapper.writeValueAsString(actualGame);
-            jsonObject.put("status", "SUCCESS");
-            jsonObject.put("object_game", result);
-            return jsonObject;
-
-        } catch (IOException e) {
-            e.getMessage();
-        }
-        return jsonObject;
-    }
 
     private JSONObject joinMatch(String id, String name) {
         JSONObject obj = new JSONObject();
         Game game;
-        for (int i=0; i<gamesList.getSize(); i++) {
-            if (gamesList.get(i).getGameID().equals(id)) {
-                game = gamesList.get(i);
-                Player player = new Player(name);
-                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
-                obj.put("player_id", player.getPlayer_ID());
+        for (int i = 0; i < gamesList.getSize(); i++) {
+//            if (gamesList.get(i).getGameID().equals(id)) {
+            game = gamesList.get(i);
+            Player player = new Player(name);
+//                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
+            obj.put("player_id", player.getPlayer_ID());
 
-            }
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-
-
         return obj;
     }
 
-
-    public LinkedList<Token> getTokenList() {
-        return TokenList;
-    }
     /**
     *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
      * @author Brayan
@@ -296,18 +268,33 @@ public class Server {
 
     }
 
-    public static void main(String[] args) {
+
+    public String choosePlayerStart(int gameNumber){
+
+        Random rand = new Random();
+//        int sizelist = gamesList.returnValue(gameNumber).getPlayersList().getSize();
+//        int randomInt = rand.nextInt((sizelist));
+//
+//        return gamesList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
+        return "";
+    }
 
 
 
+
+
+    public static void main(String[] args){
 
         Server server = new Server(6307);
         Player p = new Player("Brayan");
-        System.out.println(server.getTokenList());
+//        System.out.println(server.getTokenList());
 //        p.create_ID();
-        p.assign_tokens(server.getTokenList());
+//        p.assign_tokens(server.getTokenList());
         System.out.println("Servidor iniciado...");
         server.connectionListener();
 
     }
+
+
+
 }
