@@ -37,13 +37,13 @@ public class Scrabble extends Application {
     private VBox joinMatchContainer; //Ventana de unión a partida existente.
     private BorderPane gameScreenContainer; //Ventana del juego.
 
-
     @Override
     public void start(Stage stage) {
         controller = new Controller(this);
 
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
+
 
 
         /////////////////////////////Pantalla de Inicio//////////////////////
@@ -103,11 +103,12 @@ public class Scrabble extends Application {
             String match_id = joinTextField.getText();
             controller.join_match(match_id);
             gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
+
         });
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
 
         /////////////////////////////Pantalla de Juego//////////////////////
-        BorderPane gameScreenContainer = new BorderPane();
+        gameScreenContainer = new BorderPane();
 
         //Imagen del usuario
         Image userImage = imageLoader(cwd + "/res/userIcon.png");
@@ -492,6 +493,8 @@ public class Scrabble extends Application {
         tokenBox.getChildren().remove(letterSelected);
         letterSelected = null;
     }
+
+    //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
 
     //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
 
