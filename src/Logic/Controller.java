@@ -46,9 +46,10 @@ public class Controller {
     /**
      * Este método le pide al servidor unir al jugador a una partida existente.
      */
-    public void join_match(String match_id) {
+    public boolean join_match(String match_id) {
         message = prepare();
         message.put("action", "JOIN_MATCH");
+        message.put("player_name", this.playerName);
         message.put("match_id", match_id);
 
         response = client.connect(message);
@@ -57,8 +58,10 @@ public class Controller {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
             this.current_match_id = match_id;
+            return true;
         } else {
             System.out.println("Could not join match");
+            return false;
         }
     }
 
@@ -118,7 +121,7 @@ public class Controller {
      */
     private JSONObject prepare() {
         JSONObject object = new JSONObject();
-        object.put("player_id", player_id);
+        object.put("player_id", this.player_id);
         return object;
     }
 

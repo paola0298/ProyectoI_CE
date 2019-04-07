@@ -89,12 +89,12 @@ public class  LinkedList<T> {
         }
     }
 
-    public Node<T> get(int index){
+    public T get(int index){
         Node<T> tmp = this.head;
-        for(int i = 0;i < index  && tmp.getNext()!= null; i++){
+        for(int i=0; i<index  && tmp.getNext()!= null; i++){
             tmp = tmp.getNext();
         }
-        return tmp;
+        return tmp.getValue();
     }
 
 

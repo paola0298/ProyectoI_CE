@@ -7,13 +7,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.util.Random;
 
 public class Player{
-    private String Player_ID;
+    private String playerID;
     private String name;
     private LinkedList<Token> tokenlist = new LinkedList<>();
 
 
     public Player(String name) {
-        this.Player_ID = RandomStringUtils.randomAlphanumeric(6);
+        this.playerID = RandomStringUtils.randomAlphanumeric(6);
         this.name = name;
     }
 
@@ -27,8 +27,29 @@ public class Player{
             tokenlist.addLast(random_token.getValue());
 
         }
-
-
     }
 
+    public String getPlayer_ID() {
+        return playerID;
+    }
+
+    public void setPlayer_ID(String player_ID) {
+        playerID= player_ID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LinkedList<Token> getTokenlist() {
+        return tokenlist;
+    }
+
+    public void setTokenlist(LinkedList<Token> tokenlist) {
+        this.tokenlist = tokenlist;
+    }
 }

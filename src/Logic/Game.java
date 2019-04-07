@@ -19,7 +19,12 @@ public class Game {
     }
 
     public boolean addPlayer(Player player) {
-        return true;
+        if (players.getSize() < maxPlayers) {
+            players.addLast(player);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void removePlayer() {

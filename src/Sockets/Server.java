@@ -1,9 +1,12 @@
 package Sockets;
 
+import Logic.Game;
 import Logic.Player;
 import Logic.Token;
 import Structures.LinkedList;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -19,9 +22,10 @@ import java.net.Socket;
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
  */
 public class Server {
-    public LinkedList<Token> TokenList = new LinkedList<>();
     private ServerSocket serverSocket;
     private boolean isRunning = true;
+    private LinkedList<Game> gamesList = new LinkedList<>();
+    private LinkedList<Token> TokenList = new LinkedList<>();
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
@@ -103,33 +107,37 @@ public class Server {
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
 
-            JSONObject jsonMessage = new JSONObject(receiveDataFromClient(con));
+            JSONObject msg = new JSONObject(receiveDataFromClient(con));
 
-            System.out.println("JSON received: " + jsonMessage.toString());
+            System.out.println("JSON received: " + msg.toString());
 
-            JSONObject response = new JSONObject();
+            JSONObject response;
 
-            switch (jsonMessage.get("action").toString()) {
+            switch (msg.get("action").toString()) {
                 case "CREATE_MATCH":
-                    response.put("CODE", "123456");
-                    sendResponse(response.toString(), con);
+//                    response.put("CODE", "123456");
+//                    sendResponse(response.toString(), con);
+
                     break;
                 case "JOIN_MATCH":
-                    response.put("ID_PARTIDA", "1");
-                    response.put("MATRIZ", "matriz");
-                    sendResponse(response.toString(), con);
+//                    response.put("ID_PARTIDA", "1");
+//                    response.put("MATRIZ", "matriz");
+//                    sendResponse(response.toString(), con);
+                    String matchID = msg.getString("match_id");
+                    String playerName = msg.getString("player_name");
+                    response = joinMatch(matchID, playerName);
                     break;
                 case "CHECK_WORD":
-                    response.put("WORD_STATUS", "VALID");
-                    sendResponse(response.toString(), con);
+//                    response.put("WORD_STATUS", "VALID");
+//                    sendResponse(response.toString(), con);
                     break;
                 case "CALL_EXPERT":
-                    response.put("WORD_STATUS", "INVALID");
-                    sendResponse(response.toString(), con);
+//                    response.put("WORD_STATUS", "INVALID");
+//                    sendResponse(response.toString(), con);
                     break;
                 case "CHECK_TURN":
-                    response.put("YOUR_TURN", "NO");
-                    sendResponse(response.toString(), con);
+//                    response.put("YOUR_TURN", "NO");
+//                    sendResponse(response.toString(), con);
                     break;
                 default:
                     sendResponse("Palabra clave no encontrada", con);
@@ -145,13 +153,31 @@ public class Server {
 
     }
 
+    private JSONObject joinMatch(String id, String name) {
+        JSONObject obj = new JSONObject();
+        Game game;
+        for (int i=0; i<gamesList.getSize(); i++) {
+            if (gamesList.get(i).getGameID().equals(id)) {
+                game = gamesList.get(i);
+                Player player = new Player(name);
+                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
+                obj.put("player_id", player.getPlayer_ID());
+
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+
+        return obj;
+    }
+
     public LinkedList<Token> getTokenList() {
         //TokenList.printList();
         return TokenList;
     }
 
     public void fillTokenList(){
-
         Token A = new Token("*****", 1, "A");
         Token E = new Token("*****", 1, "E");
         Token O = new Token("*****", 1, "O");
@@ -229,11 +255,7 @@ public class Server {
         for (int bonus = 1;bonus <= 2;bonus++){
             this.TokenList.addFirst(Bonus);
         }
-
         //TokenList.printList();
-
-
-
     }
 
     public static void main(String[] args) {
