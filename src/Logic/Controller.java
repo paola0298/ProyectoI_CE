@@ -46,7 +46,7 @@ public class Controller {
     /**
      * Este método le pide al servidor unir al jugador a una partida existente.
      */
-    public void join_match() {
+    public void join_match(String match_id) {
         message = prepare();
         message.put("action", "JOIN_MATCH");
         message.put("match_id", match_id);
@@ -56,6 +56,7 @@ public class Controller {
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
+            this.match_id = match_id;
         } else {
             System.out.println("Could not join match");
         }
@@ -73,6 +74,7 @@ public class Controller {
 
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Disconnected successfully");
+            this.match_id = "-";
         } else {
             System.out.println("An error ocurred");
         }

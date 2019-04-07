@@ -87,6 +87,8 @@ public class Scrabble extends Application {
         joinResponse.setId("join_message");
         joinButton.setOnAction(event -> {
             //Decirle a controller que envie un request al servidor.
+            String match_id = joinTextField.getText();
+            controller.join_match(match_id);
         });
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
 
