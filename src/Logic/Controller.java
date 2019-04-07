@@ -1,6 +1,5 @@
 package Logic;
 
-import EnumTypes.ACTIONS;
 import GUI.Scrabble;
 import Sockets.Client;
 import org.json.JSONObject;
@@ -10,46 +9,126 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Controller {
-    private String player_id = "-";
     private JSONObject message;
     private JSONObject response;
     private String cwd = System.getProperty("user.dir");
     private Client client;
     private Scrabble gui;
 
+    private String playerName = "-";
+    private String player_id = "-";
+    private String current_match_id = "-";
+
     public Controller(Scrabble gui) {
         this.gui = gui;
         initialize();
     }
 
-    public void doAction(ACTIONS action) {
-        message = new JSONObject();
-        message.put("player_id", player_id);
+    /**
+     * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
+     * @param max_players Cantidad máxima de jugadores en la partida.
+     */
+    public void create_match(int max_players) {
+        message = prepare();
+        message.put("action", "CREATE_MATCH");
+        message.put("max_players", max_players);
 
-        switch (action) {
-            case CREATE_MATCH:
-                System.out.println("Creating match");
-                message.put("action", "CREATE_MATCH");
-                message.put("max_players", "4");
-                handleResponse(client.connect(message.toString()));
-                break;
-            case JOIN_MATCH:
-                System.out.println("Joining match");
-                break;
-        }
-    }
+        response = client.connect(message);
 
-    private void handleResponse(String res) {
-        response = new JSONObject(res);
-        switch (response.get("CODE").toString()) {
-            case "123456":
+        if (response.get("status").equals("SUCCESS")) {
+            System.out.println("Match created successfully");
+            player_id = response.getString("player_id");
+        } else {
+            System.out.println("Could not create match");
         }
     }
 
     /**
-     * Carga las configuraciones del archivo de configuración, e instancia la clase Client.
+     * Este método le pide al servidor unir al jugador a una partida existente.
      */
-    public void initialize() {
+    public boolean join_match(String match_id) {
+        message = prepare();
+        message.put("action", "JOIN_MATCH");
+        message.put("player_name", this.playerName);
+        message.put("match_id", match_id);
+
+        response = client.connect(message);
+
+        if (response.get("status").equals("SUCCESS")) {
+            System.out.println("Joined match succesfully");
+            player_id = response.getString("player_id");
+            this.current_match_id = match_id;
+            return true;
+        } else {
+            System.out.println("Could not join match");
+            return false;
+        }
+    }
+
+    /**
+     * Este método le pide al servidor que desconecte al servidor de la partida actual.
+     */
+    public void leave_match() {
+        message = prepare();
+        message.put("action", "DISCONNECT");
+        message.put("match_id", current_match_id);
+
+        response = client.connect(message);
+
+        if (response.get("status").equals("SUCCESS")) {
+            System.out.println("Disconnected successfully");
+            this.current_match_id = "-";
+        } else {
+            System.out.println("An error ocurred");
+        }
+    }
+
+    /**
+     * Este método le pide al servidor verificar si la palabra es válida.
+     * @param word Palabra a verificar en el servidor.
+     */
+    public void check_word(String word) {
+        message = prepare();
+        message.put("match_id", current_match_id);
+        message.put("word", word);
+
+        response = client.connect(message);
+
+        if (response.get("response").equals("VALID")) {
+            System.out.println("The word is valid");
+        } else {
+            System.out.println("Try again");
+        }
+    }
+
+    /**
+     * Este método verifica si ya es el turno del jugador.
+     */
+    public void check_turn() {
+        message = prepare();
+        message.put("match_id", current_match_id);
+        response = client.connect(message);
+
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    /**
+     * Este método prepara un nuevo objeto JSON para usar en los pedidos al servidor.
+     * @return Objeto JSON base para generar cada pedido al servidor.
+     */
+    private JSONObject prepare() {
+        JSONObject object = new JSONObject();
+        object.put("player_id", this.player_id);
+        return object;
+    }
+
+    /**
+     * Este método carga las configuraciones del archivo de configuración, e instancia la clase Client.
+     */
+    private void initialize() {
         Properties props = new Properties();
         try {
             FileInputStream stream = new FileInputStream(cwd + "/res/settings.properties");

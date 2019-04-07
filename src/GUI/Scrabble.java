@@ -1,11 +1,9 @@
 package GUI;
 
-import EnumTypes.ACTIONS;
 import Logic.Controller;
 import Structures.LinkedList;
 import Structures.Node;
 import javafx.application.Application;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,7 +22,6 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
     private Controller controller;
@@ -34,8 +31,12 @@ public class Scrabble extends Application {
     private HBox actualPlayerInfoContainer;
     private HBox tokenBox;
     private ImageView letterSelected = null;
-    private GridPane matrixContainer;
 
+    private BorderPane gameScreenContainer; //Ventana del juego.
+    private GridPane matrixContainer; // Matríz del juego
+    private VBox joinMatchContainer; //Ventana de unión a partida existente.
+    private VBox initialWindow; // Ventana inicial
+    private BorderPane root; //Ventana de partida nueva
 
     @Override
     public void start(Stage stage) {
@@ -43,14 +44,38 @@ public class Scrabble extends Application {
 
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
+
+        init_initialWindow();
+        init_newMatchWindow();
+        init_joinWindow();
+        init_gameWindow();
+
+        //Aquí añaden su panel al contenedor principal.
+        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
+        Scene scene = new Scene(mainLayout, 1280, 720);
+        scene.getStylesheets().add(("file:///" + cwd + "/res/styles.css").replace(" ", "%20"));
+        stage.setMinWidth(640);
+        stage.setMinHeight(480);
+        stage.setScene(scene);
+        stage.setTitle("Scrabble TEC");
+//        initialWindow.toFront();
+        gameScreenContainer.toFront();
+        stage.show();
+    }
+
+    public void show() {
+        launch(Scrabble.class);
+    }
+
+    private void init_initialWindow() {
         /////////////////////////////Pantalla de Inicio//////////////////////
         /* Pantalla inicial donde el jugador puede elegir entre ingresar a un partida, o crear una propia
         Cuando se crea una partida nueva se genera un código con el que se puede invitar a otros jugadores
         En esta ventana se especifíca cuantos jugadores tendrá la partida
          */
-        VBox initialWindow = new VBox();
+        initialWindow = new VBox();
         initialWindow.setStyle("-fx-background-color: #1a8c24;");
-        initialWindow.setAlignment(Pos.TOP_LEFT);
+        initialWindow.setAlignment(Pos.CENTER);
         initialWindow.setSpacing(15);
         initialWindow.setPadding(new Insets(15));
         // El usuario ingresa su nombre
@@ -60,40 +85,130 @@ public class Scrabble extends Application {
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
         Button Join = new Button("Unirme a una partida existente");
+        Join.setOnAction(event -> {
+            String name = Players_Name_Input.getText();
+            if (!name.equals("")) {
+                controller.setPlayerName(Players_Name_Input.getText());
+                joinMatchContainer.toFront();
+            }
+        });
+
         Button New_Game = new Button("Crear una nueva partida");
-        Join.setTranslateY(30);
-        New_Game.setTranslateY(50);
+
+        New_Game.setOnAction(actionEvent -> {
+            String name = Players_Name_Input.getText();
+            if (!name.equals("")) {
+                controller.setPlayerName(Players_Name_Input.getText());
+                joinMatchContainer.toFront();
+                //Todo mostrar el panel de Hazel
+            }
+        });
 
 
         initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
+    }
 
-
-        //Pantalla de unión a partida existente.
-        VBox joinMatchContainer = new VBox();
-        joinMatchContainer.setStyle("-fx-background-color: gray;");
+    private void init_joinWindow() {
+        ///////////////////Pantalla de unión a partida existente//////////////////////
+        joinMatchContainer = new VBox();
+        joinMatchContainer.setStyle("-fx-background-color: white");
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
         Label joinTitle = new Label("Ingresa el código de la partida");
-        joinTitle.setId("");
         TextField joinTextField = new TextField(); //Brayan: Agregué una d al final del nombre de la variable, en la siguiente línea también
         joinTextField.setMaxWidth(200);
         Button joinButton = new Button("Unirse");
         Label joinResponse = new Label("");
         joinResponse.setId("join_message");
         joinButton.setOnAction(event -> {
-            //Decirle a controller que envie un request al servidor.
-            controller.doAction(ACTIONS.CREATE_MATCH);
+            String match_id = joinTextField.getText();
+            if (!match_id.equals("")) {
+                boolean success = controller.join_match(match_id);
+                if (success) {
+                    gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
+                } else {
+
+                }
+            }
         });
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
+    }
 
+    private void init_newMatchWindow() {
+        /* Window for create a new game displays an comboBox for choose the number of players in the game */
+        root = new BorderPane();
+
+        root.setPadding(new Insets(15, 20, 10, 10));
+        root.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
+        //espacio del border pane al boton
+
+        Label numberPlayers = new Label("Number of Players");
+        numberPlayers.setPadding(new Insets(2,2,2,2));
+        numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143,188,143), CornerRadii.EMPTY, Insets.EMPTY)));
+        numberPlayers.setTextFill(Color.rgb(34,139,34));
+        numberPlayers.setFont(new Font("Serif",30));
+        numberPlayers.setAlignment(Pos.CENTER);
+        HBox hBox = new HBox();
+        hBox.getChildren().add(numberPlayers);
+
+        //Create a ComboBox
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().add("Two Players");
+        comboBox.getItems().add("Three Players");
+        comboBox.getItems().add("Four Players");
+        comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46,139,87), CornerRadii.EMPTY,Insets.EMPTY)));
+        comboBox.setStyle("-fx-font: 30px \"Serif\";");
+        hBox.getChildren().add(comboBox);
+
+        hBox.setSpacing(20);
+        hBox.setAlignment(Pos.CENTER);
+        root.setCenter(hBox);
+        Button startButton = new Button("Start Game");
+        startButton.setPadding(new Insets(20, 10, 10, 20));
+        startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72,209,204), CornerRadii.EMPTY, Insets.EMPTY)));
+        startButton.setTextFill(Color.rgb(0,100,0));
+        startButton.setFont(new Font("Serif", 30));
+        startButton.setAlignment(Pos.CENTER_RIGHT);
+        root.setBottom(startButton);
+        // Alignment.
+        BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
+
+        // Set margin for bottom area.
+        BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
+    }
+
+    private void init_gameWindow() {
         /////////////////////////////Pantalla de Juego//////////////////////
+        gameScreenContainer = new BorderPane();
 
+//        //Imagen del usuario
+//        Image userImage = imageLoader(cwd + "/res/userIcon.png");
+//        ImageView addUserImage = new ImageView(userImage);
+//        addUserImage.setFitHeight(120);
+//        addUserImage.setFitWidth(120);
+//
+//        //puntuacion del usuario
+//        HBox userScoreBox = new HBox();
+//        userScoreBox.setSpacing(10);
+//        userScoreBox.setAlignment(Pos.CENTER);
+//
+//
+//        Text userScoreText = new Text("Mi puntuación es: ");
+//        Text userScore = new Text("50");
+//
+//        userScoreBox.getChildren().addAll(userScoreText, userScore);
+//
+//        //Fichas
+//
+//        Image token = imageLoader(cwd + "/res/token.png");
+//        ImageView tokenImage = new ImageView(token);
+//        tokenImage.setFitWidth(501);
+//        tokenImage.setFitHeight(82);
 
-        BorderPane gameScreenContainer = new BorderPane();
 
         //Boton para enviar la palabra
-        Image scrabbleImage = imageLoader(cwd + "/res/scrabble.jpg");
+        Image scrabbleImage = imageLoader(cwd + "/res/images/scrabble.jpg");
         ImageView scrabbleImageButton = new ImageView(scrabbleImage);
         scrabbleImageButton.setFitWidth(150);
         scrabbleImageButton.setFitHeight(150);
@@ -151,68 +266,7 @@ public class Scrabble extends Application {
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
         playerLoader();
-
-        /* Window for create a new game displays an comboBox for choose the number of players in the game */
-        BorderPane root = new BorderPane();
-
-        root.setPadding(new Insets(15, 20, 10, 10));
-        root.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
-        //espacio del border pane al boton
-
-        Label numberPlayers = new Label("Number of Players");
-        numberPlayers.setPadding(new Insets(2,2,2,2));
-        numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143,188,143), CornerRadii.EMPTY, Insets.EMPTY)));
-        numberPlayers.setTextFill(Color.rgb(34,139,34));
-        numberPlayers.setFont(new Font("Serif",30));
-        numberPlayers.setAlignment(Pos.CENTER);
-        HBox hBox = new HBox();
-        hBox.getChildren().add(numberPlayers);
-
-        //Create a ComboBox
-        ComboBox<String> comboBox = new ComboBox<>();
-        comboBox.getItems().add("Two Players");
-        comboBox.getItems().add("Three Players");
-        comboBox.getItems().add("Four Players");
-        comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46,139,87), CornerRadii.EMPTY,Insets.EMPTY)));
-        comboBox.setStyle("-fx-font: 30px \"Serif\";");
-        hBox.getChildren().add(comboBox);
-
-        hBox.setSpacing(20);
-        hBox.setAlignment(Pos.CENTER);
-        root.setCenter(hBox);
-        Button startButton = new Button("Start Game");
-        startButton.setPadding(new Insets(20, 10, 10, 20));
-        startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72,209,204), CornerRadii.EMPTY, Insets.EMPTY)));
-        startButton.setTextFill(Color.rgb(0,100,0));
-        startButton.setFont(new Font("Serif", 30));
-        startButton.setAlignment(Pos.CENTER_RIGHT);
-        root.setBottom(startButton);
-        // Alignment.
-        BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
-
-        // Set margin for bottom area.
-        BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
-
-        //Aquí añaden su panel al contenedor principal.
-        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
-        Scene scene = new Scene(mainLayout, 1280, 720);
-        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
-
-
-
-//        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
-        stage.setMinWidth(640);
-        stage.setMinHeight(480);
-        stage.setScene(scene);
-        stage.setTitle("Scrabble TEC");
-        root.toFront();
-        stage.show();
     }
-
-    public void show() {
-        launch(Scrabble.class);
-    }
-
 
     /**
      * @param path Ruta de la imagen
@@ -225,7 +279,7 @@ public class Scrabble extends Application {
         }catch (FileNotFoundException e){
             System.out.println("Couldn't load images!");
         }
-        System.out.println("Returning null");
+        System.out.println("Could not find " + path);
         return null;
     }
 
@@ -236,7 +290,6 @@ public class Scrabble extends Application {
         //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
 
         // instanciar widgets;
-        Image userImage;
         ImageView addUserImage;
 
         Text userScoreText;
@@ -244,10 +297,10 @@ public class Scrabble extends Application {
         Text userName;
 
         LinkedList<ImageView> imageForUser = new LinkedList<>();
-        imageForUser.addLast(loadImageView("/res/player_pink.png"));
-        imageForUser.addLast(loadImageView("/res/player_blue.png"));
-        imageForUser.addLast(loadImageView("/res/player_red.png"));
-        imageForUser.addLast(loadImageView("/res/player_green.png"));
+        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
+        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
+        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
+        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
 
         // playersList
         // temporal, mientras se genera la lista de jugadores
@@ -311,7 +364,7 @@ public class Scrabble extends Application {
      * Método para cargar las imágenes de las fichas del jugador
      */
     private void tokenLoader(){
-        ImageView aLetter = loadImageView("/res/tokenImages/A.png");
+        ImageView aLetter = loadImageView("/res/images/token/A.png");
         aLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==aLetter)
                 letterSelected=null;
@@ -319,42 +372,42 @@ public class Scrabble extends Application {
                 letterSelected = aLetter;
 
         });
-        ImageView bLetter = loadImageView("/res/tokenImages/B.png");
+        ImageView bLetter = loadImageView("/res/images/token/B.png");
         bLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==bLetter)
                 letterSelected=null;
             else
                 letterSelected = bLetter;
         });
-        ImageView cLetter = loadImageView("/res/tokenImages/C.png");
+        ImageView cLetter = loadImageView("/res/images/token/C.png");
         cLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==cLetter)
                 letterSelected=null;
             else
                 letterSelected = cLetter;
         });
-        ImageView dLetter = loadImageView("/res/tokenImages/D.png");
+        ImageView dLetter = loadImageView("/res/images/token/D.png");
         dLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==dLetter)
                 letterSelected=null;
             else
                 letterSelected = dLetter;
         });
-        ImageView eLetter = loadImageView("/res/tokenImages/R.png");
+        ImageView eLetter = loadImageView("/res/images/token/R.png");
         eLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==eLetter)
                 letterSelected=null;
             else
                 letterSelected = eLetter;
         });
-        ImageView fLetter = loadImageView("/res/tokenImages/F.png");
+        ImageView fLetter = loadImageView("/res/images/token/F.png");
         fLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==fLetter)
                 letterSelected=null;
             else
                 letterSelected = fLetter;
         });
-        ImageView gLetter = loadImageView("/res/tokenImages/G.png");
+        ImageView gLetter = loadImageView("/res/images/token/G.png");
         gLetter.setOnMouseClicked(mouseEvent -> {
             if (letterSelected==gLetter)
                 letterSelected=null;
@@ -449,6 +502,15 @@ public class Scrabble extends Application {
         imagecontainer.getChildren().add(image);
         tokenBox.getChildren().remove(letterSelected);
         letterSelected = null;
+    }
+
+    //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
+
+    /**
+     * Este método se encarga de cargar el estado actual del juego
+     */
+    public void loadMatch() {
+
     }
 
 }

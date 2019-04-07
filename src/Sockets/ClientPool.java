@@ -35,7 +35,7 @@ public class ClientPool {
             JSONObject obj = new JSONObject();
             obj.put("action", actions[random.nextInt(5)]);
             obj.put("player_id", "client_" + i);
-            JSONObject response = new JSONObject(list.get(i).connect(obj.toString()));
+            JSONObject response = new JSONObject(list.get(i).connect(obj));
             System.out.println(response.toString(2));
         }
 

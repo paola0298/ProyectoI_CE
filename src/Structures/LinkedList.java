@@ -1,6 +1,6 @@
 package Structures;
 
-public class LinkedList<T> {
+public class  LinkedList<T> {
 
     private int size;
     private Node<T> head;
@@ -79,18 +79,35 @@ public class LinkedList<T> {
 
     public void printList(){
         Node<T> temp = this.head;
-        while (temp!=null){
-            System.out.println(temp.getValue());
-            temp = temp.getNext();
+        if (temp == null){
+            System.out.println("Error, lista nula");//Brayan: Se añade para determinar si la lista está vacía
+        }else {
+            while (temp != null) {
+                System.out.println(temp.getValue());
+                temp = temp.getNext();
+            }
         }
     }
 
-    public Node<T> acces_index(int index){
+    public T get(int index){
         Node<T> tmp = this.head;
-        for(int i = 0;i < index  && tmp.getNext()!= null; i++){
+        for(int i=0; i<index  && tmp.getNext()!= null; i++){
+            tmp = tmp.getNext();
+        }
+        return tmp.getValue();
+    }
+
+
+    public Node<T> acces_index(int index) {
+        Node<T> tmp = this.head;
+        for (int i = 0; i < index && tmp.getNext() != null; i++) {
             tmp = tmp.getNext();
         }
         return tmp;
+    }
+
+    public int getSize() {
+        return size;
     }
 
 
@@ -104,5 +121,8 @@ public class LinkedList<T> {
         list.addFirst(200);
         list.deleteElement(100);
         list.printList();
+        System.out.println("hola");
+        list.acces_index(3);
+        System.out.println("hola");
     }
 }
