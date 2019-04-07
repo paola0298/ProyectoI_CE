@@ -85,6 +85,15 @@ public class LinkedList<T> {
         }
     }
 
+    public Node<T> acces_index(int index){
+        Node<T> tmp = this.head;
+        for(int i = 0;i < index  && tmp.getNext()!= null; i++){
+            tmp = tmp.getNext();
+        }
+        return tmp;
+    }
+
+
     public static void main(String[] args) {
         LinkedList<Integer> list = new LinkedList<>();
         list.addLast(1);

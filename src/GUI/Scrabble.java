@@ -333,7 +333,6 @@ public class Scrabble extends Application {
         return addTokenImage;
     }
 
-
     /**
      * Método para agregar filas y columnas a la cuadrícula (matrixContainer)
      */
@@ -347,8 +346,6 @@ public class Scrabble extends Application {
             rowConst.setPercentHeight(100.0 / 15);
             matrixContainer.getRowConstraints().add(rowConst);
         }
-
-
     }
 
     /**
