@@ -75,6 +75,9 @@ public class Scrabble extends Application {
         ///////////////////Pantalla de unión a partida existente//////////////////////
         joinMatchContainer = new VBox();
         joinMatchContainer.setStyle("-fx-background-color: white");
+
+        //Pantalla de unión a partida existente.
+        VBox joinMatchContainer = new VBox();
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
