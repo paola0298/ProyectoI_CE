@@ -89,6 +89,7 @@ public class  LinkedList<T> {
         }
     }
 
+
     public T get(int index){
         Node<T> tmp = this.head;
         for(int i=0; i<index  && tmp.getNext()!= null; i++){
@@ -110,19 +111,4 @@ public class  LinkedList<T> {
         return size;
     }
 
-
-    public static void main(String[] args) {
-        LinkedList<Integer> list = new LinkedList<>();
-        list.addLast(1);
-        list.addLast(2);
-        list.addLast(3);
-        list.addLast(4);
-        list.addFirst(100);
-        list.addFirst(200);
-        list.deleteElement(100);
-        list.printList();
-        System.out.println("hola");
-        list.acces_index(3);
-        System.out.println("hola");
-    }
 }
