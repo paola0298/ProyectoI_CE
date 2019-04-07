@@ -195,7 +195,7 @@ public class Scrabble extends Application {
 
         //Aquí añaden su panel al contenedor principal.
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
-        Scene scene = new Scene(mainLayout, 1280, 720);
+        Scene scene = new Scene(mainLayout, 1280, 900);
         scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
 
 
