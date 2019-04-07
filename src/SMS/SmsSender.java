@@ -1,26 +1,47 @@
 package SMS;
 
-// Install the Java helper library from twilio.com/docs/libraries/java
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SmsSender {
-    // Find your Account Sid and Auth Token at twilio.com/console
-    public static final String ACCOUNT_SID =
-            "AC49c2f86ea29541a25bae6a8d02128982";
-    public static final String AUTH_TOKEN =
-            "fc3df5871ac07519f21a4391691b6f68";
+    public String sendSms(String word, String name) {
+        try {
+            // Construct data
+            String apiKey = "apikey=" + "rYtc5Ks0rAo-O4IkqDvJkOh2XGOabUCuJufHw1xJu4";
+            String message = "&message=" + "Buenas, el jugador " + name + ", desea saber si la siguiente palabra puede " +
+                    "ser añadida al diccionario de palabras. La palabra es= " + word + ".";
+            String sender = "&sender=" + "AeroTEC";
+            String numbers = "&numbers=50683216963";
+
+            // Send data
+            HttpURLConnection conn = (HttpURLConnection) new URL("https://api.txtlocal.com/send/?").openConnection();
+            String data = apiKey + numbers + message + sender;
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+            conn.getOutputStream().write(data.getBytes("UTF-8"));
+            final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            final StringBuffer stringBuffer = new StringBuffer();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            rd.close();
+
+            return stringBuffer.toString();
+        } catch (Exception e) {
+            System.out.println("Error SMS " + e);
+            return "Error " + e;
+        }
+
+    }
 
     public static void main(String[] args) {
-        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
-
-        Message message = Message
-                .creator(new PhoneNumber("+50683216963"), // to
-                        new PhoneNumber("+16503790702"), // from
-                        "Where's Wallace?")
-                .create();
-
-        System.out.println(message.getSid());
+        SmsSender smsSender = new SmsSender();
+        String returnn = smsSender.sendSms("Hola", "Paola");
+        System.out.println(returnn);
     }
+
 }
