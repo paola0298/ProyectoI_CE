@@ -24,7 +24,6 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
     private Controller controller;
