@@ -44,10 +44,9 @@ public class Scrabble extends Application {
     public void start(Stage stage) {
         controller = new Controller(this);
 
-        joinMatchContainer = new VBox();
-
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
+
 
         /////////////////////////////Pantalla de Inicio//////////////////////
         /* Pantalla inicial donde el jugador puede elegir entre ingresar a un partida, o crear una propia
@@ -67,7 +66,7 @@ public class Scrabble extends Application {
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
         Button Join = new Button("Unirme a una partida existente");
         Join.setOnAction(event -> {
-            joinMatchContainer.toFront();
+//            joinMatchContainer.toFront();
         });
 
         Button New_Game = new Button("Crear una nueva partida");
