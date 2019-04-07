@@ -244,7 +244,7 @@ public class Server {
         Server server = new Server(6307);
         Player p = new Player("Brayan");
         System.out.println(server.getTokenList());
-        p.create_ID();
+//        p.create_ID();
         p.assign_tokens(server.getTokenList());
         System.out.println("Servidor iniciado...");
         server.connectionListener();

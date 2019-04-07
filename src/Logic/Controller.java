@@ -15,6 +15,7 @@ public class Controller {
     private Client client;
     private Scrabble gui;
 
+    private String playerName = "-";
     private String player_id = "-";
     private String current_match_id = "-";
 
@@ -107,6 +108,9 @@ public class Controller {
 
     }
 
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 
     /**
      * Este método prepara un nuevo objeto JSON para usar en los pedidos al servidor.

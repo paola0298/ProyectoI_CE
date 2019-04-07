@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
 
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
@@ -52,18 +51,22 @@ public class Scrabble extends Application {
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
         Button Join = new Button("Unirme a una partida existente");
-        Join.setOnAction(event -> joinMatchContainer.toFront());
-        Button New_Game = new Button("Crear una nueva partida");
-        Join.setOnAction(actionEvent -> {
-            String Name = Players_Name_Input.getText();
-            //Es necesario esconder esta pantalla
-
-
+        Join.setOnAction(event -> {
+            String name = Players_Name_Input.getText();
+            if (!name.equals("")) {
+                controller.setPlayerName(Players_Name_Input.getText());
+                joinMatchContainer.toFront();
+            }
         });
-        New_Game.setOnAction(actionEvent -> {
-            String Name = Players_Name_Input.getText();
-            //Es necesario esconder esta pantalla
+        Button New_Game = new Button("Crear una nueva partida");
 
+        New_Game.setOnAction(actionEvent -> {
+            String name = Players_Name_Input.getText();
+            if (!name.equals("")) {
+                controller.setPlayerName(Players_Name_Input.getText());
+                joinMatchContainer.toFront();
+                //Todo mostrar el panel de Hazel
+            }
         });
 
 
@@ -77,7 +80,6 @@ public class Scrabble extends Application {
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
         Label joinTitle = new Label("Ingresa el código de la partida");
-        joinTitle.setId("");
         TextField joinTextField = new TextField(); //Brayan: Agregué una d al final del nombre de la variable, en la siguiente línea también
         joinTextField.setMaxWidth(200);
         Button joinButton = new Button("Unirse");
