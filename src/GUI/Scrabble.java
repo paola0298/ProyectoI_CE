@@ -94,7 +94,7 @@ public class Scrabble extends Application {
             //Decirle a controller que envie un request al servidor.
             String match_id = joinTextField.getText();
             controller.join_match(match_id);
-            gameScreenContainer.toFront();
+            gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
         });
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
 
