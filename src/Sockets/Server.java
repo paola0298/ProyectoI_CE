@@ -2,15 +2,17 @@ package Sockets;
 
 import Logic.Game;
 import Logic.Player;
+import Structures.LinkedList;
 import Structures.Lista;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.lang.reflect.GenericArrayType;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.Random; //This Library is for choose and player for start the game
 
 /**
  * @author Paola
@@ -22,13 +24,13 @@ public class Server {
 
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-    private Lista<Game> gameList = new Lista<Game>(); //Lista de partidas, Hazel
+    private LinkedList<Game> gameList = new LinkedList<Game>(); //Lista de partidas, Hazel
 
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
-    public Server(int port){
+    public Server(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -39,7 +41,7 @@ public class Server {
     /**
      * @return La conexion con el cliente
      */
-    public Socket clientConnection(){
+    public Socket clientConnection() {
         Socket con = null;
         try {
             con = serverSocket.accept();
@@ -52,7 +54,7 @@ public class Server {
     /**
      * @return El mensaje recibido del cliente
      */
-    public String receiveDataFromClient(Socket con){
+    public String receiveDataFromClient(Socket con) {
         String actualMessage = "";
         try {
             DataInputStream inputStream = new DataInputStream(con.getInputStream());
@@ -67,9 +69,9 @@ public class Server {
 
     /**
      * @param response Respuesta para el cliente
-     * @param con Conexion con el cliente
+     * @param con      Conexion con el cliente
      */
-    public void sendResponse(String response, Socket con){
+    public void sendResponse(String response, Socket con) {
         try {
             DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
             outputStream.writeUTF(response);
@@ -82,7 +84,7 @@ public class Server {
     /**
      * Escucha las conexiones del cliente
      */
-    public void connectionListener(){
+    public void connectionListener() {
         //Posible thread
 //        Runnable task = () -> {
 //            //codigo a ejecutar
@@ -99,7 +101,7 @@ public class Server {
 //        thread.start();
 //
 
-        while (this.isRunning){
+        while (this.isRunning) {
 
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
@@ -146,31 +148,42 @@ public class Server {
 
     }
 
-    public Lista<Game> getGameList() {
-        /**
-         *
-         */
+    public LinkedList<Game> getGameList() {
         return gameList;
     }
 
-    public void setGameList(Lista<Game> gameList) {
+    public void setGameList(LinkedList<Game> gameList) {
         this.gameList = gameList;
     }
 
-    public void addPlayerToExistingGame(Player player, String idGame){
-        /**
-         * Add a new player to a existing game
-         *
-         * @author HazelMartinez
-         * @version 1.0
-         * @since 2019/05/04
-         */
-        for(int index = 0; index < gameList.getSize(); index++){
-            if(gameList.retornarValor(index).getIdGame() == idGame){
-                gameList.retornarValor(index).getPlayersList().insertar(player);
+    /**
+     * @param player
+     * @param idGame
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 2019/05/04
+     */
+    public void addPlayerToExistingGame(Player player, String idGame) {
+        //Add a new player to a existing game
+        for (int index = 0; index < gameList.getSize(); index++) {
+            if (gameList.returnValue(index).getIdGame() == idGame) {
+                gameList.returnValue(index).getPlayersList().insert(player);
             }
         }
     }
+
+    public String choosePlayerStart(int gameNumber){
+
+        Random rand = new Random();
+        int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
+        int randomInt = rand.nextInt((sizelist));
+
+        return gameList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
+    }
+
+
+
+
 
     public static void main(String[] args){
 
@@ -178,4 +191,7 @@ public class Server {
         System.out.println("Servidor iniciado...");
         server.connectionListener();
     }
+
+
+
 }
