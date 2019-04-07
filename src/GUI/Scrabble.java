@@ -42,7 +42,7 @@ public class Scrabble extends Application {
          */
         initialWindow = new VBox();
         initialWindow.setStyle("-fx-background-color: #1a8c24;");
-        initialWindow.setAlignment(Pos.TOP_LEFT);
+        initialWindow.setAlignment(Pos.CENTER);
         initialWindow.setSpacing(15);
         initialWindow.setPadding(new Insets(15));
         // El usuario ingresa su nombre
@@ -54,8 +54,18 @@ public class Scrabble extends Application {
         Button Join = new Button("Unirme a una partida existente");
         Join.setOnAction(event -> joinMatchContainer.toFront());
         Button New_Game = new Button("Crear una nueva partida");
-        Join.setTranslateY(30);
-        New_Game.setTranslateY(50);
+        Join.setOnAction(actionEvent -> {
+            String Name = Players_Name_Input.getText();
+            //Es necesario esconder esta pantalla
+
+
+        });
+        New_Game.setOnAction(actionEvent -> {
+            String Name = Players_Name_Input.getText();
+            //Es necesario esconder esta pantalla
+
+        });
+
 
         initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
 
