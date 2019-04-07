@@ -19,15 +19,9 @@ import java.net.Socket;
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
  */
 public class Server {
-    public LinkedList<Token> TokenList = new LinkedList<Token>();
+    public LinkedList<Token> TokenList = new LinkedList<>();
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-
-    public LinkedList<Token> getTokenList() {
-        //TokenList.printList();
-        return TokenList;
-    }
-
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
@@ -150,6 +144,12 @@ public class Server {
         }
 
     }
+
+    public LinkedList<Token> getTokenList() {
+        //TokenList.printList();
+        return TokenList;
+    }
+
     public void fillTokenList(){
 
         Token A = new Token("*****", 1, "A");

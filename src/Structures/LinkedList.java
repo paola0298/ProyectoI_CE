@@ -97,12 +97,17 @@ public class  LinkedList<T> {
         return tmp;
     }
 
-    public Node<T> acces_index(int index){
+
+    public Node<T> acces_index(int index) {
         Node<T> tmp = this.head;
-        for(int i = 0;i < index  && tmp.getNext()!= null; i++){
+        for (int i = 0; i < index && tmp.getNext() != null; i++) {
             tmp = tmp.getNext();
         }
         return tmp;
+    }
+
+    public int getSize() {
+        return size;
     }
 
 

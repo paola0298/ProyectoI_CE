@@ -1,9 +1,9 @@
 package Logic;
 
 public class Token {
-    String imagePath;
-    int score;
-    String letter;
+    private String imagePath;
+    private int score;
+    private String letter;
 
     public Token(String imagePath, int score, String letter) {
         this.imagePath = imagePath;
