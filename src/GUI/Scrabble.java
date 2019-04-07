@@ -5,6 +5,7 @@ import Logic.Controller;
 import Structures.LinkedList;
 import Structures.Node;
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,6 +31,8 @@ public class Scrabble extends Application {
     private VBox upPlayerInfoContainer;
     private HBox actualPlayerInfoContainer;
     private HBox tokenBox;
+    private ImageView letterSelected;
+    private GridPane matrixContainer;
 
     @Override
     public void start(Stage stage) {
@@ -86,31 +89,6 @@ public class Scrabble extends Application {
 
         BorderPane gameScreenContainer = new BorderPane();
 
-//        //Imagen del usuario
-//        Image userImage = imageLoader(cwd + "/res/userIcon.png");
-//        ImageView addUserImage = new ImageView(userImage);
-//        addUserImage.setFitHeight(120);
-//        addUserImage.setFitWidth(120);
-//
-//        //puntuacion del usuario
-//        HBox userScoreBox = new HBox();
-//        userScoreBox.setSpacing(10);
-//        userScoreBox.setAlignment(Pos.CENTER);
-//
-//
-//        Text userScoreText = new Text("Mi puntuación es: ");
-//        Text userScore = new Text("50");
-//
-//        userScoreBox.getChildren().addAll(userScoreText, userScore);
-
-//        //Fichas
-//
-//        Image token = imageLoader(cwd + "/res/token.png");
-//        ImageView tokenImage = new ImageView(token);
-//        tokenImage.setFitWidth(501);
-//        tokenImage.setFitHeight(82);
-
-
         //Boton para enviar la palabra
         Image scrabbleImage = imageLoader(cwd + "/res/scrabble.jpg");
         ImageView scrabbleImageButton = new ImageView(scrabbleImage);
@@ -141,14 +119,16 @@ public class Scrabble extends Application {
         upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
-        GridPane matrixContainer = new GridPane();
+        // contenedor de la cuadricula
+        matrixContainer = new GridPane();
         matrixContainer.setStyle("-fx-background-color: white;\n" +
-                "    -fx-background-radius: 5.0;\n" +
-                "    -fx-background-insets: 5.0 5.0 5.0 5.0;\n" +
-                "    -fx-padding: 10;\n" +
-                "    -fx-hgap: 10;\n" +
-                "    -fx-vgap: 10;");
+                "    -fx-border-width: 2px; -fx-border-color: black");
+        matrixContainer.setOnMouseClicked(event->{
+            putImageOnContainer((int)event.getSceneX(), (int)event.getSceneY());
 
+        });
+        matrixContainer.setGridLinesVisible(true);
+        addColumnsAndRows();
 
         rightPlayerInfoContainer = new VBox();
         rightPlayerInfoContainer.setStyle("-fx-background-color: white");
@@ -169,7 +149,6 @@ public class Scrabble extends Application {
         playerLoader();
 
 
-
         //Aquí añaden su panel al contenedor principal.
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow);
         gameScreenContainer.toFront();
@@ -187,6 +166,10 @@ public class Scrabble extends Application {
     }
 
 
+    /**
+     * @param path Ruta de la imagen
+     * @return El objeto de la imagen creada
+     */
     private Image imageLoader(String path){
         try{
             FileInputStream i = new FileInputStream(path);
@@ -198,6 +181,9 @@ public class Scrabble extends Application {
         return null;
     }
 
+    /**
+     * Carga en la interfaz los jugadores presentes en la partida
+     */
     private void playerLoader(){
         //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
 
@@ -266,9 +252,20 @@ public class Scrabble extends Application {
 
     }
 
+    /**
+     * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
+     */
+    private void putOppositeNumberToken(){
+        //TODO colocar en imagenes la cantidad de fichas que tienen los demás jugadores
+    }
+    /**
+     * Método para cargar las imágenes de las fichas del jugador
+     */
     private void tokenLoader(){
-
         ImageView aLetter = loadImageView("/res/tokenImages/A.png");
+        aLetter.setOnMouseClicked(mouseEvent -> {
+            letterSelected = aLetter;
+        });
         ImageView bLetter = loadImageView("/res/tokenImages/B.png");
         ImageView cLetter = loadImageView("/res/tokenImages/C.png");
         ImageView dLetter = loadImageView("/res/tokenImages/D.png");
@@ -279,8 +276,13 @@ public class Scrabble extends Application {
         tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
                 eLetter, fLetter, gLetter); //agregar las fichas
 
+
     }
 
+    /**
+     * @param path Ruta del archivo
+     * @return Un objeto ImageView de la imagen agregada
+     */
     private ImageView loadImageView(String path){
         Image tokenImage = imageLoader(cwd + path);
         ImageView addTokenImage = new ImageView(tokenImage);
@@ -289,5 +291,43 @@ public class Scrabble extends Application {
 
         return addTokenImage;
     }
+
+
+    /**
+     * Método para agregar filas y columnas a la cuadrícula (matrixContainer)
+     */
+    private void addColumnsAndRows() {
+        for (int i = 0; i < 15; i++) {
+            ColumnConstraints colConst = new ColumnConstraints();
+            colConst.setPercentWidth(100.0 / 15);
+            matrixContainer.getColumnConstraints().add(colConst);
+
+            RowConstraints rowConst = new RowConstraints();
+            rowConst.setPercentHeight(100.0 / 15);
+            matrixContainer.getRowConstraints().add(rowConst);
+        }
+    }
+
+    /**
+     * @param xPos Posición X donde se presionó
+     * @param yPos Posición Y donde se presionó
+     */
+    private void putImageOnContainer(int xPos, int yPos){
+        System.out.println("PosX " + xPos);
+        System.out.println("PosY " + yPos);
+        LinkedList<Integer> rowColumnList = new LinkedList<>();
+        getRowAndColumn(rowColumnList, xPos, yPos);
+        ImageView image = new ImageView(letterSelected.getImage());
+        image.setFitHeight(30);
+        image.setFitWidth(30);
+        matrixContainer.getChildren().add(image);
+        GridPane.setHalignment(image, HPos.CENTER);
+        tokenBox.getChildren().remove(letterSelected);
+
+    }
+
+    private void getRowAndColumn(LinkedList<Integer> rowColumnList, int xPos, int yPos) {
+    }
+
 
 }
