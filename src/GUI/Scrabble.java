@@ -2,7 +2,10 @@ package GUI;
 
 import EnumTypes.ACTIONS;
 import Logic.Controller;
+import Structures.LinkedList;
+import Structures.Node;
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,11 +23,19 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
+
 
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
     private Controller controller;
+    private VBox rightPlayerInfoContainer;
+    private VBox leftPlayerInfoContainer;
+    private VBox upPlayerInfoContainer;
+    private HBox actualPlayerInfoContainer;
+    private HBox tokenBox;
+    private ImageView letterSelected = null;
+    private GridPane matrixContainer;
+
 
     @Override
     public void start(Stage stage) {
@@ -81,31 +92,6 @@ public class Scrabble extends Application {
 
         BorderPane gameScreenContainer = new BorderPane();
 
-        //Imagen del usuario
-        Image userImage = imageLoader(cwd + "/res/userIcon.png");
-        ImageView addUserImage = new ImageView(userImage);
-        addUserImage.setFitHeight(120);
-        addUserImage.setFitWidth(120);
-
-        //puntuacion del usuario
-        HBox userScoreBox = new HBox();
-        userScoreBox.setSpacing(10);
-        userScoreBox.setAlignment(Pos.CENTER);
-
-
-        Text userScoreText = new Text("Mi puntuación es: ");
-        Text userScore = new Text("50");
-
-        userScoreBox.getChildren().addAll(userScoreText, userScore);
-
-        //Fichas
-
-        Image token = imageLoader(cwd + "/res/token.png");
-        ImageView tokenImage = new ImageView(token);
-        tokenImage.setFitWidth(501);
-        tokenImage.setFitHeight(82);
-
-
         //Boton para enviar la palabra
         Image scrabbleImage = imageLoader(cwd + "/res/scrabble.jpg");
         ImageView scrabbleImageButton = new ImageView(scrabbleImage);
@@ -118,38 +104,53 @@ public class Scrabble extends Application {
 
         // contenedores
 
-        VBox scoreAndToken = new VBox();
-        scoreAndToken.setAlignment(Pos.CENTER);
-        scoreAndToken.setSpacing(10);
-        scoreAndToken.getChildren().addAll(userScoreBox, tokenImage); //agregar las fichas
+        tokenBox = new HBox();
+        tokenBox.setAlignment(Pos.CENTER);
+        tokenBox.setSpacing(5);
+        tokenLoader();
 
-        HBox actualPlayerInfoContainer = new HBox();
+
+        actualPlayerInfoContainer = new HBox();
         actualPlayerInfoContainer.setStyle("-fx-background-color: white");
         actualPlayerInfoContainer.setAlignment(Pos.CENTER);
         actualPlayerInfoContainer.setSpacing(15);
-        actualPlayerInfoContainer.setPrefHeight(210);
-        actualPlayerInfoContainer.getChildren().addAll(addUserImage, scoreAndToken, scrabbleImageButton);
+        actualPlayerInfoContainer.setPrefHeight(200);
+        actualPlayerInfoContainer.getChildren().addAll(tokenBox, scrabbleImageButton);
 
-        VBox upPlayerInfoContainer = new VBox();
-        upPlayerInfoContainer.setStyle("-fx-background-color: green");
+        upPlayerInfoContainer = new VBox();
+        upPlayerInfoContainer.setStyle("-fx-background-color: white");
+        upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
-        GridPane matrixContainer = new GridPane();
-        matrixContainer.setStyle("-fx-background-color: purple");
+        // contenedor de la cuadricula
+        matrixContainer = new GridPane();
+        matrixContainer.setStyle("-fx-background-color: white;\n" +
+                "    -fx-border-width: 2px; -fx-border-color: black");
+//        matrixContainer.setOnMouseClicked(event->{
+//            putImageOnContainer();
+//
+//        });
+        matrixContainer.setGridLinesVisible(true);
 
-        VBox rightPlayerInfoContainer = new VBox();
-        rightPlayerInfoContainer.setStyle("-fx-background-color: red");
-        rightPlayerInfoContainer.setPrefWidth(170);
+        addColumnsAndRows();
+        addBoxToGrid();
 
-        VBox leftPlayerInfoContainer = new VBox();
-        leftPlayerInfoContainer.setStyle("-fx-background-color: orange");
-        leftPlayerInfoContainer.setPrefWidth(170);
+        rightPlayerInfoContainer = new VBox();
+        rightPlayerInfoContainer.setStyle("-fx-background-color: white");
+        rightPlayerInfoContainer.setAlignment(Pos.CENTER);
+        rightPlayerInfoContainer.setPrefWidth(150);
+
+        leftPlayerInfoContainer = new VBox();
+        leftPlayerInfoContainer.setStyle("-fx-background-color: white");
+        leftPlayerInfoContainer.setAlignment(Pos.CENTER);
+        leftPlayerInfoContainer.setPrefWidth(150);
 
         gameScreenContainer.setTop(upPlayerInfoContainer);
         gameScreenContainer.setBottom(actualPlayerInfoContainer);
         gameScreenContainer.setCenter(matrixContainer);
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
+        playerLoader();
 
         /* Window for create a new game displays an comboBox for choose the number of players in the game */
         BorderPane root = new BorderPane();
@@ -196,6 +197,10 @@ public class Scrabble extends Application {
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
         Scene scene = new Scene(mainLayout, 1280, 720);
         scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
+
+
+
+//        scene.getStylesheets().add("file:///" + cwd + "/res/styles.css");
         stage.setMinWidth(640);
         stage.setMinHeight(480);
         stage.setScene(scene);
@@ -209,6 +214,10 @@ public class Scrabble extends Application {
     }
 
 
+    /**
+     * @param path Ruta de la imagen
+     * @return El objeto de la imagen creada
+     */
     private Image imageLoader(String path){
         try{
             FileInputStream i = new FileInputStream(path);
@@ -220,7 +229,10 @@ public class Scrabble extends Application {
         return null;
     }
 
-    private void playerLoader(String actualUserScore){
+    /**
+     * Carga en la interfaz los jugadores presentes en la partida
+     */
+    private void playerLoader(){
         //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
 
         // instanciar widgets;
@@ -229,27 +241,214 @@ public class Scrabble extends Application {
 
         Text userScoreText;
         Text userScore;
+        Text userName;
+
+        LinkedList<ImageView> imageForUser = new LinkedList<>();
+        imageForUser.addLast(loadImageView("/res/player_pink.png"));
+        imageForUser.addLast(loadImageView("/res/player_blue.png"));
+        imageForUser.addLast(loadImageView("/res/player_red.png"));
+        imageForUser.addLast(loadImageView("/res/player_green.png"));
+
+        // playersList
+        // temporal, mientras se genera la lista de jugadores
+        LinkedList<String> players =  new LinkedList<>();
+        players.addLast("Hazel");
+        players.addLast("Brayan");
+        players.addLast("Marlon");
+        players.addLast("Paola");
+        Node<String> temp = players.getHead();
+
+        int cont = 0;
+        int i = 0;
+
+        while(temp!=null){
+
+            addUserImage = imageForUser.acces_index(i).getValue();
+            addUserImage.setFitHeight(100);
+            addUserImage.setFitWidth(60);
 
 
-        //Right and left users
-        //imagen del usuario
-        VBox rightLeftPlayers = new VBox();
-        userImage = imageLoader(cwd + "/res/userIcon2.png");
-        addUserImage = new ImageView(userImage);
-        addUserImage.setFitHeight(120);
-        addUserImage.setFitWidth(120);
+            VBox playersBox = new VBox();
+            playersBox.setAlignment(Pos.CENTER);
+            userName = new Text(temp.getValue());
+
+            //puntuacion del usuario
+            HBox userScoreBox = new HBox();
+            userScoreBox.setAlignment(Pos.CENTER);
+            userScoreBox.setSpacing(10);
+            userScoreBox.setAlignment(Pos.CENTER);
+            userScoreText = new Text("Puntos:");
+            userScore = new Text("50");
+            userScoreBox.getChildren().addAll(userScoreText, userScore);
+            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+
+            if (cont==0){
+                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else if (cont==1){
+                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else if (cont == 2){
+                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+            } else {
+                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+            }
+
+            temp = temp.getNext();
+            cont++;
+            i++;
+        }
 
 
-        //puntuacion del usuario
-        HBox userScoreBox = new HBox();
-        userScoreBox.setSpacing(10);
-        userScoreBox.setAlignment(Pos.CENTER);
-        userScoreText = new Text("Puntos obtenidos: ");
-        userScore = new Text(actualUserScore);
-        userScoreBox.getChildren().addAll(userScoreText, userScore);
 
+    }
 
+    /**
+     * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
+     */
+    private void putOppositeNumberToken(){
+        //TODO colocar en imagenes la cantidad de fichas que tienen los demás jugadores
+    }
+    /**
+     * Método para cargar las imágenes de las fichas del jugador
+     */
+    private void tokenLoader(){
+        ImageView aLetter = loadImageView("/res/tokenImages/A.png");
+        aLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==aLetter)
+                letterSelected=null;
+            else
+                letterSelected = aLetter;
 
+        });
+        ImageView bLetter = loadImageView("/res/tokenImages/B.png");
+        bLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==bLetter)
+                letterSelected=null;
+            else
+                letterSelected = bLetter;
+        });
+        ImageView cLetter = loadImageView("/res/tokenImages/C.png");
+        cLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==cLetter)
+                letterSelected=null;
+            else
+                letterSelected = cLetter;
+        });
+        ImageView dLetter = loadImageView("/res/tokenImages/D.png");
+        dLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==dLetter)
+                letterSelected=null;
+            else
+                letterSelected = dLetter;
+        });
+        ImageView eLetter = loadImageView("/res/tokenImages/R.png");
+        eLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==eLetter)
+                letterSelected=null;
+            else
+                letterSelected = eLetter;
+        });
+        ImageView fLetter = loadImageView("/res/tokenImages/F.png");
+        fLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==fLetter)
+                letterSelected=null;
+            else
+                letterSelected = fLetter;
+        });
+        ImageView gLetter = loadImageView("/res/tokenImages/G.png");
+        gLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==gLetter)
+                letterSelected=null;
+            else
+                letterSelected = gLetter;
+        });
+
+        tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
+                eLetter, fLetter, gLetter); //agregar las fichas
+    }
+
+    /**
+     * @param path Ruta del archivo
+     * @return Un objeto ImageView de la imagen agregada
+     */
+    private ImageView loadImageView(String path){
+        Image tokenImage = imageLoader(cwd + path);
+        ImageView addTokenImage = new ImageView(tokenImage);
+        addTokenImage.setFitHeight(80);
+        addTokenImage.setFitWidth(80);
+
+        return addTokenImage;
+    }
+
+    /**
+     * Método para agregar filas y columnas a la cuadrícula (matrixContainer)
+     */
+    private void addColumnsAndRows() {
+        for (int i = 0; i < 15; i++) {
+            ColumnConstraints colConst = new ColumnConstraints();
+            colConst.setPercentWidth(100.0 / 15);
+            matrixContainer.getColumnConstraints().add(colConst);
+
+            RowConstraints rowConst = new RowConstraints();
+            rowConst.setPercentHeight(100.0 / 15);
+            matrixContainer.getRowConstraints().add(rowConst);
+        }
+    }
+
+    /**
+     * Método para agregar Boxes a cada cuadro de la cuadricula
+     */
+    private void addBoxToGrid(){
+        for(int i=0; i<15; i++){
+            for (int j=0; j<15; j++){
+                HBox box =  new HBox();
+                box.setAlignment(Pos.CENTER);
+                box.setOnMouseClicked(mouseEvent -> {
+                    if (box.getChildren().size()==0) {
+                        if (letterSelected != null) {
+                            putImageOnContainer(box);
+                        }
+                    }
+                    else {
+                        ImageView child = (ImageView) box.getChildren().get(0);
+                        child.setFitHeight(80);
+                        child.setFitWidth(80);
+
+                        box.getChildren().remove(0);
+                        tokenBox.getChildren().add(child);
+                        addGestureToNewToken();
+
+                        if (letterSelected != null) {
+                            putImageOnContainer(box);
+                        }
+                    }
+                });
+                matrixContainer.add(box, i, j);
+            }
+        }
+    }
+
+    private void addGestureToNewToken() {
+        int size = tokenBox.getChildren().size();
+        ImageView newToken = (ImageView) tokenBox.getChildren().get(size-1);
+        newToken.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==newToken)
+                letterSelected=null;
+            else
+                letterSelected = newToken;
+        });
+
+    }
+
+    /**
+     * Coloca la letra de la ficha en la casilla correspondiente
+     */
+    private void putImageOnContainer(HBox imagecontainer){
+        ImageView image = new ImageView(letterSelected.getImage());
+        image.setFitHeight(30);
+        image.setFitWidth(30);
+        imagecontainer.getChildren().add(image);
+        tokenBox.getChildren().remove(letterSelected);
+        letterSelected = null;
     }
 
 }
