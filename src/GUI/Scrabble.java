@@ -20,7 +20,6 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.logging.Handler;
 
 
 public class Scrabble extends Application {
@@ -31,8 +30,9 @@ public class Scrabble extends Application {
     private VBox upPlayerInfoContainer;
     private HBox actualPlayerInfoContainer;
     private HBox tokenBox;
-    private ImageView letterSelected;
+    private ImageView letterSelected = null;
     private GridPane matrixContainer;
+
 
     @Override
     public void start(Stage stage) {
@@ -123,12 +123,14 @@ public class Scrabble extends Application {
         matrixContainer = new GridPane();
         matrixContainer.setStyle("-fx-background-color: white;\n" +
                 "    -fx-border-width: 2px; -fx-border-color: black");
-        matrixContainer.setOnMouseClicked(event->{
-            putImageOnContainer((int)event.getSceneX(), (int)event.getSceneY());
-
-        });
+//        matrixContainer.setOnMouseClicked(event->{
+//            putImageOnContainer();
+//
+//        });
         matrixContainer.setGridLinesVisible(true);
+
         addColumnsAndRows();
+        addBoxToGrid();
 
         rightPlayerInfoContainer = new VBox();
         rightPlayerInfoContainer.setStyle("-fx-background-color: white");
@@ -195,6 +197,12 @@ public class Scrabble extends Application {
         Text userScore;
         Text userName;
 
+        LinkedList<ImageView> imageForUser = new LinkedList<>();
+        imageForUser.addLast(loadImageView("/res/player_pink.png"));
+        imageForUser.addLast(loadImageView("/res/player_blue.png"));
+        imageForUser.addLast(loadImageView("/res/player_red.png"));
+        imageForUser.addLast(loadImageView("/res/player_green.png"));
+
         // playersList
         // temporal, mientras se genera la lista de jugadores
         LinkedList<String> players =  new LinkedList<>();
@@ -205,20 +213,14 @@ public class Scrabble extends Application {
         Node<String> temp = players.getHead();
 
         int cont = 0;
+        int i = 0;
 
         while(temp!=null){
 
-            if (cont==0){
-                userImage = imageLoader(cwd + "/res/userIcon.png");
-                addUserImage = new ImageView(userImage);
-                addUserImage.setFitHeight(120);
-                addUserImage.setFitWidth(120);
-            } else {
-                userImage = imageLoader(cwd + "/res/userIcon2.png");
-                addUserImage = new ImageView(userImage);
-                addUserImage.setFitHeight(100);
-                addUserImage.setFitWidth(100);
-            }
+            addUserImage = imageForUser.acces_index(i).getValue();
+            addUserImage.setFitHeight(100);
+            addUserImage.setFitWidth(60);
+
 
             VBox playersBox = new VBox();
             playersBox.setAlignment(Pos.CENTER);
@@ -246,6 +248,7 @@ public class Scrabble extends Application {
 
             temp = temp.getNext();
             cont++;
+            i++;
         }
 
 
@@ -264,19 +267,57 @@ public class Scrabble extends Application {
     private void tokenLoader(){
         ImageView aLetter = loadImageView("/res/tokenImages/A.png");
         aLetter.setOnMouseClicked(mouseEvent -> {
-            letterSelected = aLetter;
+            if (letterSelected==aLetter)
+                letterSelected=null;
+            else
+                letterSelected = aLetter;
+
         });
         ImageView bLetter = loadImageView("/res/tokenImages/B.png");
+        bLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==bLetter)
+                letterSelected=null;
+            else
+                letterSelected = bLetter;
+        });
         ImageView cLetter = loadImageView("/res/tokenImages/C.png");
+        cLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==cLetter)
+                letterSelected=null;
+            else
+                letterSelected = cLetter;
+        });
         ImageView dLetter = loadImageView("/res/tokenImages/D.png");
+        dLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==dLetter)
+                letterSelected=null;
+            else
+                letterSelected = dLetter;
+        });
         ImageView eLetter = loadImageView("/res/tokenImages/R.png");
+        eLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==eLetter)
+                letterSelected=null;
+            else
+                letterSelected = eLetter;
+        });
         ImageView fLetter = loadImageView("/res/tokenImages/F.png");
+        fLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==fLetter)
+                letterSelected=null;
+            else
+                letterSelected = fLetter;
+        });
         ImageView gLetter = loadImageView("/res/tokenImages/G.png");
+        gLetter.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==gLetter)
+                letterSelected=null;
+            else
+                letterSelected = gLetter;
+        });
 
         tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
                 eLetter, fLetter, gLetter); //agregar las fichas
-
-
     }
 
     /**
@@ -306,28 +347,65 @@ public class Scrabble extends Application {
             rowConst.setPercentHeight(100.0 / 15);
             matrixContainer.getRowConstraints().add(rowConst);
         }
+
+
     }
 
     /**
-     * @param xPos Posición X donde se presionó
-     * @param yPos Posición Y donde se presionó
+     * Método para agregar Boxes a cada cuadro de la cuadricula
      */
-    private void putImageOnContainer(int xPos, int yPos){
-        System.out.println("PosX " + xPos);
-        System.out.println("PosY " + yPos);
-        LinkedList<Integer> rowColumnList = new LinkedList<>();
-        getRowAndColumn(rowColumnList, xPos, yPos);
+    private void addBoxToGrid(){
+        for(int i=0; i<15; i++){
+            for (int j=0; j<15; j++){
+                HBox box =  new HBox();
+                box.setAlignment(Pos.CENTER);
+                box.setOnMouseClicked(mouseEvent -> {
+                    if (box.getChildren().size()==0) {
+                        if (letterSelected != null) {
+                            putImageOnContainer(box);
+                        }
+                    }
+                    else {
+                        ImageView child = (ImageView) box.getChildren().get(0);
+                        child.setFitHeight(80);
+                        child.setFitWidth(80);
+
+                        box.getChildren().remove(0);
+                        tokenBox.getChildren().add(child);
+                        addGestureToNewToken();
+
+                        if (letterSelected != null) {
+                            putImageOnContainer(box);
+                        }
+                    }
+                });
+                matrixContainer.add(box, i, j);
+            }
+        }
+    }
+
+    private void addGestureToNewToken() {
+        int size = tokenBox.getChildren().size();
+        ImageView newToken = (ImageView) tokenBox.getChildren().get(size-1);
+        newToken.setOnMouseClicked(mouseEvent -> {
+            if (letterSelected==newToken)
+                letterSelected=null;
+            else
+                letterSelected = newToken;
+        });
+
+    }
+
+    /**
+     * Coloca la letra de la ficha en la casilla correspondiente
+     */
+    private void putImageOnContainer(HBox imagecontainer){
         ImageView image = new ImageView(letterSelected.getImage());
         image.setFitHeight(30);
         image.setFitWidth(30);
-        matrixContainer.getChildren().add(image);
-        GridPane.setHalignment(image, HPos.CENTER);
+        imagecontainer.getChildren().add(image);
         tokenBox.getChildren().remove(letterSelected);
-
+        letterSelected = null;
     }
-
-    private void getRowAndColumn(LinkedList<Integer> rowColumnList, int xPos, int yPos) {
-    }
-
 
 }
