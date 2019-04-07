@@ -90,11 +90,10 @@ public class  LinkedList<T> {
             tmp = tmp.getNext();
         }
         return tmp;
+    }
 
-
-
-
-
+    public int getSize() {
+        return size;
     }
 
     public static void main(String[] args) {
