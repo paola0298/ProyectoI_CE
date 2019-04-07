@@ -4,6 +4,8 @@ import Logic.Controller;
 import Structures.LinkedList;
 import Structures.Node;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,7 +35,6 @@ public class Scrabble extends Application {
     private ImageView letterSelected = null;
     private GridPane matrixContainer;
 
-
     private VBox initialWindow; // Ventana inicial
     private VBox joinMatchContainer; //Ventana de unión a partida existente.
     private BorderPane gameScreenContainer; //Ventana del juego.
@@ -43,9 +44,10 @@ public class Scrabble extends Application {
     public void start(Stage stage) {
         controller = new Controller(this);
 
-        //Contenedores de cada pantalla
-        StackPane mainLayout = new StackPane(); // Panel principal
+        joinMatchContainer = new VBox();
 
+        // En este panel va a meter sus paneles con su parte de la interfaz.
+        StackPane mainLayout = new StackPane();
 
         /////////////////////////////Pantalla de Inicio//////////////////////
         /* Pantalla inicial donde el jugador puede elegir entre ingresar a un partida, o crear una propia
@@ -64,7 +66,10 @@ public class Scrabble extends Application {
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
         Button Join = new Button("Unirme a una partida existente");
-        Join.setOnAction(event -> joinMatchContainer.toFront());
+        Join.setOnAction(event -> {
+            joinMatchContainer.toFront();
+        });
+
         Button New_Game = new Button("Crear una nueva partida");
         Join.setTranslateY(30);
         New_Game.setTranslateY(50);
@@ -75,9 +80,6 @@ public class Scrabble extends Application {
         ///////////////////Pantalla de unión a partida existente//////////////////////
         joinMatchContainer = new VBox();
         joinMatchContainer.setStyle("-fx-background-color: white");
-
-        //Pantalla de unión a partida existente.
-        VBox joinMatchContainer = new VBox();
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
@@ -97,7 +99,32 @@ public class Scrabble extends Application {
         joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
 
         /////////////////////////////Pantalla de Juego//////////////////////
-        gameScreenContainer = new BorderPane();
+        BorderPane gameScreenContainer = new BorderPane();
+
+        //Imagen del usuario
+        Image userImage = imageLoader(cwd + "/res/userIcon.png");
+        ImageView addUserImage = new ImageView(userImage);
+        addUserImage.setFitHeight(120);
+        addUserImage.setFitWidth(120);
+
+        //puntuacion del usuario
+        HBox userScoreBox = new HBox();
+        userScoreBox.setSpacing(10);
+        userScoreBox.setAlignment(Pos.CENTER);
+
+
+        Text userScoreText = new Text("Mi puntuación es: ");
+        Text userScore = new Text("50");
+
+        userScoreBox.getChildren().addAll(userScoreText, userScore);
+
+        //Fichas
+
+        Image token = imageLoader(cwd + "/res/token.png");
+        ImageView tokenImage = new ImageView(token);
+        tokenImage.setFitWidth(501);
+        tokenImage.setFitHeight(82);
+
 
         //Boton para enviar la palabra
         Image scrabbleImage = imageLoader(cwd + "/res/scrabble.jpg");
