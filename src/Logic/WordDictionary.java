@@ -43,6 +43,8 @@ public class WordDictionary {
         }
     }
 
+
+
     public static void main(String[] args) {
         boolean found = search("Hola");
         addWord("Hola");

@@ -1,5 +1,6 @@
 package Sockets;
 
+import Logic.WordDictionary;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -71,6 +72,22 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Error getting data: " + e.getMessage());
             return new JSONObject();
+        }
+    }
+
+    public void SendWord(String word){
+        if(WordDictionary.search(word)){
+            sendData(word);
+        }else{
+            System.out.println("Palabra no encontrada");
+        }
+    }
+
+    public void AddWordDictonary(String newWord){
+        if(WordDictionary.search(newWord) == false){
+            WordDictionary.addWord(newWord);
+        }else{
+            System.out.println("The word is already exist");
         }
     }
 
