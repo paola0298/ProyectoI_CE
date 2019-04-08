@@ -7,7 +7,6 @@ package Logic;
  */
 
 import Structures.LinkedList;
-import Structures.Lista;
 
 import java.util.List;
 import java.util.Random;

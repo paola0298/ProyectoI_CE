@@ -3,7 +3,6 @@ package Sockets;
 import Logic.Game;
 import Logic.Player;
 import Structures.LinkedList;
-import Structures.Lista;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
