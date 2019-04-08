@@ -268,21 +268,6 @@ public class Server {
 
     }
 
-
-    public String choosePlayerStart(int gameNumber){
-
-        Random rand = new Random();
-//        int sizelist = gamesList.returnValue(gameNumber).getPlayersList().getSize();
-//        int randomInt = rand.nextInt((sizelist));
-//
-//        return gamesList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
-        return "";
-    }
-
-
-
-
-
     public static void main(String[] args){
 
         Server server = new Server(6307);
@@ -294,7 +279,4 @@ public class Server {
         server.connectionListener();
 
     }
-
-
-
 }
