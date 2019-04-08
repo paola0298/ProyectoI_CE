@@ -26,7 +26,6 @@ public class Server {
     private boolean isRunning = true;
     private LinkedList<Game> gameList = new LinkedList<Game>(); //Lista de partidas, Hazel
 
-
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
@@ -181,7 +180,6 @@ public class Server {
      * @return user Name
      */
     public String choosePlayerStart(int gameNumber){
-
         Random rand = new Random();
         int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
         int randomInt = rand.nextInt((sizelist));
@@ -189,7 +187,6 @@ public class Server {
     }
 
     public static void main(String[] args){
-
         Server server = new Server(6307);
         System.out.println("Servidor iniciado...");
         server.connectionListener();
