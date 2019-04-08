@@ -172,18 +172,21 @@ public class Server {
         }
     }
 
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 07/04/2019
+     *
+     * @param gameNumber
+     * @return user Name
+     */
     public String choosePlayerStart(int gameNumber){
 
         Random rand = new Random();
         int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
         int randomInt = rand.nextInt((sizelist));
-
         return gameList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
     }
-
-
-
-
 
     public static void main(String[] args){
 
@@ -191,7 +194,4 @@ public class Server {
         System.out.println("Servidor iniciado...");
         server.connectionListener();
     }
-
-
-
 }
