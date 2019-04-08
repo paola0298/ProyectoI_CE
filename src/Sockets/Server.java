@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import Structures.LinkedList;
-import Structures.Lista;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -31,7 +30,6 @@ public class Server {
     private boolean isRunning = true;
     private LinkedList<Game> gamesList = new LinkedList<>();
     private LinkedList<Token> TokenList = new LinkedList<>();
-
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
@@ -269,7 +267,6 @@ public class Server {
     }
 
     public static void main(String[] args){
-
         Server server = new Server(6307);
         Player p = new Player("Brayan");
 //        System.out.println(server.getTokenList());
