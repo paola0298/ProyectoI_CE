@@ -8,9 +8,6 @@ package Logic;
 
 import Structures.LinkedList;
 import org.apache.commons.lang3.RandomStringUtils;
-import Structures.Lista;
-
-import java.util.List;
 import java.util.Random;
 
 public class Game {
