@@ -32,27 +32,39 @@ public class Player{
 
         }
     }
-
+    /**
+     * Con este método se obtiene el ID del jugador
+     * */
     public String getPlayer_ID() {
         return playerID;
     }
-
+    /**
+     * Con este método se modifica el ID del jugador
+     * */
     public void setPlayer_ID(String player_ID) {
         playerID= player_ID;
     }
-
+    /**
+     * Con este método se obtiene el nombre del jugador
+     * */
     public String getName() {
         return name;
     }
-
+    /**
+     * Con este método se modifica el nombre del jugador
+     * */
     public void setName(String name) {
         this.name = name;
     }
-
+    /**
+     * Con este método se obtiene la lista de fichas del jugador
+     * */
     public LinkedList<Token> getTokenlist() {
         return tokenlist;
     }
-
+    /**
+     * Con este método se obtiene el ID del jugador
+     * */
     public void setTokenlist(LinkedList<Token> tokenlist) {
         this.tokenlist = tokenlist;
     }
