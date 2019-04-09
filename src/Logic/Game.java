@@ -55,8 +55,13 @@ public class Game {
 
     public int getMaxPlayers() {
         return maxPlayers;
+
     }
 
+    /**
+     *
+     * @return PlayerList
+     */
     public LinkedList<Player> getPlayersList() {
         return players;
     }
@@ -72,6 +77,7 @@ public class Game {
     public void setGrid(Token[][] grid) {
         this.grid = grid;
     }
+
 
     public String getActualPlayer() {
         return actualPlayer;
