@@ -1,6 +1,7 @@
 package Logic;
 /**
  * Clase Game
+ *
  * @author HazelMartinez
  * @version 1.0
  * @since 22/03/2019
@@ -8,6 +9,7 @@ package Logic;
 
 import Structures.LinkedList;
 import org.apache.commons.lang3.RandomStringUtils;
+
 import java.util.Random;
 
 public class Game {
@@ -39,7 +41,7 @@ public class Game {
 
     }
 
-    public void tokens(){ //Que hace este método?
+    public void tokens() { //Que hace este método?
 
     }
 
@@ -90,27 +92,32 @@ public class Game {
 //        }
 
         return players.deleteElement(playerToDelete);
+
+
     }
 
     /**
-     *
+     *@author HazelMartinez
+     * @since 22/03/2019
      * @param player
      */
-    public void deletePlayer(Player player){
+    public void deletePlayer(Player player) {
         players.deleteElement(player);
 
     }
 
     /**
      *
+     *@author HazelMartinez
+     * @since 22/03/2019
      * @return The user Name that is going to play
      */
-    public boolean VerifyPlayerTurn(String player_id){
+    public boolean VerifyPlayerTurn(String player_id) {
 
 //        return players.retornarValor(userInTurn).getName().equals(userName);
 
         //This method is for know who is going to play
-        return  (actualPlayer.equals(player_id));
+        return (actualPlayer.equals(player_id));
 
     }
 
@@ -118,4 +125,5 @@ public class Game {
     public void setActualPlayer(String actualPlayer) {
         this.actualPlayer = actualPlayer;
     }
+
 }

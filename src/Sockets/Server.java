@@ -169,11 +169,30 @@ public class Server {
 //                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
             obj.put("player_id", player.getPlayer_ID());
 
+<<<<<<< HEAD
+=======
+    /**
+     * @param player
+     * @param idGame
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 2019/05/04
+     */
+    public void addPlayerToExistingGame(Player player, String idGame) {
+        //This method adds a new player to a existing game
+        //Recives the idGame for know where to add the player.
+        for (int index = 0; index < gameList.getSize(); index++) {
+            if (gameList.returnValue(index).getIdGame() == idGame) {
+                //If the idGame is found add the player to the gameList
+                gameList.returnValue(index).getPlayersList().insert(player);
+            }
+>>>>>>> Comentarios de algunos metodos 
         }
         return obj;
     }
 
     /**
+<<<<<<< HEAD
     *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
      * @author Brayan
     *
@@ -264,6 +283,24 @@ public class Server {
             this.TokenList.addFirst(Bonus);
         }
 
+=======
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 07/04/2019
+     *
+     * @param gameNumber
+     * @return user Name
+     */
+    public String choosePlayerStart(int gameNumber){
+        //This method choose a random player for start the game
+        //Recives a gameNumber, this is the number of gameList
+        Random rand = new Random();
+        int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
+        //Obtein the size of the list for have the random number between 0 and the size
+        int randomInt = rand.nextInt((sizelist)); //generate the random number
+        return gameList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
+        //return the UserName
+>>>>>>> Comentarios de algunos metodos 
     }
 
     public static void main(String[] args){
