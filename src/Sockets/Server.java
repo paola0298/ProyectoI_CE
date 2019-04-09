@@ -7,10 +7,7 @@ import Structures.LinkedList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -139,6 +136,12 @@ public class Server {
 //                    response.put("YOUR_TURN", "NO");
 //                    sendResponse(response.toString(), con);
                     break;
+                case "GET_GAME":
+                    // send the actual game
+                    String match = msg.getString("match_id");
+                    response = getActualGame(match);
+                    sendResponse(response.toString(), con);
+                    break;
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
@@ -151,6 +154,30 @@ public class Server {
             System.out.println("\n");
         }
 
+    }
+
+    private JSONObject getActualGame(String matchID){
+        JSONObject jsonObject = new JSONObject();
+        Game actualGame = null;
+        String result = "";
+        for (int i=0; i<gamesList.getSize(); i++) {
+            if (gamesList.get(i).getGameID().equals(matchID)) {
+                actualGame = gamesList.get(i);
+            }
+        }
+
+        ObjectMapper objectMapper =  new ObjectMapper();
+        try {
+
+            result = objectMapper.writeValueAsString(actualGame);
+            jsonObject.put("status", "SUCCESS");
+            jsonObject.put("object_game", result);
+            return jsonObject;
+
+        } catch (IOException e) {
+            e.getMessage();
+        }
+        return jsonObject;
     }
 
     private JSONObject joinMatch(String id, String name) {

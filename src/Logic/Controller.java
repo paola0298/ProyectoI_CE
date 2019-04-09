@@ -2,6 +2,7 @@ package Logic;
 
 import GUI.Scrabble;
 import Sockets.Client;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -19,10 +20,45 @@ public class Controller {
     private String player_id = "-";
     private String current_match_id = "-";
 
+    private Game actualGame;
+
     public Controller(Scrabble gui) {
         this.gui = gui;
         initialize();
     }
+
+
+    /**
+     * Este método obtiene el objeto Game de la partida actual
+     */
+    private Game getActualGame(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        message = prepare();
+        message.put("action", "GET_GAME");
+        message.put("match_id", current_match_id);
+
+        response = client.connect(message);
+
+        if (response.get("status").equals("SUCCESS")) {
+            // devolver el objeto deserializado
+            String stringGame = response.getString("object_game");
+            try {
+                actualGame = objectMapper.readValue(stringGame, Game.class);
+            } catch (IOException e) {
+                System.out.println("Error getting game object");
+            }
+
+        } else {
+            System.out.println("Could not create match");
+        }
+        return new Game(4);
+    }
+
+
+    public void updateGrid(){
+
+    }
+
 
     /**
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
@@ -38,6 +74,7 @@ public class Controller {
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Match created successfully");
             player_id = response.getString("player_id");
+
         } else {
             System.out.println("Could not create match");
         }

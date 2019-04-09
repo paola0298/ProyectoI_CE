@@ -38,6 +38,10 @@ public class Scrabble extends Application {
     private VBox initialWindow; // Ventana inicial
     private BorderPane root; //Ventana de partida nueva
 
+
+    private String word = null;
+    private LinkedList<LinkedList<String>> actualLetters;
+
     @Override
     public void start(Stage stage) {
         controller = new Controller(this);
@@ -52,7 +56,7 @@ public class Scrabble extends Application {
 
         //Aquí añaden su panel al contenedor principal.
         mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
-        Scene scene = new Scene(mainLayout, 1280, 720);
+        Scene scene = new Scene(mainLayout, 1280, 900);
         scene.getStylesheets().add(("file:///" + cwd + "/res/styles.css").replace(" ", "%20"));
         stage.setMinWidth(640);
         stage.setMinHeight(480);
@@ -224,7 +228,6 @@ public class Scrabble extends Application {
         tokenBox.setSpacing(5);
         tokenLoader();
 
-
         actualPlayerInfoContainer = new HBox();
         actualPlayerInfoContainer.setStyle("-fx-background-color: white");
         actualPlayerInfoContainer.setAlignment(Pos.CENTER);
@@ -241,10 +244,6 @@ public class Scrabble extends Application {
         matrixContainer = new GridPane();
         matrixContainer.setStyle("-fx-background-color: white;\n" +
                 "    -fx-border-width: 2px; -fx-border-color: black");
-//        matrixContainer.setOnMouseClicked(event->{
-//            putImageOnContainer();
-//
-//        });
         matrixContainer.setGridLinesVisible(true);
 
         addColumnsAndRows();
@@ -267,6 +266,20 @@ public class Scrabble extends Application {
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
         playerLoader();
     }
+
+    private void createWord(){
+        
+    }
+
+    private void addToActualLetters(boolean child, int row, int column){
+        if (!child){
+            // la letra no esta agregada a la lista con su respectiva fila y columna
+
+        } else {
+            // el espacio en fila y columna esta ocupado, hay que reemplazar letra
+        }
+    }
+
 
     /**
      * @param path Ruta de la imagen
@@ -456,9 +469,13 @@ public class Scrabble extends Application {
                 HBox box =  new HBox();
                 box.setAlignment(Pos.CENTER);
                 box.setOnMouseClicked(mouseEvent -> {
+                    int row = GridPane.getRowIndex(box);
+                    int column = GridPane.getColumnIndex(box);
+
                     if (box.getChildren().size()==0) {
                         if (letterSelected != null) {
                             putImageOnContainer(box);
+                            addToActualLetters(false, row, column);
                         }
                     }
                     else {
@@ -472,6 +489,7 @@ public class Scrabble extends Application {
 
                         if (letterSelected != null) {
                             putImageOnContainer(box);
+                            addToActualLetters(true, row, column);
                         }
                     }
                 });
