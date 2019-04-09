@@ -75,19 +75,34 @@ public class Client {
         }
     }
 
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 8/04/2019
+     * @param word
+     */
     public void SendWord(String word){
+        //This method send a word to the server
         if(WordDictionary.search(word)){
-            sendData(word);
+            //If the word that the user do is in the dictonary(exist) send the word.
+            sendData(word); //sends the word to the server
         }else{
-            System.out.println("Palabra no encontrada");
+            System.out.println("The word does not exist, Sorry");
         }
     }
 
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 8/04/2019
+     * @param newWord
+     */
     public void AddWordDictonary(String newWord){
-        if(WordDictionary.search(newWord) == false){
-            WordDictionary.addWord(newWord);
+        //This method is used to add a newWord in the dictonary
+        if(WordDictionary.search(newWord) == false){ //If the word doesn't exist in the dictonary
+            WordDictionary.addWord(newWord); //Add the newWord in the dictonary, this use the method from WordDictonary
         }else{
-            System.out.println("The word is already exist");
+            System.out.println("The word is already exist");// If the word already exist in the dictonary show a message
         }
     }
 
