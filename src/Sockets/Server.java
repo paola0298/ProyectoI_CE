@@ -162,9 +162,11 @@ public class Server {
      * @since 2019/05/04
      */
     public void addPlayerToExistingGame(Player player, String idGame) {
-        //Add a new player to a existing game
+        //This method adds a new player to a existing game
+        //Recives the idGame for know where to add the player.
         for (int index = 0; index < gameList.getSize(); index++) {
             if (gameList.returnValue(index).getIdGame() == idGame) {
+                //If the idGame is found add the player to the gameList
                 gameList.returnValue(index).getPlayersList().insert(player);
             }
         }
@@ -179,10 +181,14 @@ public class Server {
      * @return user Name
      */
     public String choosePlayerStart(int gameNumber){
+        //This method choose a random player for start the game
+        //Recives a gameNumber, this is the number of gameList
         Random rand = new Random();
         int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
-        int randomInt = rand.nextInt((sizelist));
+        //Obtein the size of the list for have the random number between 0 and the size
+        int randomInt = rand.nextInt((sizelist)); //generate the random number
         return gameList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
+        //return the UserName
     }
 
     public static void main(String[] args){

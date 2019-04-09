@@ -30,7 +30,8 @@ public class Game {
      */
 
     /**
-     *
+     * @author HazelMartinez
+     * @since 22/03/2019
      * @param allowedUsers
      * @param idGame
      * @param userInTurn
@@ -75,7 +76,8 @@ public class Game {
     }
 
     /**
-     *-
+     * @author HazelMartinez
+     * @since 22/03/2019
      * @param player
      */
     public void AddPlayer(Player player){
@@ -84,7 +86,8 @@ public class Game {
     }
 
     /**
-     *
+     *@author HazelMartinez
+     * @since 22/03/2019
      * @param player
      */
     public void DeletePlayer(Player player){
@@ -97,25 +100,17 @@ public class Game {
     }
 
     /**
-     *
+     *@author HazelMartinez
+     * @since 22/03/2019
      * @param userName
      * @return The user Name that is going to play
      */
     public boolean VerifyPlayerTurn(String userName){
         //This method is for know who is going to play
+        //userInTurn is a number, this indicates who is going to play
         return PlayersList.returnValue(userInTurn).getName().equals(userName);
 
     }
 
-    /**
-     *
-     * @param playerList
-     * @return a Player
-     */
-    public Player returnPlayer(List<Player> playerList){
-        //This method sends a Player to the server for start the game
-        Random rand = new Random();
-        return PlayersList.returnValue(rand.nextInt((PlayersList.getSize())));
-    }
 }
 
