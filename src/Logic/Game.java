@@ -43,34 +43,66 @@ public class Game {
         this.PlayersList = new LinkedList<Player>();
     }
 
+    /**
+     *
+     * @return allowedUsers
+     */
     public int getAllowedUsers() {
         return allowedUsers;
     }
 
+    /**
+     *
+     * @param allowedUsers
+     */
     public void setAllowedUsers(int allowedUsers) {
         this.allowedUsers = allowedUsers;
     }
 
+    /**
+     *
+     * @return idGame
+     */
     public String getIdGame() {
         return idGame;
     }
 
+    /**
+     *
+     * @param idGame
+     */
     public void setIdGame(String idGame) {
         this.idGame = idGame;
     }
 
+    /**
+     *
+     * @return PlayerList
+     */
     public LinkedList<Player> getPlayersList() {
         return PlayersList;
     }
 
+    /**
+     *
+     * @param playersList
+     */
     public void setPlayersList(LinkedList<Player> playersList) {
         PlayersList = playersList;
     }
 
+    /**
+     *
+     * @return userInTurn
+     */
     public int getUserInTurn() {
         return userInTurn;
     }
 
+    /**
+     *
+     * @param userInTurn
+     */
     public void setUserInTurn(int userInTurn) {
         this.userInTurn = userInTurn;
     }
