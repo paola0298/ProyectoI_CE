@@ -199,40 +199,44 @@ public class Server {
         return obj;
     }
 
+
     public LinkedList<Token> getTokenList() {
-        //TokenList.printList();
         return TokenList;
     }
-
+    /**
+    *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
+     * @author Brayan
+    *
+    */
     public void fillTokenList(){
-        Token A = new Token("*****", 1, "A");
-        Token E = new Token("*****", 1, "E");
-        Token O = new Token("*****", 1, "O");
-        Token I = new Token("*****", 1, "I");
-        Token S = new Token("*****", 1, "S");
-        Token N = new Token("*****", 1, "N");
-        Token R = new Token("*****", 1, "R");
-        Token U = new Token("*****", 1, "U");
-        Token D = new Token("*****", 2, "D");
-        Token L = new Token("*****", 1, "L");
-        Token T = new Token("*****", 1, "T");
-        Token C = new Token("*****", 3, "C");
-        Token G = new Token("*****", 2, "G");
-        Token B = new Token("*****", 3, "B");
-        Token M = new Token("*****", 3, "M");
-        Token P = new Token("*****", 3, "P");
-        Token H = new Token("*****", 4, "H");
-        Token F = new Token("*****", 4, "F");
-        Token V = new Token("*****", 4, "V");
-        Token Y = new Token("*****", 4, "Y");
-        Token CH = new Token("*****", 5, "CH");
-        Token Q = new Token("*****", 5, "Q");
-        Token J = new Token("*****", 8, "J");
-        Token LL = new Token("*****", 8, "LL");
-        Token Ñ = new Token("*****", 8, "Ñ");
-        Token RR = new Token("*****", 8, "RR");
-        Token X = new Token("*****", 8, "X");
-        Token Z = new Token("*****", 10, "Z");
+        Token A = new Token("res/images/token/A.png", 1, "A");
+        Token E = new Token("res/images/token/E.png", 1, "E");
+        Token O = new Token("res/images/token/O.png", 1, "O");
+        Token I = new Token("res/images/token/I.png", 1, "I");
+        Token S = new Token("res/images/token/S.png", 1, "S");
+        Token N = new Token("res/images/token/N.png", 1, "N");
+        Token R = new Token("res/images/token/R.png", 1, "R");
+        Token U = new Token("res/images/token/U.png", 1, "U");
+        Token D = new Token("res/images/token/D.png", 2, "D");
+        Token L = new Token("res/images/token/L.png", 1, "L");
+        Token T = new Token("res/images/token/T.png", 1, "T");
+        Token C = new Token("res/images/token/C.png", 3, "C");
+        Token G = new Token("res/images/token/G.png", 2, "G");
+        Token B = new Token("res/images/token/B.png", 3, "B");
+        Token M = new Token("res/images/token/M.png", 3, "M");
+        Token P = new Token("res/images/token/P.png", 3, "P");
+        Token H = new Token("res/images/token/H.png", 4, "H");
+        Token F = new Token("res/images/token/F.png", 4, "F");
+        Token V = new Token("res/images/token/V.png", 4, "V");
+        Token Y = new Token("res/images/token/Y.png", 4, "Y");
+        Token CH = new Token("res/images/token/CH.png", 5, "CH");
+        Token Q = new Token("res/images/token/Q.png", 5, "Q");
+        Token J = new Token("res/images/token/J.png", 8, "J");
+        Token LL = new Token("res/images/token/LL.png", 8, "LL");
+        Token Ñ = new Token("res/images/token/Ñ.png", 8, "Ñ");
+        Token RR = new Token("res/images/token/RR.png", 8, "RR");
+        Token X = new Token("res/images/token/X.png", 8, "X");
+        Token Z = new Token("res/images/token/Z.png", 10, "Z");
         Token Bonus = new Token("*****", 0, "");
 
 
@@ -273,16 +277,23 @@ public class Server {
         }
         //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
         for (int fvychqjllñrrxz = 1;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
-            this.TokenList.addFirst(G);
-            this.TokenList.addFirst(B);
-            this.TokenList.addFirst(M);
-            this.TokenList.addFirst(P);
-            this.TokenList.addFirst(H);
+            this.TokenList.addFirst(F);
+            this.TokenList.addFirst(V);
+            this.TokenList.addFirst(Y);
+            this.TokenList.addFirst(CH);
+            this.TokenList.addFirst(Q);
+            this.TokenList.addFirst(J);
+            this.TokenList.addFirst(LL);
+            this.TokenList.addFirst(Ñ);
+            this.TokenList.addFirst(RR);
+            this.TokenList.addFirst(X);
+            this.TokenList.addFirst(Z);
+
         }
         for (int bonus = 1;bonus <= 2;bonus++){
             this.TokenList.addFirst(Bonus);
         }
-        //TokenList.printList();
+
     }
 
     public static void main(String[] args) {

@@ -17,6 +17,10 @@ public class Player{
         this.name = name;
     }
 
+    /**
+     * Este método se encarga de tomar una cantidad de fichas aleatorias de la lista con todas las fichas que posee el servidor y son guardadas en la lista de fichas de cada jugador
+     * @param tokens
+     */
     public void assign_tokens(LinkedList<Token> tokens){ //TODO El servidor es el que le va a asignar las fichas al jugador
         int ind;
         Random random = new Random();
