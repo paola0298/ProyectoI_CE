@@ -54,7 +54,7 @@ public class Controller {
 
         response = client.connect(message);
 
-        if (response.get("status").equals("SUCCESS")) {
+        if (response.getBoolean("status")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
             this.current_match_id = match_id;
