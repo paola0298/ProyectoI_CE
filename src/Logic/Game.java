@@ -61,6 +61,7 @@ public class Game {
         return grid;
     }
 
+
     public void setGrid(Token[][] grid) {
         this.grid = grid;
     }
@@ -68,6 +69,32 @@ public class Game {
     public String getActualPlayer() {
         return actualPlayer;
     }
+
+
+    public boolean DeletePlayer(Player playerToDelete){
+
+//        for(int index = 0; index < players.getSize(); index++){
+//
+////            if(players.(index).getName() == player.getName()){
+//            if (players.get(index).getPlayer_ID().equals(playerToDelete.getPlayer_ID())) {
+//                    players.de
+//            }
+//                //players.retornarValor(index).getplayers().insertar(player);
+//                players.eliminar();
+//            }
+//        }
+
+        return players.deleteElement(playerToDelete);
+
+    }
+
+    public boolean VerifyPlayerTurn(String userName){
+
+//        return players.retornarValor(userInTurn).getName().equals(userName);
+
+
+    }
+
 
     public void setActualPlayer(String actualPlayer) {
         this.actualPlayer = actualPlayer;
