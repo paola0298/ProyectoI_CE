@@ -1,4 +1,10 @@
 package Logic;
+/**
+ * Clase Game
+ * @author HazelMartinez
+ * @version 1.0
+ * @since 22/03/2019
+ */
 
 import Structures.LinkedList;
 import org.apache.commons.lang3.RandomStringUtils;
