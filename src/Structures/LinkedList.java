@@ -43,6 +43,8 @@ public class  LinkedList<T> {
         this.size++;
     }
 
+
+
     public boolean deleteLast(){
         if (this.head!=null){
             Node<T> temp = this.head;

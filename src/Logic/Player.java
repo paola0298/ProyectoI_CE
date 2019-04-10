@@ -58,4 +58,15 @@ public class Player{
     public void setTokenlist(LinkedList<Token> tokenlist) {
         this.tokenlist = tokenlist;
     }
+
+    public boolean updateTokenList(Token tokenTo, boolean add_remove){
+        if (!add_remove)
+            return tokenlist.remove(tokenTo);
+        else {
+            tokenlist.addLast(tokenTo);
+            return true;
+        }
+
+
+    }
 }

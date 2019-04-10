@@ -35,7 +35,7 @@ public class Scrabble extends Application {
     private GridPane matrixContainer; // Matríz del juego
     private VBox joinMatchContainer; //Ventana de unión a partida existente.
     private VBox initialWindow; // Ventana inicial
-    private BorderPane root; //Ventana de partida nueva
+    private BorderPane newMatchWindow; //Ventana de partida nueva
 
 
     private String word = null;
@@ -54,7 +54,7 @@ public class Scrabble extends Application {
         init_gameWindow();
 
         //Aquí añaden su panel al contenedor principal.
-        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
+        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, newMatchWindow);
         Scene scene = new Scene(mainLayout, 1280, 900);
         scene.getStylesheets().add(("file:///" + cwd + "/res/styles.css").replace(" ", "%20"));
         stage.setMinWidth(640);
@@ -63,7 +63,7 @@ public class Scrabble extends Application {
         stage.setTitle("Scrabble TEC");
         initialWindow.toFront();
 //        gameScreenContainer.toFront();
-//        root.toFront();
+//        newMatchWindow.toFront();
         stage.show();
 
     }
@@ -95,6 +95,8 @@ public class Scrabble extends Application {
             if (!name.equals("")) {
                 controller.setPlayerName(Players_Name_Input.getText());
                 joinMatchContainer.toFront();
+            } else {
+                showAlert("Debe ingresar el nombre del jugador", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
 
@@ -103,7 +105,10 @@ public class Scrabble extends Application {
             String name = Players_Name_Input.getText();
             if (!name.equals("")) {
                 controller.setPlayerName(Players_Name_Input.getText());
-                root.toFront();
+                newMatchWindow.toFront();
+            }
+            else{
+                showAlert("Debe ingresar el nombre del jugador", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
 
@@ -118,8 +123,18 @@ public class Scrabble extends Application {
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
+
+        HBox buttonContainer = backButtonContainer();
+
+        VBox infoContainer = new VBox();
+        infoContainer.setStyle("-fx-background-color: white");
+        infoContainer.setAlignment(Pos.TOP_CENTER);
+        infoContainer.setSpacing(15);
+        infoContainer.setPadding(new Insets(15));
+        infoContainer.setPrefHeight(550);
+
         Label joinTitle = new Label("Ingresa el código de la partida");
-        TextField joinTextField = new TextField(); //Brayan: Agregué una d al final del nombre de la variable, en la siguiente línea también
+        TextField joinTextField = new TextField();
         joinTextField.setMaxWidth(200);
         Button joinButton = new Button("Unirse");
         Label joinResponse = new Label("");
@@ -127,28 +142,35 @@ public class Scrabble extends Application {
         joinButton.setOnAction(event -> {
             String match_id = joinTextField.getText();
             if (!match_id.equals("")) {
-                boolean success = controller.join_match(match_id);
-                if (success) {
+
+                if (controller.join_match(match_id)) {
                     gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
                     playerLoader();
                     tokenLoader();
-                    showMatchID();
+                    String message = "El código de la partida es: " + controller.getCurrent_match_id();
+                    showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
 
                 } else {
-
+                    showAlert("No es posible unirse a la sala", "Error de conexion", Alert.AlertType.ERROR);
                 }
+            }else {
+                showAlert("Debe ingresar el código de la partida a la que desea unirse", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
-        joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
+        infoContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
+        joinMatchContainer.getChildren().addAll(buttonContainer, infoContainer);
     }
 
     private void init_newMatchWindow() {
         /* Window for create a new game displays an comboBox for choose the number of players in the game */
-        root = new BorderPane();
+        newMatchWindow = new BorderPane();
 
-        root.setPadding(new Insets(15, 20, 10, 10));
-        root.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
+        newMatchWindow.setPadding(new Insets(15, 20, 10, 10));
+        newMatchWindow.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
         //espacio del border pane al boton
+
+        HBox buttonContainer = backButtonContainer();
+
 
         Label numberPlayers = new Label("Number of Players");
         numberPlayers.setPadding(new Insets(2,2,2,2));
@@ -170,16 +192,24 @@ public class Scrabble extends Application {
 
         hBox.setSpacing(20);
         hBox.setAlignment(Pos.CENTER);
-        root.setCenter(hBox);
+        newMatchWindow.setCenter(hBox);
         Button startButton = new Button("Start Game");
         startButton.setOnMouseClicked(mouseEvent -> {
             int i = comboBox.getSelectionModel().getSelectedIndex();
-            String selected = comboBox.getItems().get(i);
-            controller.create_match(selected);
-            gameScreenContainer.toFront();
-            playerLoader();
-            tokenLoader();
-            showMatchID();
+            if (i > -1) {
+                String selected = comboBox.getItems().get(i);
+                if (controller.create_match(selected)) {
+                    gameScreenContainer.toFront();
+                    playerLoader();
+                    tokenLoader();
+                    String message = "El código de la partida es: " + controller.getCurrent_match_id();
+                    showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
+                }else{
+                    showAlert("No se ha podido realizar la conexion con el servidor", "Error de conexion", Alert.AlertType.ERROR);
+                }
+            } else {
+                showAlert("Debe seleccionar la cantidad de jugadores", "Campo requerido", Alert.AlertType.ERROR);
+            }
 
         });
         startButton.setPadding(new Insets(20, 10, 10, 20));
@@ -187,12 +217,30 @@ public class Scrabble extends Application {
         startButton.setTextFill(Color.rgb(0,100,0));
         startButton.setFont(new Font("Serif", 30));
         startButton.setAlignment(Pos.CENTER_RIGHT);
-        root.setBottom(startButton);
+        newMatchWindow.setBottom(startButton);
+        newMatchWindow.setLeft(buttonContainer);
         // Alignment.
         BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
+        BorderPane.setAlignment(buttonContainer, Pos.TOP_LEFT);
 
         // Set margin for bottom area.
         BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
+    }
+
+    private HBox backButtonContainer(){
+        HBox buttonContainer = new HBox();
+        buttonContainer.setStyle("-fx-background-color: white");
+        buttonContainer.setAlignment(Pos.TOP_LEFT);
+        buttonContainer.setPrefHeight(350);
+        ImageView backButton = loadImageView("/res/images/backButton.png");
+        backButton.setFitHeight(50);
+        backButton.setFitWidth(50);
+        backButton.setOnMouseClicked(mouseEvent -> {
+            initialWindow.toFront();
+        });
+        buttonContainer.getChildren().addAll(backButton);
+
+        return buttonContainer;
     }
 
     private void init_gameWindow() {
@@ -231,7 +279,8 @@ public class Scrabble extends Application {
 
         ImageView showInfoButton = loadImageView("/res/images/infoIcon.png");
         showInfoButton.setOnMouseClicked(mouseEvent -> {
-            showMatchID();
+            String message = "El código de la partida es: " + controller.getCurrent_match_id();
+            showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
         });
 
         showInfoButton.setFitHeight(60);
@@ -268,20 +317,26 @@ public class Scrabble extends Application {
 
     }
 
-    private void showMatchID(){
-        String matchID =  controller.getCurrent_match_id();
-        Alert showID = new Alert(Alert.AlertType.INFORMATION);
-        showID.setTitle("Código de la partida");
+    private void showAlert(String message, String title, Alert.AlertType type){
+        Alert showID = new Alert(type);
+        showID.setTitle(title);
         showID.setHeaderText(null);
-        showID.setContentText("El código de la partida es: " + matchID);
+        showID.setContentText(message);
         showID.showAndWait();
     }
 
     private void createWord(){
+
+
         
     }
 
     private void addToActualLetters(boolean child, int row, int column){
+        LinkedList<String> tokenImage = new LinkedList<>();
+        tokenImage.addLast(String.valueOf(child));
+        tokenImage.addLast(String.valueOf(row));
+        tokenImage.addLast(String.valueOf(column));
+
         if (!child){
             // la letra no esta agregada a la lista con su respectiva fila y columna
 
@@ -479,63 +534,6 @@ public class Scrabble extends Application {
 
             temp = temp.getNext();
         }
-
-
-//
-//
-//        ImageView aLetter = loadImageView("/res/images/token/A.png");
-//        aLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==aLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = aLetter;
-//
-//        });
-//        ImageView bLetter = loadImageView("/res/images/token/B.png");
-//        bLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==bLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = bLetter;
-//        });
-//        ImageView cLetter = loadImageView("/res/images/token/C.png");
-//        cLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==cLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = cLetter;
-//        });
-//        ImageView dLetter = loadImageView("/res/images/token/D.png");
-//        dLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==dLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = dLetter;
-//        });
-//        ImageView eLetter = loadImageView("/res/images/token/R.png");
-//        eLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==eLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = eLetter;
-//        });
-//        ImageView fLetter = loadImageView("/res/images/token/F.png");
-//        fLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==fLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = fLetter;
-//        });
-//        ImageView gLetter = loadImageView("/res/images/token/G.png");
-//        gLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==gLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = gLetter;
-//        });
-//
-//        tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
-//                eLetter, fLetter, gLetter); //agregar las fichas
     }
 
     /**
@@ -581,6 +579,7 @@ public class Scrabble extends Application {
                     if (box.getChildren().size()==0) {
                         if (letterSelected != null) {
                             putImageOnContainer(box);
+
                             addToActualLetters(false, row, column);
                         }
                     }

@@ -77,4 +77,13 @@ public class Game {
     public void setActualPlayer(String actualPlayer) {
         this.actualPlayer = actualPlayer;
     }
+
+    public static void main(String[] args) {
+        Game game = new Game();
+        Token[][] tokens = game.getGrid();
+        tokens[0][1] = new Token("imagePath", 1, "A");
+
+        Token[][] tokens1 = game.getGrid();
+        System.out.println(tokens1[0][1].getScore());
+    }
 }

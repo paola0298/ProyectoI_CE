@@ -81,7 +81,7 @@ public class Controller {
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
      * @param max_players Cantidad máxima de jugadores en la partida.
      */
-    public void create_match(String max_players) {
+    public boolean create_match(String max_players) {
         message = prepare();
         message.put("action", "CREATE_MATCH");
         message.put("max_players", max_players);
@@ -94,9 +94,11 @@ public class Controller {
             player_id = response.getString("player_id");
             current_match_id = response.getString("game_id");
             getInstances();
+            return true;
 
         } else {
             System.out.println("Could not create match");
+            return false;
         }
     }
 
