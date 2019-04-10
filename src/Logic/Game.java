@@ -8,7 +8,10 @@ public class Game {
     private int maxPlayers;
     private Token[][] grid;
     private String actualPlayer;
+
     private LinkedList<Player> players;
+
+    public Game(){}
 
     public Game(int maxPlayers) {
         this.players = new LinkedList<>();
@@ -33,6 +36,14 @@ public class Game {
 
     public void tokens(){ //Que hace este método?
 
+    }
+
+    public void setPlayers(LinkedList<Player> players) {
+        this.players = players;
+    }
+
+    public LinkedList<Player> getPlayers() {
+        return players;
     }
 
     public String getGameID() {

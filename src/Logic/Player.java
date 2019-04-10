@@ -1,32 +1,38 @@
 package Logic;
 
 import Structures.LinkedList;
-import Structures.Node;
 import org.apache.commons.lang3.RandomStringUtils;
-
-import java.util.Random;
 
 public class Player{
     private String playerID;
     private String name;
-    private LinkedList<Token> tokenlist = new LinkedList<>();
+    private int score;
+    private LinkedList<Token> tokenlist;
 
+    public Player(){
+
+    }
 
     public Player(String name) {
         this.playerID = RandomStringUtils.randomAlphanumeric(6);
         this.name = name;
     }
 
-    public void assign_tokens(LinkedList<Token> tokens){ //TODO El servidor es el que le va a asignar las fichas al jugador
-        int ind;
-        Random random = new Random();
+    public String getPlayerID() {
+        return playerID;
+    }
 
-        for(int i = 0; i <= 6; i++){
-            ind = random.nextInt(100);
-            Node<Token> random_token = tokens.acces_index(ind);
-            tokenlist.addLast(random_token.getValue());
+    public void setPlayerID(String playerID) {
+        this.playerID = playerID;
+    }
 
-        }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public String getPlayer_ID() {
