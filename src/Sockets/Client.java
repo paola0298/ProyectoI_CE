@@ -3,7 +3,6 @@ package Sockets;
 import Logic.WordDictionary;
 import org.json.JSONObject;
 
-import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -110,6 +109,36 @@ public class Client {
 
         }
         */
+        int action = 0;
+
+        Client client = new Client("localhost", 7123);
+        JSONObject obj = new JSONObject();
+        obj.put("action", "CALL_EXPERT");
+        obj.put("player_id", "caca");
+        switch (action) {
+            case 0:
+                obj.put("status", "REQUESTING");
+
+                obj.put("phone", "50670143773");
+                obj.put("word", "Cacahuate");
+                JSONObject response = client.connect(obj);
+                System.out.println(response.toString(2));
+                break;
+            case 1:
+                while (true) {
+                    obj.put("status", "WAITING");
+                    JSONObject res = client.connect(obj);
+                    if (res.getString("status").equals("ANSWERED")) {
+                        System.out.println(res.toString(2));
+                        break;
+                    } else {
+                        System.out.println("Waiting..");
+                    }
+                }
+                break;
+        }
+
+
     }
 
 }

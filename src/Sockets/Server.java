@@ -106,14 +106,14 @@ public class Server {
 //
 
         while (this.isRunning){
-
+            System.out.println("Esperando conexión");
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
 
             JSONObject msg = new JSONObject(receiveDataFromClient(con));
             String playerName;
 
-            System.out.println("JSON received: " + msg.toString());
+//            System.out.println("JSON received: " + msg.toString());
 
             JSONObject response;
 
@@ -142,12 +142,57 @@ public class Server {
 //                    sendResponse(response.toString(), con);
                     break;
                 case "CALL_EXPERT":
-//                    response.put("WORD_STATUS", "INVALID");
-//                    sendResponse(response.toString(), con);
+                    response = new JSONObject();
+
+//                    if (msg.getString("status").equals("WAITING")) {
+//                        if (!expertAnswer.equals("")) {
+//                            response.put("status", "ANSWERED");
+//                            response.put("WORD_STATUS", expertAnswer);
+//                            contact_expert = false;
+//                            expert_phone = "";
+//                            expert_word = "";
+//                            player_id = "";
+//                        } else {
+//                            response.put("status", "CONTACTING");
+//                        }
+//                    } else {
+//                        contact_expert = true;
+//                        expert_phone = msg.getString("phone");
+//                        expert_word = msg.getString("word");
+//                        player_id = msg.getString("player_id");
+//
+//                        response.put("status", "CONTACTING");
+//                    }
+
+                    sendResponse(response.toString(), con);
+                    System.out.println("Esperando a contactar experto");
                     break;
                 case "CHECK_TURN":
 //                    response.put("YOUR_TURN", "NO");
 //                    sendResponse(response.toString(), con);
+                    break;
+                case "EXPERT_SERVICE":
+                    response = new JSONObject();
+
+//                    if (!contact_expert && !waiting_ex_response) {
+//                        response.put("status", "NO");
+//
+//                    } else if (contact_expert && !waiting_ex_response){
+//                        contact_expert = false;
+//                        waiting_ex_response = true;
+//                        response.put("status", "SEND_SMS");
+//                        response.put("phone", expert_phone);
+//                        response.put("word", expert_word);
+//                    } else {
+//                        if (msg.getString("status").equals("WAITING")) {
+//                            response.put("status", "WAITING");
+//                        } else if (msg.getString("status").equals("ANSWERED")) {
+//                            waiting_ex_response = false;
+//                            expertAnswer = msg.getString("expert_answer");
+//                        }
+//                    }
+
+                    sendResponse(response.toString(), con);
                     break;
                 default:
                     sendResponse("Palabra clave no encontrada", con);
@@ -157,6 +202,7 @@ public class Server {
 
             try {
                 con.close();
+                System.out.println("Conexión finalizada");
             } catch (IOException e) {
                 System.out.println("Error closing the connection " + e.getMessage());
             }
@@ -346,8 +392,9 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server(6307);
-        System.out.println("Servidor iniciado...");
+        int port = 7123;
+        Server server = new Server(port);
+        System.out.println("Servidor iniciado en puerto " + port);
         server.connectionListener();
 
     }

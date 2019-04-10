@@ -101,7 +101,6 @@ public class Scrabble extends Application {
         });
 
         Button New_Game = new Button("Crear una nueva partida");
-
         New_Game.setOnAction(actionEvent -> {
             String name = Players_Name_Input.getText();
             if (!name.equals("")) {
