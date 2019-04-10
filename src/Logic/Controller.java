@@ -47,32 +47,12 @@ public class Controller {
     }
 
     /**
-     * Este método coloca la instancia de la partica actual
-     * @param actualGame Instancia de la partida actual
-     */
-    public void setActualGame(Game actualGame) {
-        this.actualGame = actualGame;
-    }
-
-    /**
      * @return La instancia del jugador actual
      */
     public Player getPlayerInstance() {
         return playerInstance;
     }
 
-    /**
-     * Este método coloca la instancia del jugador actual
-     * @param playerInstance Instancia del jugador actual
-     */
-    public void setPlayerInstance(Player playerInstance) {
-        this.playerInstance = playerInstance;
-    }
-
-    /**
-     * Este método le coloca el nombre al jugador
-     * @param playerName Parámetro del nombre del jugador
-     */
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
@@ -93,7 +73,7 @@ public class Controller {
             System.out.println("Match created successfully");
             player_id = response.getString("player_id");
             current_match_id = response.getString("game_id");
-            getInstances();
+            deserialize();
             return true;
 
         } else {
@@ -104,6 +84,7 @@ public class Controller {
 
     /**
      * Este método le pide al servidor unir al jugador a una partida existente.
+     * @param match_id El identificador de la partida a la que se desea unir
      */
     public boolean join_match(String match_id) {
         message = prepare();
@@ -113,12 +94,14 @@ public class Controller {
 
         response = client.connect(message);
 
+        System.out.println(response.toString());
+
         if (response.getBoolean("status")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
             this.current_match_id = match_id;
 
-            getInstances();
+            deserialize();
             return true;
         } else {
             System.out.println("Could not join match");
@@ -126,7 +109,10 @@ public class Controller {
         }
     }
 
-    private void getInstances() {
+    /**
+     * Deserializa los objetos recibidos desde el servidor
+     */
+    private void deserialize() {
         ObjectMapper objectMapper =  new ObjectMapper();
         String stringGame = response.getString("game");
         String stringPlayer = response.getString("player");
@@ -165,6 +151,7 @@ public class Controller {
      */
     public void check_word(String word) {
         message = prepare();
+        message.put("action", "CHECK_WORD");
         message.put("match_id", current_match_id);
         message.put("word", word);
 
@@ -182,9 +169,16 @@ public class Controller {
      */
     public void check_turn() {
         message = prepare();
+        message.put("action", "CHECK_TURN");
         message.put("match_id", current_match_id);
         response = client.connect(message);
 
+    }
+
+    public void callExpert(){
+        message = prepare();
+        message.put("action", "CALL_EXPERT");
+        response = client.connect(message);
     }
 
     /**
@@ -217,7 +211,5 @@ public class Controller {
     private void initialize1(){
         client = new Client("localhost", 6307);
     }
-
-
 
 }

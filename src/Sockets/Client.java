@@ -1,6 +1,5 @@
 package Sockets;
 
-import Logic.WordDictionary;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
@@ -74,21 +73,6 @@ public class Client {
         }
     }
 
-    public void SendWord(String word){
-        if(WordDictionary.search(word)){
-            sendData(word);
-        }else{
-            System.out.println("Palabra no encontrada");
-        }
-    }
-
-    public void AddWordDictonary(String newWord){
-        if(WordDictionary.search(newWord) == false){
-            WordDictionary.addWord(newWord);
-        }else{
-            System.out.println("The word is already exist");
-        }
-    }
 
     public static void main(String[] args) {
         /*

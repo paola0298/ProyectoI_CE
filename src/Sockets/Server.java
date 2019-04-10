@@ -3,6 +3,7 @@ package Sockets;
 import Logic.Game;
 import Logic.Player;
 import Logic.Token;
+import Logic.WordDictionary;
 import Structures.LinkedList;
 import Structures.Node;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -119,8 +120,6 @@ public class Server {
 
             switch (msg.get("action").toString()) {
                 case "CREATE_MATCH":
-//                    response.put("CODE", "123456");
-//                    sendResponse(response.toString(), con);
                     int maxPlayers = Integer.parseInt(msg.getString("max_players"));
                     playerName = msg.getString("player_name");
                     response = createMatch(maxPlayers, playerName);
@@ -128,9 +127,6 @@ public class Server {
 
                     break;
                 case "JOIN_MATCH":
-//                    response.put("ID_PARTIDA", "1");
-//                    response.put("MATRIZ", "matriz");
-//                    sendResponse(response.toString(), con);
                     String matchID = msg.getString("match_id");
                     playerName = msg.getString("player_name");
                     response = joinMatch(matchID, playerName);
@@ -138,11 +134,10 @@ public class Server {
 
                     break;
                 case "CHECK_WORD":
-//                    response.put("WORD_STATUS", "VALID");
-//                    sendResponse(response.toString(), con);
+                    response = checkWord(); //TODO actualizar el metodo segun los datos que se necesiten
                     break;
                 case "CALL_EXPERT":
-                    response = new JSONObject();
+                    response = callExpert(); //TODO actualizar el metodo segun los datos que se necesiten
 
 //                    if (msg.getString("status").equals("WAITING")) {
 //                        if (!expertAnswer.equals("")) {
@@ -168,11 +163,11 @@ public class Server {
                     System.out.println("Esperando a contactar experto");
                     break;
                 case "CHECK_TURN":
-//                    response.put("YOUR_TURN", "NO");
-//                    sendResponse(response.toString(), con);
+                    response = checkTurn(); //TODO actualizar el metodo segun los datos que se necesiten
+                    sendResponse(response.toString(), con);
                     break;
                 case "EXPERT_SERVICE":
-                    response = new JSONObject();
+                    response = expertService(); //TODO actualizar el metodo segun los datos que se necesiten
 
 //                    if (!contact_expert && !waiting_ex_response) {
 //                        response.put("status", "NO");
@@ -194,24 +189,25 @@ public class Server {
 
                     sendResponse(response.toString(), con);
                     break;
+
+                case "DISCONNECT":
+                    response = disconnect();
+                    sendResponse(response.toString(), con);
+                    break;
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
 
             System.out.println("Cantidad de juegos creados " + gamesList.getSize());
-
             try {
                 con.close();
                 System.out.println("Conexión finalizada");
             } catch (IOException e) {
                 System.out.println("Error closing the connection " + e.getMessage());
             }
-
-            System.out.println("\n");
         }
 
     }
-
 
     /**
      * Método para crear una nueva partida
@@ -237,7 +233,7 @@ public class Server {
             jsonObject.put("game", serializedGame);
             jsonObject.put("player", serializedPlayer);
             jsonObject.put("game_id", newGame.getGameID());
-            jsonObject.put("player_id", newPlayer.getPlayer_ID());
+            jsonObject.put("player_id", newPlayer.getplayerId());
             return jsonObject;
         } catch (JsonProcessingException e) {
             jsonObject.put("status", "FAILED");
@@ -246,6 +242,12 @@ public class Server {
 
     }
 
+    /**
+     * Este método agrega un nuevo jugador a la partida
+     * @param id Identificador del jugador a agregar
+     * @param name Nombre del jugador a agregar
+     * @return Objeto Json para enviarlo al cliente
+     */
     private JSONObject joinMatch(String id, String name) {
         JSONObject obj = new JSONObject();
         Game game;
@@ -263,7 +265,7 @@ public class Server {
                     serializedGame = mapper.writeValueAsString(game);
                     serializedPlayer = mapper.writeValueAsString(player);
                     obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
-                    obj.put("player_id", player.getPlayer_ID());
+                    obj.put("player_id", player.getplayerId());
                     obj.put("game", serializedGame);
                     obj.put("player", serializedPlayer);
 
@@ -274,8 +276,25 @@ public class Server {
                 }
             }
         }
+        obj.put("status", false);
         return obj;
     }
+
+    private JSONObject checkWord(){ return new JSONObject(); }
+
+    private JSONObject callExpert() {
+        return new JSONObject();
+    }
+
+    private JSONObject checkTurn() {
+        return new JSONObject();
+    }
+
+    private JSONObject expertService() {
+        return new JSONObject();
+    }
+
+    private JSONObject disconnect() { return new JSONObject(); }
 
     private LinkedList<Token> generateTokens() {
 
@@ -292,17 +311,19 @@ public class Server {
         return tokenList; //TODO generar lista de tokens para el jugador
     }
 
-
-    public LinkedList<Token> getTokenList() {
-        return totalTokenList;
+    public void addWordDictonary(String newWord){
+        if(!WordDictionary.search(newWord)){
+            WordDictionary.addWord(newWord);
+        }else{
+            System.out.println("The word already exist");
+        }
     }
 
-
     /**
-    *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
+     *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
      * @author Brayan
-    *
-    */
+     *
+     */
     public void fillTokenList(){
         Token A = new Token("/res/images/token/A.png", 1, "A");
         Token E = new Token("/res/images/token/E.png", 1, "E");
@@ -391,8 +412,12 @@ public class Server {
 
     }
 
+    public LinkedList<Token> getTokenList() {
+        return totalTokenList;
+    }
+
     public static void main(String[] args) {
-        int port = 7123;
+        int port = 6307;
         Server server = new Server(port);
         System.out.println("Servidor iniciado en puerto " + port);
         server.connectionListener();

@@ -62,8 +62,6 @@ public class Scrabble extends Application {
         stage.setScene(scene);
         stage.setTitle("Scrabble TEC");
         initialWindow.toFront();
-//        gameScreenContainer.toFront();
-//        newMatchWindow.toFront();
         stage.show();
 
     }
@@ -79,32 +77,33 @@ public class Scrabble extends Application {
         En esta ventana se especifíca cuantos jugadores tendrá la partida
          */
         initialWindow = new VBox();
-        initialWindow.setStyle("-fx-background-color: #1a8c24;");
+//        initialWindow.setStyle("-fx-background-color: #1a8c24;");
+        initialWindow.setStyle("-fx-background-color: white");
         initialWindow.setAlignment(Pos.CENTER);
         initialWindow.setSpacing(15);
         initialWindow.setPadding(new Insets(15));
         // El usuario ingresa su nombre
-        Label Players_Name = new Label("Introduzca su nombre:");
-        TextField Players_Name_Input = new TextField();
-        Players_Name_Input.setMaxWidth(300);
+        Label playerName = new Label("Introduzca su nombre:");
+        TextField playerNameInput = new TextField();
+        playerNameInput.setMaxWidth(300);
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
-        Button Join = new Button("Unirme a una partida existente");
-        Join.setOnAction(event -> {
-            String name = Players_Name_Input.getText();
+        Button joinButton = new Button("Unirme a una partida existente");
+        joinButton.setOnAction(event -> {
+            String name = playerNameInput.getText();
             if (!name.equals("")) {
-                controller.setPlayerName(Players_Name_Input.getText());
+                controller.setPlayerName(playerNameInput.getText());
                 joinMatchContainer.toFront();
             } else {
                 showAlert("Debe ingresar el nombre del jugador", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
 
-        Button New_Game = new Button("Crear una nueva partida");
-        New_Game.setOnAction(actionEvent -> {
-            String name = Players_Name_Input.getText();
+        Button newGameButton = new Button("Crear una nueva partida");
+        newGameButton.setOnAction(actionEvent -> {
+            String name = playerNameInput.getText();
             if (!name.equals("")) {
-                controller.setPlayerName(Players_Name_Input.getText());
+                controller.setPlayerName(playerNameInput.getText());
                 newMatchWindow.toFront();
             }
             else{
@@ -112,8 +111,7 @@ public class Scrabble extends Application {
             }
         });
 
-
-        initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
+        initialWindow.getChildren().addAll(playerName,playerNameInput,joinButton,newGameButton);
     }
 
     private void init_joinWindow() {
@@ -142,14 +140,12 @@ public class Scrabble extends Application {
         joinButton.setOnAction(event -> {
             String match_id = joinTextField.getText();
             if (!match_id.equals("")) {
-
                 if (controller.join_match(match_id)) {
-                    gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
-                    playerLoader();
+                    gameScreenContainer.toFront();
+                    playerLoader2(); //TODO actualizar metodo
                     tokenLoader();
                     String message = "El código de la partida es: " + controller.getCurrent_match_id();
                     showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
-
                 } else {
                     showAlert("No es posible unirse a la sala", "Error de conexion", Alert.AlertType.ERROR);
                 }
@@ -171,15 +167,16 @@ public class Scrabble extends Application {
 
         HBox buttonContainer = backButtonContainer();
 
-
-        Label numberPlayers = new Label("Number of Players");
+        Label numberPlayers = new Label("Seleccione la cantidad de jugadores");
         numberPlayers.setPadding(new Insets(2,2,2,2));
         numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143,188,143), CornerRadii.EMPTY, Insets.EMPTY)));
         numberPlayers.setTextFill(Color.rgb(34,139,34));
         numberPlayers.setFont(new Font("Serif",30));
         numberPlayers.setAlignment(Pos.CENTER);
-        HBox hBox = new HBox();
-        hBox.getChildren().add(numberPlayers);
+
+        VBox matchOptionsContainer = new VBox();
+        matchOptionsContainer.setSpacing(20);
+        matchOptionsContainer.setAlignment(Pos.CENTER);
 
         //Create a ComboBox
         ComboBox<String> comboBox = new ComboBox<>();
@@ -188,11 +185,9 @@ public class Scrabble extends Application {
         comboBox.getItems().add("4");
         comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46,139,87), CornerRadii.EMPTY,Insets.EMPTY)));
         comboBox.setStyle("-fx-font: 30px \"Serif\";");
-        hBox.getChildren().add(comboBox);
 
-        hBox.setSpacing(20);
-        hBox.setAlignment(Pos.CENTER);
-        newMatchWindow.setCenter(hBox);
+        matchOptionsContainer.getChildren().addAll(numberPlayers, comboBox);
+        newMatchWindow.setCenter(matchOptionsContainer);
         Button startButton = new Button("Start Game");
         startButton.setOnMouseClicked(mouseEvent -> {
             int i = comboBox.getSelectionModel().getSelectedIndex();
@@ -200,7 +195,7 @@ public class Scrabble extends Application {
                 String selected = comboBox.getItems().get(i);
                 if (controller.create_match(selected)) {
                     gameScreenContainer.toFront();
-                    playerLoader();
+                    playerLoader2();
                     tokenLoader();
                     String message = "El código de la partida es: " + controller.getCurrent_match_id();
                     showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
@@ -212,7 +207,7 @@ public class Scrabble extends Application {
             }
 
         });
-        startButton.setPadding(new Insets(20, 10, 10, 20));
+
         startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72,209,204), CornerRadii.EMPTY, Insets.EMPTY)));
         startButton.setTextFill(Color.rgb(0,100,0));
         startButton.setFont(new Font("Serif", 30));
@@ -364,147 +359,207 @@ public class Scrabble extends Application {
     /**
      * Carga en la interfaz los jugadores presentes en la partida
      */
-    private void playerLoader() {
-        //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
-
-        // instanciar widgets;
-        ImageView addUserImage;
-
-        Text userScoreText;
+    private void playerLoader2() {
+        ImageView userImage;
+        Text scoreLabel;
         Text userScore;
         Text userName;
-
+        int c = 0;
         LinkedList<ImageView> imageForUser = new LinkedList<>();
         imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
         imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
         imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
         imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
-        Node<ImageView> imageTemp = imageForUser.getHead();
 
-        // playersList
+        LinkedList<Player> playersToLoad = controller.getActualGame().getPlayers();
 
-        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
-        Node<Player> playerTemp = actualPlayers.getHead();
-        Player actualPlayer = controller.getPlayerInstance();
-        if (actualPlayer != playerTemp.getValue()) {
-            actualPlayers.remove(actualPlayer);
-            actualPlayers.addFirst(actualPlayer);
-        }
+        for (int i=0; i<playersToLoad.getSize(); i++) {
+            Player player = playersToLoad.get(i);
+            System.out.println("Player: " + player.getName());
+            userImage = imageForUser.get(i);
+            userImage.setFitWidth(60);
+            userImage.setFitHeight(100);
 
-        int i = 0;
-        while (playerTemp != null) {
-            addUserImage = imageTemp.getValue();
-            addUserImage.setFitHeight(100);
-            addUserImage.setFitWidth(60);
+            VBox playerBox = new VBox();
+            playerBox.setAlignment(Pos.CENTER);
+            userName = new Text(player.getName());
 
-            VBox playersBox = new VBox();
-            playersBox.setAlignment(Pos.CENTER);
-            userName = new Text(playerTemp.getValue().getName());
-
-            //puntuacion del usuario
+            //Puntuación del usuario
             HBox userScoreBox = new HBox();
             userScoreBox.setAlignment(Pos.CENTER);
             userScoreBox.setSpacing(10);
-            userScoreBox.setAlignment(Pos.CENTER);
-            userScoreText = new Text("Puntos:");
-            String score = String.valueOf(playerTemp.getValue().getScore());
-            userScore = new Text(score);
-            userScoreBox.getChildren().addAll(userScoreText, userScore);
-            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+            scoreLabel = new Text("Puntos: ");
+            userScore = new Text(String.valueOf(player.getScore()));
+            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+            playerBox.getChildren().addAll(userName, userImage, userScoreBox);
 
-            if (i==0){
-                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-            } else if (i==1){
-                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-            } else if (i == 2){
-                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+            System.out.println("Player id " + player.getplayerId());
+            System.out.println("Actual player id " + player.getplayerId());
+
+            if (player.getplayerId().equals(controller.getPlayerInstance().getplayerId())) {
+                System.out.println("Adding actual player");
+                this.actualPlayerInfoContainer.getChildren().add(playerBox);
             } else {
-                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+                System.out.println("Adding other players");
+                switch (c) {
+                    case 0:
+                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                    case 1:
+                        this.upPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                    case 2:
+                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                }
+                c++;
             }
-
-            imageTemp = imageTemp.getNext();
-            playerTemp = playerTemp.getNext();
-            i++;
 
         }
 
-//
 
-//        int i = 0;
-//        while(temp!=null){
-//            addUserImage = imageForUser.acces_index(i).getValue();
-//            addUserImage.setFitHeight(100);
-//            addUserImage.setFitWidth(60);
+
+    }
+//    private void playerLoader() {
+//        // instanciar widgets;
+//        ImageView userImage;
 //
-//            VBox playersBox = new VBox();
-//            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(temp.getValue().getName());
+//        Text scoreLabel;
+//        Text userScore;
+//        Text userName;
 //
-//            //puntuacion del usuario
-//            HBox userScoreBox = new HBox();
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreBox.setSpacing(10);
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreText = new Text("Puntos:");
-//            String score = String.valueOf(temp.getValue().getScore());
-//            userScore = new Text(score);
-//            userScoreBox.getChildren().addAll(userScoreText, userScore);
-//            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+//        LinkedList<ImageView> imageForUser = new LinkedList<>();
+//        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
+//        Node<ImageView> imageTemp = imageForUser.getHead();
 //
+//        // playersList
+//
+//        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
+//        Node<Player> playerTemp = actualPlayers.getHead();
+//        Player actualPlayer = controller.getPlayerInstance();
+//
+//        if (actualPlayer != playerTemp.getValue()) {
+//            actualPlayers.remove(actualPlayer);
+//            actualPlayers.addFirst(actualPlayer);
 //        }
-
 //
-////         temporal, mientras se genera la lista de jugadores
-//        LinkedList<String> players =  new LinkedList<>();
-//        players.addLast("Hazel");
-//        players.addLast("Brayan");
-//        players.addLast("Marlon");
-//        players.addLast("Paola");
-//        Node<String> temp = players.getHead();
-//
-//        int cont = 0;
 //        int i = 0;
-//
-//        while(temp!=null){
-//
-//            addUserImage = imageForUser.acces_index(i).getValue();
-//            addUserImage.setFitHeight(100);
-//            addUserImage.setFitWidth(60);
-//
+//        while (playerTemp != null) {
+//            userImage = imageTemp.getValue();
+//            userImage.setFitHeight(100);
+//            userImage.setFitWidth(60);
 //
 //            VBox playersBox = new VBox();
 //            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(temp.getValue());
+//            userName = new Text(playerTemp.getValue().getName());
 //
 //            //puntuacion del usuario
 //            HBox userScoreBox = new HBox();
 //            userScoreBox.setAlignment(Pos.CENTER);
 //            userScoreBox.setSpacing(10);
 //            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreText = new Text("Puntos:");
-//            userScore = new Text("50");
-//            userScoreBox.getChildren().addAll(userScoreText, userScore);
-//            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
-
-//            if (cont==0){
+//            scoreLabel = new Text("Puntos:");
+//            String score = String.valueOf(playerTemp.getValue().getScore());
+//            userScore = new Text(score);
+//            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+//            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+//
+//            if (i==0){
 //                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (cont==1){
+//            } else if (i==1){
 //                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (cont == 2){
+//            } else if (i == 2){
 //                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
 //            } else {
 //                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
 //            }
 //
-//            temp = temp.getNext();
-//            cont++;
+//            imageTemp = imageTemp.getNext();
+//            playerTemp = playerTemp.getNext();
 //            i++;
+//
 //        }
-
-
-
-
-    }
+//
+////
+//
+////        int i = 0;
+////        while(temp!=null){
+////            userImage = imageForUser.acces_index(i).getValue();
+////            userImage.setFitHeight(100);
+////            userImage.setFitWidth(60);
+////
+////            VBox playersBox = new VBox();
+////            playersBox.setAlignment(Pos.CENTER);
+////            userName = new Text(temp.getValue().getName());
+////
+////            //puntuacion del usuario
+////            HBox userScoreBox = new HBox();
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            userScoreBox.setSpacing(10);
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            scoreLabel = new Text("Puntos:");
+////            String score = String.valueOf(temp.getValue().getScore());
+////            userScore = new Text(score);
+////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+////
+////        }
+//
+////
+//////         temporal, mientras se genera la lista de jugadores
+////        LinkedList<String> players =  new LinkedList<>();
+////        players.addLast("Hazel");
+////        players.addLast("Brayan");
+////        players.addLast("Marlon");
+////        players.addLast("Paola");
+////        Node<String> temp = players.getHead();
+////
+////        int cont = 0;
+////        int i = 0;
+////
+////        while(temp!=null){
+////
+////            userImage = imageForUser.acces_index(i).getValue();
+////            userImage.setFitHeight(100);
+////            userImage.setFitWidth(60);
+////
+////
+////            VBox playersBox = new VBox();
+////            playersBox.setAlignment(Pos.CENTER);
+////            userName = new Text(temp.getValue());
+////
+////            //puntuacion del usuario
+////            HBox userScoreBox = new HBox();
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            userScoreBox.setSpacing(10);
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            scoreLabel = new Text("Puntos:");
+////            userScore = new Text("50");
+////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+//
+////            if (cont==0){
+////                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else if (cont==1){
+////                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else if (cont == 2){
+////                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else {
+////                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+////            }
+////
+////            temp = temp.getNext();
+////            cont++;
+////            i++;
+////        }
+//
+//
+//
+//
+//    }
 
     /**
      * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
@@ -541,12 +596,11 @@ public class Scrabble extends Application {
      * @return Un objeto ImageView de la imagen agregada
      */
     private ImageView loadImageView(String path){
-        Image tokenImage = imageLoader(cwd+path);
-        ImageView addTokenImage = new ImageView(tokenImage);
-        addTokenImage.setFitHeight(80);
-        addTokenImage.setFitWidth(80);
-
-        return addTokenImage;
+        Image image = imageLoader(cwd+path);
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(80);
+        imageView.setFitWidth(80);
+        return imageView;
     }
 
     /**
@@ -570,35 +624,35 @@ public class Scrabble extends Application {
     private void addBoxToGrid(){
         for(int i=0; i<15; i++){
             for (int j=0; j<15; j++){
-                HBox box =  new HBox();
-                box.setAlignment(Pos.CENTER);
-                box.setOnMouseClicked(mouseEvent -> {
-                    int row = GridPane.getRowIndex(box);
-                    int column = GridPane.getColumnIndex(box);
+                HBox tokenContainer =  new HBox();
+                tokenContainer.setAlignment(Pos.CENTER);
+                tokenContainer.setOnMouseClicked(mouseEvent -> {
+                    int row = GridPane.getRowIndex(tokenContainer);
+                    int column = GridPane.getColumnIndex(tokenContainer);
 
-                    if (box.getChildren().size()==0) {
+                    if (tokenContainer.getChildren().size()==0) {
                         if (letterSelected != null) {
-                            putImageOnContainer(box);
+                            putImageOnContainer(tokenContainer);
 
                             addToActualLetters(false, row, column);
                         }
                     }
                     else {
-                        ImageView child = (ImageView) box.getChildren().get(0);
+                        ImageView child = (ImageView) tokenContainer.getChildren().get(0);
                         child.setFitHeight(80);
                         child.setFitWidth(80);
 
-                        box.getChildren().remove(0);
+                        tokenContainer.getChildren().remove(0);
                         tokenBox.getChildren().add(child);
                         addGestureToNewToken();
 
                         if (letterSelected != null) {
-                            putImageOnContainer(box);
+                            putImageOnContainer(tokenContainer);
                             addToActualLetters(true, row, column);
                         }
                     }
                 });
-                matrixContainer.add(box, i, j);
+                matrixContainer.add(tokenContainer, i, j);
             }
         }
     }
