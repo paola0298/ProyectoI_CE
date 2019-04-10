@@ -213,7 +213,7 @@ public class Controller {
     }
 
     private void initialize1(){
-        client = new Client("localhost", 6307);
+        client = new Client("localhost", 7123);
     }
 
 
