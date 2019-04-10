@@ -3,15 +3,23 @@ package Structures;
 public class  LinkedList<T> {
 
     private int size;
+
     private Node<T> head;
+    public LinkedList(){
+        this.size = 0;
+        this.head = null;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 
     public Node<T> getHead() {
         return head;
     }
 
-    public LinkedList(){
-        this.size = 0;
-        this.head = null;
+    public void setHead(Node<T> head) {
+        this.head = head;
     }
 
     public void addLast(T value){
@@ -57,7 +65,7 @@ public class  LinkedList<T> {
         return false;
     }
 
-    public boolean deleteElement(T element){
+    public boolean remove(T element){
         if (element == this.head.getValue()){
             deleteFirst();
         } else {
@@ -119,10 +127,8 @@ public class  LinkedList<T> {
         list.addLast(4);
         list.addFirst(100);
         list.addFirst(200);
-        list.deleteElement(100);
+        list.remove(100);
         list.printList();
-        System.out.println("hola");
-        list.acces_index(3);
-        System.out.println("hola");
+
     }
 }
