@@ -21,13 +21,8 @@ import java.net.Socket;
 public class Server {
     private ServerSocket serverSocket;
     private boolean isRunning = true;
-<<<<<<< HEAD
     private LinkedList<Game> gamesList = new LinkedList<>();
     private LinkedList<Token> TokenList = new LinkedList<>();
-=======
-    private Lista<Game> gameList = new Lista<Game>(); //Lista de partidas, Hazel
-
->>>>>>> Documentacion
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
