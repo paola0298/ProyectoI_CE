@@ -107,8 +107,91 @@ public class  LinkedList<T> {
         return tmp;
     }
 
+
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 22/03/2019
+     * @param value
+     */
+    public void insert(T value){
+        //This method adds a object in the list
+        Node<T> newNode = new Node<>(value);
+        newNode.saveValue(value);
+        if(this.head == null){  // if the list hasn't anything yet
+            this.head = newNode;
+            head.newReference(null);
+        }else{
+            Node<T> temp;//If the list has contain
+            temp = this.head;
+            while(temp.getNext() != null){
+                temp = temp.getNext();
+            }
+            newNode.setPrevious(temp);
+            temp.newReference(newNode);
+            this.size++;
+        }
+    }
+
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * since 22/03/2019
+     * @param player
+     */
+    public void deleteNode(T player){
+        //This method deletes a player in the playersList
+        Node<T> temp;
+        temp = this.head;
+        Node<T> temp2;
+        while(temp != player){
+            if(temp.getNext()==null){
+                return;
+            }
+            temp = temp.getNext();
+        }temp2 = temp.getPrevious();
+        temp2.setNext(temp2.getNext().getNext());
+
+    }
+
+    /**
+     * @author HazelMartinez
+     * @version 1.0
+     * @since 22/03/2019
+     * @param position
+     * @return a position
+     */
+    public T returnValue(int position) {
+        //This method is used for get a index in a list
+        int indice;
+        indice = 0;
+        Node<T> temp;
+        temp = this.head;
+        while (indice != position) {
+            temp = temp.getNext();
+            indice++;
+        }
+        return temp.getValue();
+    }
+
+    // setters and getters
     public int getSize() {
         return size;
     }
 
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    /*public static void main(String[] args) {
+        LinkedList<Integer> list = new LinkedList<>();
+        list.addLast(1);
+        list.addLast(2);
+        list.addLast(3);
+        list.addLast(4);
+        list.addFirst(100);
+        list.addFirst(200);
+        list.deleteElement(100);
+        list.printList();
+    }*/
 }

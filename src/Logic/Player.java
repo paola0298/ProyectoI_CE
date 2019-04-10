@@ -24,7 +24,6 @@ public class Player{
     public void assign_tokens(LinkedList<Token> tokens){ //TODO El servidor es el que le va a asignar las fichas al jugador
         int ind;
         Random random = new Random();
-
         for(int i = 0; i <= 6; i++){
             ind = random.nextInt(100);
             Node<Token> random_token = tokens.acces_index(ind);
@@ -56,4 +55,5 @@ public class Player{
     public void setTokenlist(LinkedList<Token> tokenlist) {
         this.tokenlist = tokenlist;
     }
+
 }

@@ -31,12 +31,11 @@ public class Server {
     private LinkedList<Game> gamesList = new LinkedList<>();
     private LinkedList<Token> TokenList = new LinkedList<>();
 
+
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
-
     public Server(int port) {
-
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -158,7 +157,6 @@ public class Server {
 
     }
 
-
     private JSONObject joinMatch(String id, String name) {
         JSONObject obj = new JSONObject();
         Game game;
@@ -169,35 +167,15 @@ public class Server {
 //                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
             obj.put("player_id", player.getPlayer_ID());
 
-<<<<<<< HEAD
-=======
-    /**
-     * @param player
-     * @param idGame
-     * @author HazelMartinez
-     * @version 1.0
-     * @since 2019/05/04
-     */
-    public void addPlayerToExistingGame(Player player, String idGame) {
-        //This method adds a new player to a existing game
-        //Recives the idGame for know where to add the player.
-        for (int index = 0; index < gameList.getSize(); index++) {
-            if (gameList.returnValue(index).getIdGame() == idGame) {
-                //If the idGame is found add the player to the gameList
-                gameList.returnValue(index).getPlayersList().insert(player);
-            }
->>>>>>> Comentarios de algunos metodos 
         }
         return obj;
     }
-
     /**
-<<<<<<< HEAD
     *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
      * @author Brayan
     *
     */
-    public void fillTokenList(){
+    public void fillTokenList() {
         Token A = new Token("res/images/token/A.png", 1, "A");
         Token E = new Token("res/images/token/E.png", 1, "E");
         Token O = new Token("res/images/token/O.png", 1, "O");
@@ -230,34 +208,34 @@ public class Server {
 
 
         //Se añaden las fichas A y E a la lista
-        for (int ae = 1;ae <= 12; ae++){
+        for (int ae = 1; ae <= 12; ae++) {
             TokenList.addLast(A);
             TokenList.addFirst(E);
         }
         //Se añade la ficha O a la lista
-        for (int o = 1;o <= 9;o++){
+        for (int o = 1; o <= 9; o++) {
             this.TokenList.addFirst(O);
         }
         //Se añaden las fichas I y S a la lista
-        for (int is = 1;is <= 6;is++){
+        for (int is = 1; is <= 6; is++) {
             this.TokenList.addFirst(I);
             this.TokenList.addFirst(S);
         }
         //Se añaden las fichas N,R,U,D a la lista
-        for (int nrud = 1;nrud <= 5;nrud++){
+        for (int nrud = 1; nrud <= 5; nrud++) {
             this.TokenList.addFirst(N);
             this.TokenList.addFirst(R);
             this.TokenList.addFirst(U);
             this.TokenList.addFirst(D);
         }
         //Se añaden las fichas L,T,C a la lista
-        for (int ltc = 1;ltc <= 4;ltc++){
+        for (int ltc = 1; ltc <= 4; ltc++) {
             this.TokenList.addFirst(L);
             this.TokenList.addFirst(T);
             this.TokenList.addFirst(C);
         }
         //Se añaden las fichas G,B,M,P,H a la lista
-        for (int gbmph = 1;gbmph <= 2;gbmph++){
+        for (int gbmph = 1; gbmph <= 2; gbmph++) {
             this.TokenList.addFirst(G);
             this.TokenList.addFirst(B);
             this.TokenList.addFirst(M);
@@ -265,7 +243,7 @@ public class Server {
             this.TokenList.addFirst(H);
         }
         //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
-        for (int fvychqjllñrrxz = 1;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
+        for (int fvychqjllñrrxz = 1; fvychqjllñrrxz <= 1; fvychqjllñrrxz++) {
             this.TokenList.addFirst(F);
             this.TokenList.addFirst(V);
             this.TokenList.addFirst(Y);
@@ -279,29 +257,17 @@ public class Server {
             this.TokenList.addFirst(Z);
 
         }
-        for (int bonus = 1;bonus <= 2;bonus++){
+        for (int bonus = 1; bonus <= 2; bonus++) {
             this.TokenList.addFirst(Bonus);
         }
 
-=======
-     * @author HazelMartinez
-     * @version 1.0
-     * @since 07/04/2019
-     *
-     * @param gameNumber
-     * @return user Name
-     */
-    public String choosePlayerStart(int gameNumber){
-        //This method choose a random player for start the game
-        //Recives a gameNumber, this is the number of gameList
-        Random rand = new Random();
-        int sizelist = gameList.returnValue(gameNumber).getPlayersList().getSize();
-        //Obtein the size of the list for have the random number between 0 and the size
-        int randomInt = rand.nextInt((sizelist)); //generate the random number
-        return gameList.returnValue(gameNumber).getPlayersList().returnValue(randomInt).getName();
-        //return the UserName
->>>>>>> Comentarios de algunos metodos 
     }
+
+
+    public LinkedList<Game> getGameList() {
+        return gamesList;
+    }
+
 
     public static void main(String[] args){
         Server server = new Server(6307);

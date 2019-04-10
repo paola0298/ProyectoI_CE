@@ -1,7 +1,10 @@
 package Logic;
 /**
  * Clase Game
+<<<<<<< HEAD
  *
+=======
+>>>>>>> c734b6c850b5fcca2544391a380c2ab310678c0c
  * @author HazelMartinez
  * @version 1.0
  * @since 22/03/2019
@@ -83,25 +86,6 @@ public class Game {
         return actualPlayer;
     }
 
-
-    public boolean DeletePlayer(Player playerToDelete) {
-
-//        for(int index = 0; index < players.getSize(); index++){
-//
-////            if(players.(index).getName() == player.getName()){
-//            if (players.get(index).getPlayer_ID().equals(playerToDelete.getPlayer_ID())) {
-//                    players.de
-//            }
-//                //players.retornarValor(index).getplayers().insertar(player);
-//                players.eliminar();
-//            }
-//        }
-
-        return players.deleteElement(playerToDelete);
-
-
-    }
-
     /**
      *@author HazelMartinez
      * @since 22/03/2019
@@ -131,5 +115,6 @@ public class Game {
     public void setActualPlayer(String actualPlayer) {
         this.actualPlayer = actualPlayer;
     }
+
 
 }
