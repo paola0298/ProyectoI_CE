@@ -29,13 +29,22 @@ public class Server {
     private ServerSocket serverSocket;
     private boolean isRunning = true;
     private LinkedList<Game> gamesList = new LinkedList<>();
-    private LinkedList<Token> totalTokenList = new LinkedList<>();
+    private LinkedList<Token> tokenInstances = new LinkedList<>();
+    private int[][] letterInfo;
+
+    //Prueba
+    String expertAnswer;
+    boolean contact_expert = false;
+    boolean waiting_ex_response = false;
+    String expert_phone = "";
+    String expert_word = "";
+    String player_id = "";
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
     public Server(int port){
-        fillTokenList();
+        init();
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -139,25 +148,25 @@ public class Server {
                 case "CALL_EXPERT":
                     response = callExpert(); //TODO actualizar el metodo segun los datos que se necesiten
 
-//                    if (msg.getString("status").equals("WAITING")) {
-//                        if (!expertAnswer.equals("")) {
-//                            response.put("status", "ANSWERED");
-//                            response.put("WORD_STATUS", expertAnswer);
-//                            contact_expert = false;
-//                            expert_phone = "";
-//                            expert_word = "";
-//                            player_id = "";
-//                        } else {
-//                            response.put("status", "CONTACTING");
-//                        }
-//                    } else {
-//                        contact_expert = true;
-//                        expert_phone = msg.getString("phone");
-//                        expert_word = msg.getString("word");
-//                        player_id = msg.getString("player_id");
-//
-//                        response.put("status", "CONTACTING");
-//                    }
+                    if (msg.getString("status").equals("WAITING")) {
+                        if (!expertAnswer.equals("")) {
+                            response.put("status", "ANSWERED");
+                            response.put("WORD_STATUS", expertAnswer);
+                            contact_expert = false;
+                            expert_phone = "";
+                            expert_word = "";
+                            player_id = "";
+                        } else {
+                            response.put("status", "CONTACTING");
+                        }
+                    } else {
+                        contact_expert = true;
+                        expert_phone = msg.getString("phone");
+                        expert_word = msg.getString("word");
+                        player_id = msg.getString("player_id");
+
+                        response.put("status", "CONTACTING");
+                    }
 
                     sendResponse(response.toString(), con);
                     System.out.println("Esperando a contactar experto");
@@ -169,23 +178,23 @@ public class Server {
                 case "EXPERT_SERVICE":
                     response = expertService(); //TODO actualizar el metodo segun los datos que se necesiten
 
-//                    if (!contact_expert && !waiting_ex_response) {
-//                        response.put("status", "NO");
-//
-//                    } else if (contact_expert && !waiting_ex_response){
-//                        contact_expert = false;
-//                        waiting_ex_response = true;
-//                        response.put("status", "SEND_SMS");
-//                        response.put("phone", expert_phone);
-//                        response.put("word", expert_word);
-//                    } else {
-//                        if (msg.getString("status").equals("WAITING")) {
-//                            response.put("status", "WAITING");
-//                        } else if (msg.getString("status").equals("ANSWERED")) {
-//                            waiting_ex_response = false;
-//                            expertAnswer = msg.getString("expert_answer");
-//                        }
-//                    }
+                    if (!contact_expert && !waiting_ex_response) {
+                        response.put("status", "NO");
+
+                    } else if (contact_expert && !waiting_ex_response){
+                        contact_expert = false;
+                        waiting_ex_response = true;
+                        response.put("status", "SEND_SMS");
+                        response.put("phone", expert_phone);
+                        response.put("word", expert_word);
+                    } else {
+                        if (msg.getString("status").equals("WAITING")) {
+                            response.put("status", "WAITING");
+                        } else if (msg.getString("status").equals("ANSWERED")) {
+                            waiting_ex_response = false;
+                            expertAnswer = msg.getString("expert_answer");
+                        }
+                    }
 
                     sendResponse(response.toString(), con);
                     break;
@@ -304,7 +313,7 @@ public class Server {
 
         for (int i = 0; i <= 6; i++) {
             ind = random.nextInt(100);
-            Node<Token> random_token = totalTokenList.acces_index(ind);
+            Node<Token> random_token = tokenInstances.acces_index(ind);
             tokenList.addLast(random_token.getValue());
         }
 
@@ -358,69 +367,163 @@ public class Server {
 
         //Se añaden las fichas A y E a la lista
         for (int ae = 1;ae <= 12; ae++){
-            totalTokenList.addLast(A);
-            totalTokenList.addFirst(E);
+            tokenInstances.addLast(A);
+            tokenInstances.addFirst(E);
         }
         //Se añade la ficha O a la lista
         for (int o = 1;o <= 9;o++){
-            this.totalTokenList.addFirst(O);
+            this.tokenInstances.addFirst(O);
         }
         //Se añaden las fichas I y S a la lista
         for (int is = 1;is <= 6;is++){
-            this.totalTokenList.addFirst(I);
-            this.totalTokenList.addFirst(S);
+            this.tokenInstances.addFirst(I);
+            this.tokenInstances.addFirst(S);
         }
         //Se añaden las fichas N,R,U,D a la lista
         for (int nrud = 1;nrud <= 5;nrud++){
-            this.totalTokenList.addFirst(N);
-            this.totalTokenList.addFirst(R);
-            this.totalTokenList.addFirst(U);
-            this.totalTokenList.addFirst(D);
+            this.tokenInstances.addFirst(N);
+            this.tokenInstances.addFirst(R);
+            this.tokenInstances.addFirst(U);
+            this.tokenInstances.addFirst(D);
         }
         //Se añaden las fichas L,T,C a la lista
         for (int ltc = 1;ltc <= 4;ltc++){
-            this.totalTokenList.addFirst(L);
-            this.totalTokenList.addFirst(T);
-            this.totalTokenList.addFirst(C);
+            this.tokenInstances.addFirst(L);
+            this.tokenInstances.addFirst(T);
+            this.tokenInstances.addFirst(C);
         }
         //Se añaden las fichas G,B,M,P,H a la lista
         for (int gbmph = 1;gbmph <= 2;gbmph++){
-            this.totalTokenList.addFirst(G);
-            this.totalTokenList.addFirst(B);
-            this.totalTokenList.addFirst(M);
-            this.totalTokenList.addFirst(P);
-            this.totalTokenList.addFirst(H);
+            this.tokenInstances.addFirst(G);
+            this.tokenInstances.addFirst(B);
+            this.tokenInstances.addFirst(M);
+            this.tokenInstances.addFirst(P);
+            this.tokenInstances.addFirst(H);
         }
         //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
         for (int fvychqjllñrrxz = 1;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
-            this.totalTokenList.addFirst(F);
-            this.totalTokenList.addFirst(V);
-            this.totalTokenList.addFirst(Y);
-            this.totalTokenList.addFirst(CH);
-            this.totalTokenList.addFirst(Q);
-            this.totalTokenList.addFirst(J);
-            this.totalTokenList.addFirst(LL);
-            this.totalTokenList.addFirst(Ñ);
-            this.totalTokenList.addFirst(RR);
-            this.totalTokenList.addFirst(X);
-            this.totalTokenList.addFirst(Z);
+            this.tokenInstances.addFirst(F);
+            this.tokenInstances.addFirst(V);
+            this.tokenInstances.addFirst(Y);
+            this.tokenInstances.addFirst(CH);
+            this.tokenInstances.addFirst(Q);
+            this.tokenInstances.addFirst(J);
+            this.tokenInstances.addFirst(LL);
+            this.tokenInstances.addFirst(Ñ);
+            this.tokenInstances.addFirst(RR);
+            this.tokenInstances.addFirst(X);
+            this.tokenInstances.addFirst(Z);
 
         }
         for (int bonus = 1;bonus <= 2;bonus++){
-            this.totalTokenList.addFirst(Bonus);
+            this.tokenInstances.addFirst(Bonus);
         }
 
     }
 
     public LinkedList<Token> getTokenList() {
-        return totalTokenList;
+        return tokenInstances;
+    }
+
+    private void init() {
+        LinkedList<Token> letters = new LinkedList<>();
+        this.letterInfo = new int[][]{
+                {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,5,1,1,1,1,4,4,8,4,10,5,8,8,8}, //Valores
+                {12,2,4,5,12,1,2,2,6,1,1,4,2,5,9,2,1,5,6,4,5,1,2,1,1,1,1,1,1,1} //Repeticiones
+        };
+
+        char letter = 'A';
+        for (int i=0; i<26; i++) {
+            letters.addLast(new Token("/res/images/token/"+ letter + ".png", letterInfo[0][i], String.valueOf(letter)));
+            letter += 1;
+        }
+        letters.addLast(new Token("-", 5, "CH"));
+        letters.addLast(new Token("-", 8, "LL"));
+        letters.addLast(new Token("-", 8, "Ñ"));
+        letters.addLast(new Token("-", 8, "RR"));
+
+        this.tokenInstances = letters;
+    }
+
+    private LinkedList<Token> randomTokens(int count) {
+        LinkedList<Token> list = new LinkedList<>();
+        Random random = new Random();
+
+        for (int i=0; i<count; i++) {
+            int range = random.nextInt(100);
+            int iter;
+            int type;
+            if (range<=31) {
+
+                iter = random.nextInt(count(12));
+                type = 12;
+            } else if (32<range && range<=54) {
+
+                iter = random.nextInt(count(9));
+                type = 9;
+            } else if (54<range && range<=69) {
+
+                iter = random.nextInt(count(6));
+                type = 6;
+            } else if (69<range && range<=82) {
+
+                iter = random.nextInt(count(5));
+                type = 5;
+            } else if (82<range && range<=92) {
+
+                iter = random.nextInt(count(4));
+                type = 4;
+            } else if (92<range && range<=97) {
+
+                iter = random.nextInt(count(2));
+                type = 2;
+            } else {
+
+                iter = random.nextInt(count(1));
+                type = 1;
+            }
+
+            list.addLast(findOccurrence(iter, type));
+        }
+        return list;
+    }
+
+    private int count(int element) {
+        int e = 0;
+        for(int i:letterInfo[1]) {
+            if (i == element) {
+                e++;
+            }
+        }
+        return e;
+    }
+
+
+    private Token findOccurrence(int iter, int type) {
+        int index = 0;
+        int c = 0;
+        for (int element:letterInfo[1]) {
+            if (c == iter) {
+                break;
+            } else if (element == type) {
+                c++;
+            }
+            index++;
+        }
+        return tokenInstances.get(index);
     }
 
     public static void main(String[] args) {
         int port = 6307;
         Server server = new Server(port);
-        System.out.println("Servidor iniciado en puerto " + port);
+//        System.out.println("Servidor iniciado en puerto " + port);
         server.connectionListener();
+//      server.init();
+//      LinkedList<Token> list = server.randomTokens(7);
+//        System.out.println("-------------------");
+//      for (int i=0; i<list.getSize(); i++) {
+//          System.out.println("Token: " + list.get(i).getLetter());
+//      }
 
     }
 }

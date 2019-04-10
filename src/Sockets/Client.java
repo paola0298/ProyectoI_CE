@@ -98,13 +98,13 @@ public class Client {
         Client client = new Client("localhost", 7123);
         JSONObject obj = new JSONObject();
         obj.put("action", "CALL_EXPERT");
-        obj.put("player_id", "caca");
+        obj.put("player_id", "jugador1");
         switch (action) {
             case 0:
                 obj.put("status", "REQUESTING");
 
-                obj.put("phone", "50670143773");
-                obj.put("word", "Cacahuate");
+                obj.put("phone", "50671766731");
+                obj.put("word", "Ratón");
                 JSONObject response = client.connect(obj);
                 System.out.println(response.toString(2));
                 break;
