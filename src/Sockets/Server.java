@@ -89,21 +89,6 @@ public class Server {
      * Escucha las conexiones del cliente
      */
     public void connectionListener(){
-        //Posible thread
-//        Runnable task = () -> {
-//            //codigo a ejecutar
-//        };
-//
-//        Thread worker = new Thread(task);
-//        worker.setDaemon(true);
-//        worker.start();
-//
-//        Thread thread = new Thread(() -> {
-//            //codigo a ejecutar
-//        });
-//        thread.setDaemon(true); // para que termine de ejecutarse, al terminar ejecucion principal que lo llama
-//        thread.start();
-//
 
         while (this.isRunning){
             System.out.println("Esperando conexión");
