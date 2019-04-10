@@ -131,6 +131,10 @@ public class Scrabble extends Application {
                 boolean success = controller.join_match(match_id);
                 if (success) {
                     gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
+                    playerLoader();
+                    tokenLoader();
+                    showMatchID();
+
                 } else {
 
                 }
@@ -230,6 +234,10 @@ public class Scrabble extends Application {
         showInfoButton.setOnMouseClicked(mouseEvent -> {
             showMatchID();
         });
+
+        showInfoButton.setFitHeight(60);
+        showInfoButton.setFitWidth(60);
+
 
         upPlayerInfoContainer.getChildren().addAll(showInfoButton);
 

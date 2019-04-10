@@ -91,20 +91,9 @@ public class Controller {
 
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Match created successfully");
-            ObjectMapper objectMapper =  new ObjectMapper();
             player_id = response.getString("player_id");
             current_match_id = response.getString("game_id");
-            String stringGame = response.getString("game");
-            String stringPlayer = response.getString("player");
-
-            try {
-                actualGame = objectMapper.readValue(stringGame, Game.class);
-                playerInstance = objectMapper.readValue(stringPlayer, Player.class);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error getting game object");
-            }
+            getInstances();
 
         } else {
             System.out.println("Could not create match");
@@ -126,10 +115,27 @@ public class Controller {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
             this.current_match_id = match_id;
+
+            getInstances();
             return true;
         } else {
             System.out.println("Could not join match");
             return false;
+        }
+    }
+
+    private void getInstances() {
+        ObjectMapper objectMapper =  new ObjectMapper();
+        String stringGame = response.getString("game");
+        String stringPlayer = response.getString("player");
+
+        try {
+            actualGame = objectMapper.readValue(stringGame, Game.class);
+            playerInstance = objectMapper.readValue(stringPlayer, Player.class);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error getting game object");
         }
     }
 

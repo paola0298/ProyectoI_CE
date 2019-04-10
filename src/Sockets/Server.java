@@ -134,6 +134,7 @@ public class Server {
                     String matchID = msg.getString("match_id");
                     playerName = msg.getString("player_name");
                     response = joinMatch(matchID, playerName);
+                    sendResponse(response.toString(), con);
 
                     break;
                 case "CHECK_WORD":
@@ -202,19 +203,31 @@ public class Server {
     private JSONObject joinMatch(String id, String name) {
         JSONObject obj = new JSONObject();
         Game game;
+        String serializedGame = "";
+        String serializedPlayer = "";
         for (int i=0; i<gamesList.getSize(); i++) {
             if (gamesList.get(i).getGameID().equals(id)) {
                 game = gamesList.get(i);
                 Player player = new Player(name);
-                obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
-                obj.put("player_id", player.getPlayer_ID());
+                player.setTokenlist(generateTokens());
 
+                ObjectMapper mapper = new ObjectMapper();
+
+                try {
+                    serializedGame = mapper.writeValueAsString(game);
+                    serializedPlayer = mapper.writeValueAsString(player);
+                    obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
+                    obj.put("player_id", player.getPlayer_ID());
+                    obj.put("game", serializedGame);
+                    obj.put("player", serializedPlayer);
+
+                    return obj;
+                } catch (JsonProcessingException e) {
+                    obj.put("status", "FAILED");
+                    return obj;
+                }
             }
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-
-
         return obj;
     }
 
