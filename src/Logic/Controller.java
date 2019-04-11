@@ -31,7 +31,7 @@ public class Controller {
      */
     public Controller(Scrabble gui) {
         this.gui = gui;
-        initialize1();
+        initialize();
     }
 
     /**

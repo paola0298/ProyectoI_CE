@@ -367,7 +367,7 @@ public class Server {
         return null;
     }
 
-    public LinkedList<Token> updateTokenList(boolean flag, Token token){
+    public LinkedList<Token> updateTokenList(boolean flag, Token token, String matchID, String playerID){
         return new LinkedList<>();
 
     }
