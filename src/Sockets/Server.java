@@ -32,10 +32,11 @@ public class Server {
     private LinkedList<Token> tokenInstances = new LinkedList<>();
     private int[][] letterInfo;
 
-    //Prueba
+    //TODO estos atributos deben ir dentro de la clase Game, para que sea específico de cada partida.
     String expertAnswer;
     boolean contact_expert = false;
     boolean waiting_ex_response = false;
+    boolean receivedAnswer = false;
     String expert_phone = "";
     String expert_word = "";
     String player_id = "";
@@ -147,56 +148,12 @@ public class Server {
                     response = checkWord(); //TODO actualizar el metodo segun los datos que se necesiten
                     break;
                 case "CALL_EXPERT":
-                    response = callExpert(); //TODO actualizar el metodo segun los datos que se necesiten
-
-                    if (msg.getString("status").equals("WAITING")) {
-                        if (!expertAnswer.equals("")) {
-                            response.put("status", "ANSWERED");
-                            response.put("WORD_STATUS", expertAnswer);
-                            contact_expert = false;
-                            expert_phone = "";
-                            expert_word = "";
-                            player_id = "";
-                        } else {
-                            response.put("status", "CONTACTING");
-                        }
-                    } else {
-                        contact_expert = true;
-                        expert_phone = msg.getString("phone");
-                        expert_word = msg.getString("word");
-                        player_id = msg.getString("player_id");
-
-                        response.put("status", "CONTACTING");
-                    }
-
-                    sendResponse(response.toString(), con);
-                    System.out.println("Esperando a contactar experto");
-                    break;
-                case "CHECK_TURN":
-                    response = checkTurn(); //TODO actualizar el metodo segun los datos que se necesiten
+                    response = callExpert(msg); //TODO actualizar el metodo segun los datos que se necesiten
                     sendResponse(response.toString(), con);
                     break;
+
                 case "EXPERT_SERVICE":
-                    response = expertService(); //TODO actualizar el metodo segun los datos que se necesiten
-
-                    if (!contact_expert && !waiting_ex_response) {
-                        response.put("status", "NO");
-
-                    } else if (contact_expert && !waiting_ex_response){
-                        contact_expert = false;
-                        waiting_ex_response = true;
-                        response.put("status", "SEND_SMS");
-                        response.put("phone", expert_phone);
-                        response.put("word", expert_word);
-                    } else {
-                        if (msg.getString("status").equals("WAITING")) {
-                            response.put("status", "WAITING");
-                        } else if (msg.getString("status").equals("ANSWERED")) {
-                            waiting_ex_response = false;
-                            expertAnswer = msg.getString("expert_answer");
-                        }
-                    }
-
+                    response = expertService();
                     sendResponse(response.toString(), con);
                     break;
 
@@ -292,8 +249,69 @@ public class Server {
 
     private JSONObject checkWord(){ return new JSONObject(); }
 
-    private JSONObject callExpert() {
-        return new JSONObject();
+    private JSONObject callExpert(JSONObject msg) {
+        JSONObject obj = new JSONObject();
+
+//        if (msg.getString("status").equals("WAITING")) {
+//            if (!expertAnswer.equals("")) {
+//                response.put("status", "ANSWERED");
+//                response.put("WORD_STATUS", expertAnswer);
+//                contact_expert = false;
+//                expert_phone = "";
+//                expert_word = "";
+//                player_id = "";
+//            } else {
+//                response.put("status", "CONTACTING");
+//            }
+//        } else {
+//            contact_expert = true;
+//            expert_phone = msg.getString("phone");
+//            expert_word = msg.getString("word");
+//            player_id = msg.getString("player_id");
+//
+//            response.put("status", "CONTACTING");
+//        }
+//
+//        sendResponse(response.toString(), con);
+//        System.out.println("Esperando a contactar experto");
+//        break;
+//        case "CHECK_TURN":
+//        response = checkTurn(); //TODO actualizar el metodo segun los datos que se necesiten
+//        sendResponse(response.toString(), con);
+//        break;
+//        case "EXPERT_SERVICE":
+//        response = expertService(); //TODO actualizar el metodo segun los datos que se necesiten
+//
+//        if (!contact_expert && !waiting_ex_response) {
+//            response.put("status", "NO");
+//
+//        } else if (contact_expert && !waiting_ex_response){
+//            contact_expert = false;
+//            waiting_ex_response = true;
+//            response.put("status", "SEND_SMS");
+//            response.put("phone", expert_phone);
+//            response.put("word", expert_word);
+//        } else {
+//            if (msg.getString("status").equals("WAITING")) {
+//                response.put("status", "WAITING");
+//            } else if (msg.getString("status").equals("ANSWERED")) {
+//                waiting_ex_response = false;
+//                expertAnswer = msg.getString("expert_answer");
+//            }
+//        }
+        if (!receivedAnswer) {
+            expert_phone = msg.getString("phone");
+            expert_word = msg.getString("word");
+            player_id = msg.getString("player_id");
+            contact_expert = true;
+            obj.put("status", "CONTACTING");
+        } else {
+            obj.put("status", "ANSWERED");
+            obj.put("word_status", expertAnswer);
+        }
+
+
+        return obj;
     }
 
     private JSONObject checkTurn() {
@@ -301,7 +319,15 @@ public class Server {
     }
 
     private JSONObject expertService() {
-        return new JSONObject();
+        JSONObject obj = new JSONObject();
+
+        if (!contact_expert) {
+            obj.put("status", "NO");
+        } else {
+            obj.put("status", "SEND_SMS");
+        }
+
+        return obj;
     }
 
     private JSONObject disconnect() { return new JSONObject(); }
