@@ -2,6 +2,7 @@ package Logic;
 
 import GUI.Scrabble;
 import Sockets.Client;
+import Structures.LinkedList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ public class Controller {
     private String current_match_id = "-";
     private Game actualGame;
     private Player playerInstance;
+    private Token[][] grid;
 
 
     /**
@@ -57,6 +59,27 @@ public class Controller {
         this.playerName = playerName;
     }
 
+    public void addToken(Token tokenToAdd, int row, int column){
+        grid[column][row] = tokenToAdd;
+    }
+
+    /**
+     * @param flag Bandera que determina si se va a eliminar (false) o agregar (true) un token
+     * @param token Token que se va a agregar o eliminar
+     * @return Nueva lista de tokens actualizada
+     */
+    public LinkedList<Token> updateTokenList(boolean flag, Token token){
+        LinkedList<Token> actualList = getPlayerInstance().getTokenlist();
+
+        if (flag){
+            actualList.addLast(token);
+        }
+        else {
+            actualList.remove(token);
+        }
+        return actualList;
+    }
+
     /**
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
      * @param max_players Cantidad máxima de jugadores en la partida.
@@ -74,12 +97,18 @@ public class Controller {
             player_id = response.getString("player_id");
             current_match_id = response.getString("game_id");
             deserialize();
+            updatePlayers();
+            grid = actualGame.getGrid();
             return true;
-
         } else {
             System.out.println("Could not create match");
             return false;
         }
+    }
+
+    private void updatePlayers(){
+        LinkedList<Player> actualPlayers = actualGame.getPlayers();
+        gui.playerLoader2(actualPlayers);
     }
 
     /**
@@ -100,8 +129,9 @@ public class Controller {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
             this.current_match_id = match_id;
-
             deserialize();
+            updatePlayers();
+            grid = actualGame.getGrid();
             return true;
         } else {
             System.out.println("Could not join match");
@@ -209,7 +239,7 @@ public class Controller {
     }
 
     private void initialize1(){
-        client = new Client("localhost", 7123);
+        client = new Client("localhost", 6307);
     }
 
 }

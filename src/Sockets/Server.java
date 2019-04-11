@@ -40,6 +40,7 @@ public class Server {
     String expert_word = "";
     String player_id = "";
 
+
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
@@ -326,6 +327,23 @@ public class Server {
         }else{
             System.out.println("The word already exist");
         }
+    }
+
+    public Game getActualGame(String matchID){
+        Node<Game> temp = gamesList.getHead();
+        while(temp!=null){
+            if (temp.getValue().getGameID().equals(matchID)){
+                return temp.getValue();
+            } else
+                temp = temp.getNext();
+        }
+
+        return null;
+    }
+
+    public LinkedList<Token> updateTokenList(boolean flag, Token token){
+        return new LinkedList<>();
+
     }
 
     /**
