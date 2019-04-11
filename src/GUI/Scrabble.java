@@ -30,12 +30,13 @@ public class Scrabble extends Application {
     private HBox actualPlayerInfoContainer;
     private HBox tokenBox;
     private ImageView letterSelected = null;
+    private Token selectedToken = null;
 
     private BorderPane gameScreenContainer; //Ventana del juego.
     private GridPane matrixContainer; // Matríz del juego
     private VBox joinMatchContainer; //Ventana de unión a partida existente.
     private VBox initialWindow; // Ventana inicial
-    private BorderPane root; //Ventana de partida nueva
+    private BorderPane newMatchWindow; //Ventana de partida nueva
 
 
     private String word = null;
@@ -54,7 +55,7 @@ public class Scrabble extends Application {
         init_gameWindow();
 
         //Aquí añaden su panel al contenedor principal.
-        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, root);
+        mainLayout.getChildren().addAll(joinMatchContainer, gameScreenContainer, initialWindow, newMatchWindow);
         Scene scene = new Scene(mainLayout, 1280, 900);
         scene.getStylesheets().add(("file:///" + cwd + "/res/styles.css").replace(" ", "%20"));
         stage.setMinWidth(640);
@@ -62,8 +63,6 @@ public class Scrabble extends Application {
         stage.setScene(scene);
         stage.setTitle("Scrabble TEC");
         initialWindow.toFront();
-//        gameScreenContainer.toFront();
-//        root.toFront();
         stage.show();
 
     }
@@ -79,36 +78,41 @@ public class Scrabble extends Application {
         En esta ventana se especifíca cuantos jugadores tendrá la partida
          */
         initialWindow = new VBox();
-        initialWindow.setStyle("-fx-background-color: #1a8c24;");
+//        initialWindow.setStyle("-fx-background-color: #1a8c24;");
+        initialWindow.setStyle("-fx-background-color: white");
         initialWindow.setAlignment(Pos.CENTER);
         initialWindow.setSpacing(15);
         initialWindow.setPadding(new Insets(15));
         // El usuario ingresa su nombre
-        Label Players_Name = new Label("Introduzca su nombre:");
-        TextField Players_Name_Input = new TextField();
-        Players_Name_Input.setMaxWidth(300);
+        Label playerName = new Label("Introduzca su nombre:");
+        TextField playerNameInput = new TextField();
+        playerNameInput.setMaxWidth(300);
 
         // El usuario escoge si quiere unirse a una partida o si va a crear una nueva
-        Button Join = new Button("Unirme a una partida existente");
-        Join.setOnAction(event -> {
-            String name = Players_Name_Input.getText();
+        Button joinButton = new Button("Unirme a una partida existente");
+        joinButton.setOnAction(event -> {
+            String name = playerNameInput.getText();
             if (!name.equals("")) {
-                controller.setPlayerName(Players_Name_Input.getText());
+                controller.setPlayerName(playerNameInput.getText());
                 joinMatchContainer.toFront();
+            } else {
+                showAlert("Debe ingresar el nombre del jugador", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
 
-        Button New_Game = new Button("Crear una nueva partida");
-        New_Game.setOnAction(actionEvent -> {
-            String name = Players_Name_Input.getText();
+        Button newGameButton = new Button("Crear una nueva partida");
+        newGameButton.setOnAction(actionEvent -> {
+            String name = playerNameInput.getText();
             if (!name.equals("")) {
-                controller.setPlayerName(Players_Name_Input.getText());
-                root.toFront();
+                controller.setPlayerName(playerNameInput.getText());
+                newMatchWindow.toFront();
+            }
+            else{
+                showAlert("Debe ingresar el nombre del jugador", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
 
-
-        initialWindow.getChildren().addAll(Players_Name,Players_Name_Input,Join,New_Game);
+        initialWindow.getChildren().addAll(playerName,playerNameInput,joinButton,newGameButton);
     }
 
     private void init_joinWindow() {
@@ -118,8 +122,18 @@ public class Scrabble extends Application {
         joinMatchContainer.setAlignment(Pos.CENTER);
         joinMatchContainer.setSpacing(15);
         joinMatchContainer.setPadding(new Insets(15));
+
+        HBox buttonContainer = backButtonContainer();
+
+        VBox infoContainer = new VBox();
+        infoContainer.setStyle("-fx-background-color: white");
+        infoContainer.setAlignment(Pos.TOP_CENTER);
+        infoContainer.setSpacing(15);
+        infoContainer.setPadding(new Insets(15));
+        infoContainer.setPrefHeight(550);
+
         Label joinTitle = new Label("Ingresa el código de la partida");
-        TextField joinTextField = new TextField(); //Brayan: Agregué una d al final del nombre de la variable, en la siguiente línea también
+        TextField joinTextField = new TextField();
         joinTextField.setMaxWidth(200);
         Button joinButton = new Button("Unirse");
         Label joinResponse = new Label("");
@@ -127,37 +141,43 @@ public class Scrabble extends Application {
         joinButton.setOnAction(event -> {
             String match_id = joinTextField.getText();
             if (!match_id.equals("")) {
-                boolean success = controller.join_match(match_id);
-                if (success) {
-                    gameScreenContainer.toFront(); //TODO esté método lo llamaría Controller
-                    playerLoader();
+                if (controller.join_match(match_id)) {
+                    gameScreenContainer.toFront();
+//                    playerLoader2(); //TODO actualizar metodo
                     tokenLoader();
-                    showMatchID();
-
+                    String message = "El código de la partida es: " + controller.getCurrent_match_id();
+                    showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
                 } else {
-
+                    showAlert("No es posible unirse a la sala", "Error de conexion", Alert.AlertType.ERROR);
                 }
+            }else {
+                showAlert("Debe ingresar el código de la partida a la que desea unirse", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
-        joinMatchContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
+        infoContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
+        joinMatchContainer.getChildren().addAll(buttonContainer, infoContainer);
     }
 
     private void init_newMatchWindow() {
         /* Window for create a new game displays an comboBox for choose the number of players in the game */
-        root = new BorderPane();
+        newMatchWindow = new BorderPane();
 
-        root.setPadding(new Insets(15, 20, 10, 10));
-        root.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
+        newMatchWindow.setPadding(new Insets(15, 20, 10, 10));
+        newMatchWindow.setBackground(new Background(new BackgroundFill(Color.rgb(47,79,79), CornerRadii.EMPTY, Insets.EMPTY)));
         //espacio del border pane al boton
 
-        Label numberPlayers = new Label("Number of Players");
+        HBox buttonContainer = backButtonContainer();
+
+        Label numberPlayers = new Label("Seleccione la cantidad de jugadores");
         numberPlayers.setPadding(new Insets(2,2,2,2));
         numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143,188,143), CornerRadii.EMPTY, Insets.EMPTY)));
         numberPlayers.setTextFill(Color.rgb(34,139,34));
         numberPlayers.setFont(new Font("Serif",30));
         numberPlayers.setAlignment(Pos.CENTER);
-        HBox hBox = new HBox();
-        hBox.getChildren().add(numberPlayers);
+
+        VBox matchOptionsContainer = new VBox();
+        matchOptionsContainer.setSpacing(20);
+        matchOptionsContainer.setAlignment(Pos.CENTER);
 
         //Create a ComboBox
         ComboBox<String> comboBox = new ComboBox<>();
@@ -166,33 +186,55 @@ public class Scrabble extends Application {
         comboBox.getItems().add("4");
         comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46,139,87), CornerRadii.EMPTY,Insets.EMPTY)));
         comboBox.setStyle("-fx-font: 30px \"Serif\";");
-        hBox.getChildren().add(comboBox);
 
-        hBox.setSpacing(20);
-        hBox.setAlignment(Pos.CENTER);
-        root.setCenter(hBox);
+        matchOptionsContainer.getChildren().addAll(numberPlayers, comboBox);
+        newMatchWindow.setCenter(matchOptionsContainer);
         Button startButton = new Button("Start Game");
         startButton.setOnMouseClicked(mouseEvent -> {
             int i = comboBox.getSelectionModel().getSelectedIndex();
-            String selected = comboBox.getItems().get(i);
-            controller.create_match(selected);
-            gameScreenContainer.toFront();
-            playerLoader();
-            tokenLoader();
-            showMatchID();
+            if (i > -1) {
+                String selected = comboBox.getItems().get(i);
+                if (controller.create_match(selected)) {
+                    gameScreenContainer.toFront();
+//                    playerLoader2();
+                    tokenLoader();
+                    String message = "El código de la partida es: " + controller.getCurrent_match_id();
+                    showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
+                }else{
+                    showAlert("No se ha podido realizar la conexion con el servidor", "Error de conexion", Alert.AlertType.ERROR);
+                }
+            } else {
+                showAlert("Debe seleccionar la cantidad de jugadores", "Campo requerido", Alert.AlertType.ERROR);
+            }
 
         });
-        startButton.setPadding(new Insets(20, 10, 10, 20));
+
         startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72,209,204), CornerRadii.EMPTY, Insets.EMPTY)));
         startButton.setTextFill(Color.rgb(0,100,0));
         startButton.setFont(new Font("Serif", 30));
         startButton.setAlignment(Pos.CENTER_RIGHT);
-        root.setBottom(startButton);
+        newMatchWindow.setBottom(startButton);
+        newMatchWindow.setLeft(buttonContainer);
         // Alignment.
         BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
+        BorderPane.setAlignment(buttonContainer, Pos.TOP_LEFT);
 
         // Set margin for bottom area.
         BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
+    }
+
+    private HBox backButtonContainer(){
+        HBox buttonContainer = new HBox();
+        buttonContainer.setStyle("-fx-background-color: white");
+        buttonContainer.setAlignment(Pos.TOP_LEFT);
+        buttonContainer.setPrefHeight(350);
+        ImageView backButton = loadImageView("/res/images/backButton.png", 50, 50);
+        backButton.setOnMouseClicked(mouseEvent -> {
+            initialWindow.toFront();
+        });
+        buttonContainer.getChildren().addAll(backButton);
+
+        return buttonContainer;
     }
 
     private void init_gameWindow() {
@@ -229,14 +271,11 @@ public class Scrabble extends Application {
         upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
-        ImageView showInfoButton = loadImageView("/res/images/infoIcon.png");
+        ImageView showInfoButton = loadImageView("/res/images/infoIcon.png", 60, 60);
         showInfoButton.setOnMouseClicked(mouseEvent -> {
-            showMatchID();
+            String message = "El código de la partida es: " + controller.getCurrent_match_id();
+            showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
         });
-
-        showInfoButton.setFitHeight(60);
-        showInfoButton.setFitWidth(60);
-
 
         upPlayerInfoContainer.getChildren().addAll(showInfoButton);
 
@@ -268,20 +307,26 @@ public class Scrabble extends Application {
 
     }
 
-    private void showMatchID(){
-        String matchID =  controller.getCurrent_match_id();
-        Alert showID = new Alert(Alert.AlertType.INFORMATION);
-        showID.setTitle("Código de la partida");
+    private void showAlert(String message, String title, Alert.AlertType type){
+        Alert showID = new Alert(type);
+        showID.setTitle(title);
         showID.setHeaderText(null);
-        showID.setContentText("El código de la partida es: " + matchID);
+        showID.setContentText(message);
         showID.showAndWait();
     }
 
     private void createWord(){
+
+
         
     }
 
     private void addToActualLetters(boolean child, int row, int column){
+        LinkedList<String> tokenImage = new LinkedList<>();
+        tokenImage.addLast(String.valueOf(child));
+        tokenImage.addLast(String.valueOf(row));
+        tokenImage.addLast(String.valueOf(column));
+
         if (!child){
             // la letra no esta agregada a la lista con su respectiva fila y columna
 
@@ -309,147 +354,205 @@ public class Scrabble extends Application {
     /**
      * Carga en la interfaz los jugadores presentes en la partida
      */
-    private void playerLoader() {
-        //TODO por cada jugador que este en la lista de jugadores del juego actual, cargar los datos en la interfaz
-
-        // instanciar widgets;
-        ImageView addUserImage;
-
-        Text userScoreText;
+    public void playerLoader2(LinkedList<Player> playersToLoad) {
+        ImageView userImage;
+        Text scoreLabel;
         Text userScore;
         Text userName;
-
+        int c = 0;
         LinkedList<ImageView> imageForUser = new LinkedList<>();
-        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
-        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
-        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
-        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
-        Node<ImageView> imageTemp = imageForUser.getHead();
+        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png", 100, 60));
+        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png", 100, 60));
+        imageForUser.addLast(loadImageView("/res/images/user/player_red.png", 100, 60));
+        imageForUser.addLast(loadImageView("/res/images/user/player_green.png", 100, 60));
 
-        // playersList
+//        LinkedList<Player> playersToLoad = controller.getActualGame().getPlayers();
 
-        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
-        Node<Player> playerTemp = actualPlayers.getHead();
-        Player actualPlayer = controller.getPlayerInstance();
-        if (actualPlayer != playerTemp.getValue()) {
-            actualPlayers.remove(actualPlayer);
-            actualPlayers.addFirst(actualPlayer);
-        }
+        for (int i=0; i<playersToLoad.getSize(); i++) {
+            Player player = playersToLoad.get(i);
+            System.out.println("Player: " + player.getName());
+            userImage = imageForUser.get(i);
 
-        int i = 0;
-        while (playerTemp != null) {
-            addUserImage = imageTemp.getValue();
-            addUserImage.setFitHeight(100);
-            addUserImage.setFitWidth(60);
+            VBox playerBox = new VBox();
+            playerBox.setAlignment(Pos.CENTER);
+            userName = new Text(player.getName());
 
-            VBox playersBox = new VBox();
-            playersBox.setAlignment(Pos.CENTER);
-            userName = new Text(playerTemp.getValue().getName());
-
-            //puntuacion del usuario
+            //Puntuación del usuario
             HBox userScoreBox = new HBox();
             userScoreBox.setAlignment(Pos.CENTER);
             userScoreBox.setSpacing(10);
-            userScoreBox.setAlignment(Pos.CENTER);
-            userScoreText = new Text("Puntos:");
-            String score = String.valueOf(playerTemp.getValue().getScore());
-            userScore = new Text(score);
-            userScoreBox.getChildren().addAll(userScoreText, userScore);
-            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+            scoreLabel = new Text("Puntos: ");
+            userScore = new Text(String.valueOf(player.getScore()));
+            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+            playerBox.getChildren().addAll(userName, userImage, userScoreBox);
 
-            if (i==0){
-                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-            } else if (i==1){
-                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-            } else if (i == 2){
-                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+            System.out.println("Player id " + player.getplayerId());
+            System.out.println("Actual player id " + player.getplayerId());
+
+            if (player.getplayerId().equals(controller.getPlayerInstance().getplayerId())) {
+                System.out.println("Adding actual player");
+                this.actualPlayerInfoContainer.getChildren().add(playerBox);
             } else {
-                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+                System.out.println("Adding other players");
+                switch (c) {
+                    case 0:
+                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                    case 1:
+                        this.upPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                    case 2:
+                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
+                        break;
+                }
+                c++;
             }
-
-            imageTemp = imageTemp.getNext();
-            playerTemp = playerTemp.getNext();
-            i++;
 
         }
 
-//
 
-//        int i = 0;
-//        while(temp!=null){
-//            addUserImage = imageForUser.acces_index(i).getValue();
-//            addUserImage.setFitHeight(100);
-//            addUserImage.setFitWidth(60);
+
+    }
+//    private void playerLoader() {
+//        // instanciar widgets;
+//        ImageView userImage;
 //
-//            VBox playersBox = new VBox();
-//            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(temp.getValue().getName());
+//        Text scoreLabel;
+//        Text userScore;
+//        Text userName;
 //
-//            //puntuacion del usuario
-//            HBox userScoreBox = new HBox();
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreBox.setSpacing(10);
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreText = new Text("Puntos:");
-//            String score = String.valueOf(temp.getValue().getScore());
-//            userScore = new Text(score);
-//            userScoreBox.getChildren().addAll(userScoreText, userScore);
-//            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
+//        LinkedList<ImageView> imageForUser = new LinkedList<>();
+//        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
+//        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
+//        Node<ImageView> imageTemp = imageForUser.getHead();
 //
+//        // playersList
+//
+//        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
+//        Node<Player> playerTemp = actualPlayers.getHead();
+//        Player actualPlayer = controller.getPlayerInstance();
+//
+//        if (actualPlayer != playerTemp.getValue()) {
+//            actualPlayers.remove(actualPlayer);
+//            actualPlayers.addFirst(actualPlayer);
 //        }
-
 //
-////         temporal, mientras se genera la lista de jugadores
-//        LinkedList<String> players =  new LinkedList<>();
-//        players.addLast("Hazel");
-//        players.addLast("Brayan");
-//        players.addLast("Marlon");
-//        players.addLast("Paola");
-//        Node<String> temp = players.getHead();
-//
-//        int cont = 0;
 //        int i = 0;
-//
-//        while(temp!=null){
-//
-//            addUserImage = imageForUser.acces_index(i).getValue();
-//            addUserImage.setFitHeight(100);
-//            addUserImage.setFitWidth(60);
-//
+//        while (playerTemp != null) {
+//            userImage = imageTemp.getValue();
+//            userImage.setFitHeight(100);
+//            userImage.setFitWidth(60);
 //
 //            VBox playersBox = new VBox();
 //            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(temp.getValue());
+//            userName = new Text(playerTemp.getValue().getName());
 //
 //            //puntuacion del usuario
 //            HBox userScoreBox = new HBox();
 //            userScoreBox.setAlignment(Pos.CENTER);
 //            userScoreBox.setSpacing(10);
 //            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreText = new Text("Puntos:");
-//            userScore = new Text("50");
-//            userScoreBox.getChildren().addAll(userScoreText, userScore);
-//            playersBox.getChildren().addAll(userName, addUserImage, userScoreBox);
-
-//            if (cont==0){
+//            scoreLabel = new Text("Puntos:");
+//            String score = String.valueOf(playerTemp.getValue().getScore());
+//            userScore = new Text(score);
+//            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+//            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+//
+//            if (i==0){
 //                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (cont==1){
+//            } else if (i==1){
 //                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (cont == 2){
+//            } else if (i == 2){
 //                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
 //            } else {
 //                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
 //            }
 //
-//            temp = temp.getNext();
-//            cont++;
+//            imageTemp = imageTemp.getNext();
+//            playerTemp = playerTemp.getNext();
 //            i++;
+//
 //        }
-
-
-
-
-    }
+//
+////
+//
+////        int i = 0;
+////        while(temp!=null){
+////            userImage = imageForUser.acces_index(i).getValue();
+////            userImage.setFitHeight(100);
+////            userImage.setFitWidth(60);
+////
+////            VBox playersBox = new VBox();
+////            playersBox.setAlignment(Pos.CENTER);
+////            userName = new Text(temp.getValue().getName());
+////
+////            //puntuacion del usuario
+////            HBox userScoreBox = new HBox();
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            userScoreBox.setSpacing(10);
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            scoreLabel = new Text("Puntos:");
+////            String score = String.valueOf(temp.getValue().getScore());
+////            userScore = new Text(score);
+////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+////
+////        }
+//
+////
+//////         temporal, mientras se genera la lista de jugadores
+////        LinkedList<String> players =  new LinkedList<>();
+////        players.addLast("Hazel");
+////        players.addLast("Brayan");
+////        players.addLast("Marlon");
+////        players.addLast("Paola");
+////        Node<String> temp = players.getHead();
+////
+////        int cont = 0;
+////        int i = 0;
+////
+////        while(temp!=null){
+////
+////            userImage = imageForUser.acces_index(i).getValue();
+////            userImage.setFitHeight(100);
+////            userImage.setFitWidth(60);
+////
+////
+////            VBox playersBox = new VBox();
+////            playersBox.setAlignment(Pos.CENTER);
+////            userName = new Text(temp.getValue());
+////
+////            //puntuacion del usuario
+////            HBox userScoreBox = new HBox();
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            userScoreBox.setSpacing(10);
+////            userScoreBox.setAlignment(Pos.CENTER);
+////            scoreLabel = new Text("Puntos:");
+////            userScore = new Text("50");
+////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
+////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
+//
+////            if (cont==0){
+////                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else if (cont==1){
+////                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else if (cont == 2){
+////                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
+////            } else {
+////                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
+////            }
+////
+////            temp = temp.getNext();
+////            cont++;
+////            i++;
+////        }
+//
+//
+//
+//
+//    }
 
     /**
      * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
@@ -461,94 +564,55 @@ public class Scrabble extends Application {
      * Método para cargar las imágenes de las fichas del jugador
      */
     private void tokenLoader(){
-        LinkedList<Token> tokenLinkedList = controller.getPlayerInstance().getTokenlist();
-        Node<Token> temp = tokenLinkedList.getHead();
+        LinkedList<Token> tokenList = controller.getPlayerInstance().getTokenlist();
+//        Node<Token> temp = tokenLinkedList.getHead();
 
-        while (temp!=null){
-            Token actualToken = temp.getValue();
+//        while (temp!=null){
+//            Token actualToken = temp.getValue();
+//
+//            ImageView letter = loadImageView(actualToken.getImagePath());
+//            letter.setOnMouseClicked(mouseEvent -> {
+//                if (letterSelected == letter)
+//                    letterSelected = null;
+//                else
+//                    letterSelected = letter;
+//            });
+//
+//            tokenBox.getChildren().addAll(letter);
+//
+//            temp = temp.getNext();
+//        }
 
-            ImageView letter = loadImageView(actualToken.getImagePath());
+        //TODO actualizar logica
+
+        for (int i=0; i<tokenList.getSize(); i++) {
+            Token token = tokenList.get(i);
+            ImageView letter = loadImageView(token.getImagePath(), 80, 80);
+
             letter.setOnMouseClicked(mouseEvent -> {
-                if (letterSelected == letter)
-                    letterSelected = null;
-                else
-                    letterSelected = letter;
+                if (selectedToken == token) {
+                    selectedToken = null;
+                } else {
+                    selectedToken = token;
+                }
             });
+            tokenBox.getChildren().add(letter);
 
-            tokenBox.getChildren().addAll(letter);
-
-            temp = temp.getNext();
         }
 
 
-//
-//
-//        ImageView aLetter = loadImageView("/res/images/token/A.png");
-//        aLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==aLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = aLetter;
-//
-//        });
-//        ImageView bLetter = loadImageView("/res/images/token/B.png");
-//        bLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==bLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = bLetter;
-//        });
-//        ImageView cLetter = loadImageView("/res/images/token/C.png");
-//        cLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==cLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = cLetter;
-//        });
-//        ImageView dLetter = loadImageView("/res/images/token/D.png");
-//        dLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==dLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = dLetter;
-//        });
-//        ImageView eLetter = loadImageView("/res/images/token/R.png");
-//        eLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==eLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = eLetter;
-//        });
-//        ImageView fLetter = loadImageView("/res/images/token/F.png");
-//        fLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==fLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = fLetter;
-//        });
-//        ImageView gLetter = loadImageView("/res/images/token/G.png");
-//        gLetter.setOnMouseClicked(mouseEvent -> {
-//            if (letterSelected==gLetter)
-//                letterSelected=null;
-//            else
-//                letterSelected = gLetter;
-//        });
-//
-//        tokenBox.getChildren().addAll(aLetter, bLetter, cLetter, dLetter,
-//                eLetter, fLetter, gLetter); //agregar las fichas
     }
 
     /**
      * @param path Ruta del archivo
      * @return Un objeto ImageView de la imagen agregada
      */
-    private ImageView loadImageView(String path){
-        Image tokenImage = imageLoader(cwd+path);
-        ImageView addTokenImage = new ImageView(tokenImage);
-        addTokenImage.setFitHeight(80);
-        addTokenImage.setFitWidth(80);
-
-        return addTokenImage;
+    private ImageView loadImageView(String path, int height, int width){
+        Image image = imageLoader(cwd+path);
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(height);
+        imageView.setFitWidth(width);
+        return imageView;
     }
 
     /**
@@ -572,34 +636,44 @@ public class Scrabble extends Application {
     private void addBoxToGrid(){
         for(int i=0; i<15; i++){
             for (int j=0; j<15; j++){
-                HBox box =  new HBox();
-                box.setAlignment(Pos.CENTER);
-                box.setOnMouseClicked(mouseEvent -> {
-                    int row = GridPane.getRowIndex(box);
-                    int column = GridPane.getColumnIndex(box);
+                HBox tokenContainer =  new HBox();
+                tokenContainer.setAlignment(Pos.CENTER);
+                tokenContainer.setOnMouseClicked(mouseEvent -> {
+                    int row = GridPane.getRowIndex(tokenContainer);
+                    int column = GridPane.getColumnIndex(tokenContainer);
 
-                    if (box.getChildren().size()==0) {
-                        if (letterSelected != null) {
-                            putImageOnContainer(box);
-                            addToActualLetters(false, row, column);
+//                    if (tokenContainer.getChildren().size()==0) {
+//                        if (letterSelected != null) {
+//                            putImageOnContainer(tokenContainer);
+//
+//                            addToActualLetters(false, row, column);
+//                        }
+//                    }
+//                    else {
+//                        ImageView child = (ImageView) tokenContainer.getChildren().get(0);
+//                        child.setFitHeight(80);
+//                        child.setFitWidth(80);
+//
+//                        tokenContainer.getChildren().remove(0);
+//                        tokenBox.getChildren().add(child);
+//                        addGestureToNewToken();
+//
+//                        if (letterSelected != null) {
+//                            putImageOnContainer(tokenContainer);
+//                            addToActualLetters(true, row, column);
+//                        }
+//                    }
+
+                    if (tokenContainer.getChildren().size()==0){
+                        if (selectedToken != null){
+                            putImageOnContainer(tokenContainer);
                         }
                     }
-                    else {
-                        ImageView child = (ImageView) box.getChildren().get(0);
-                        child.setFitHeight(80);
-                        child.setFitWidth(80);
-
-                        box.getChildren().remove(0);
-                        tokenBox.getChildren().add(child);
-                        addGestureToNewToken();
-
-                        if (letterSelected != null) {
-                            putImageOnContainer(box);
-                            addToActualLetters(true, row, column);
-                        }
+                    else{
+                        ImageView child = (ImageView) tokenContainer.getChildren().get(0);
                     }
                 });
-                matrixContainer.add(box, i, j);
+                matrixContainer.add(tokenContainer, i, j);
             }
         }
     }
@@ -620,6 +694,7 @@ public class Scrabble extends Application {
      * Coloca la letra de la ficha en la casilla correspondiente
      */
     private void putImageOnContainer(HBox imagecontainer){
+        //TODO actualizar que tome la imagen de selected token, que es el token actual
         ImageView image = new ImageView(letterSelected.getImage());
         image.setFitHeight(30);
         image.setFitWidth(30);

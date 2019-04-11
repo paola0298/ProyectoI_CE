@@ -1,6 +1,5 @@
 package Sockets;
 
-import Logic.WordDictionary;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
@@ -74,21 +73,6 @@ public class Client {
         }
     }
 
-    public void SendWord(String word){
-        if(WordDictionary.search(word)){
-            sendData(word);
-        }else{
-            System.out.println("Palabra no encontrada");
-        }
-    }
-
-    public void AddWordDictonary(String newWord){
-        if(WordDictionary.search(newWord) == false){
-            WordDictionary.addWord(newWord);
-        }else{
-            System.out.println("The word is already exist");
-        }
-    }
 
     public static void main(String[] args) {
         /*
@@ -114,13 +98,13 @@ public class Client {
         Client client = new Client("localhost", 7123);
         JSONObject obj = new JSONObject();
         obj.put("action", "CALL_EXPERT");
-        obj.put("player_id", "caca");
+        obj.put("player_id", "jugador1");
         switch (action) {
             case 0:
                 obj.put("status", "REQUESTING");
 
-                obj.put("phone", "50670143773");
-                obj.put("word", "Cacahuate");
+                obj.put("phone", "50671766731");
+                obj.put("word", "Ratón");
                 JSONObject response = client.connect(obj);
                 System.out.println(response.toString(2));
                 break;

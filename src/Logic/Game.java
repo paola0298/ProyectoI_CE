@@ -34,14 +34,6 @@ public class Game {
 
     }
 
-    public void tokens(){ //Que hace este método?
-
-    }
-
-    public void setPlayers(LinkedList<Player> players) {
-        this.players = players;
-    }
-
     public LinkedList<Player> getPlayers() {
         return players;
     }
@@ -50,31 +42,8 @@ public class Game {
         return gameID;
     }
 
-    public void setGameID(String gameID) {
-        this.gameID = gameID;
-    }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    public void setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
-    }
-
     public Token[][] getGrid() {
         return grid;
     }
 
-    public void setGrid(Token[][] grid) {
-        this.grid = grid;
-    }
-
-    public String getActualPlayer() {
-        return actualPlayer;
-    }
-
-    public void setActualPlayer(String actualPlayer) {
-        this.actualPlayer = actualPlayer;
-    }
 }

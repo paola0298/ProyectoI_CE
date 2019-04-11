@@ -13,25 +13,13 @@ public class Token {
         this.letter = letter;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
 
     public String getImagePath() {
         return imagePath;
     }
 
-    public void setScore(int score) {
-        this.score = score;
-    }
-
     public int getScore() {
         return score;
-    }
-
-    public void setLetter(String letter) {
-        this.letter = letter;
-
     }
 
     public String getLetter() {

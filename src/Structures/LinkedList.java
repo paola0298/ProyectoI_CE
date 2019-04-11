@@ -10,16 +10,8 @@ public class  LinkedList<T> {
         this.head = null;
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     public Node<T> getHead() {
         return head;
-    }
-
-    public void setHead(Node<T> head) {
-        this.head = head;
     }
 
     public void addLast(T value){
@@ -85,16 +77,27 @@ public class  LinkedList<T> {
         return false;
     }
 
-    public void printList(){
+    @Override
+    public String toString(){
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("[");
         Node<T> temp = this.head;
         if (temp == null){
-            System.out.println("Error, lista nula");//Brayan: Se añade para determinar si la lista está vacía
+            buffer.append("]");
+            return buffer.toString();
         }else {
+            int i = 0;
             while (temp != null) {
-                System.out.println(temp.getValue());
+                buffer.append(temp.getValue());
+                if(i!=size-1)
+                    buffer.append(", ");
+                else
+                    buffer.append("]");
                 temp = temp.getNext();
+                i++;
             }
         }
+        return buffer.toString();
     }
 
     public T get(int index){
@@ -104,7 +107,6 @@ public class  LinkedList<T> {
         }
         return tmp.getValue();
     }
-
 
     public Node<T> acces_index(int index) {
         Node<T> tmp = this.head;
@@ -128,7 +130,7 @@ public class  LinkedList<T> {
         list.addFirst(100);
         list.addFirst(200);
         list.remove(100);
-        list.printList();
-
+        System.out.println(list.size);
+        System.out.println(list);
     }
 }

@@ -1,7 +1,6 @@
 package Logic;
 
 import org.apache.commons.lang3.StringUtils;
-
 import java.io.*;
 
 public class WordDictionary {
