@@ -102,21 +102,6 @@ public class Server {
      * Escucha las conexiones del cliente
      */
     public void connectionListener(){
-        //Posible thread
-//        Runnable task = () -> {
-//            //codigo a ejecutar
-//        };
-//
-//        Thread worker = new Thread(task);
-//        worker.setDaemon(true);
-//        worker.start();
-//
-//        Thread thread = new Thread(() -> {
-//            //codigo a ejecutar
-//        });
-//        thread.setDaemon(true); // para que termine de ejecutarse, al terminar ejecucion principal que lo llama
-//        thread.start();
-//
 
         while (this.isRunning){
             System.out.println("Esperando conexión");
@@ -390,7 +375,7 @@ public class Server {
         Token RR = new Token("/res/images/token/RR.png", 8, "RR");
         Token X = new Token("/res/images/token/X.png", 8, "X");
         Token Z = new Token("/res/images/token/Z.png", 10, "Z");
-        Token Bonus = new Token("*****", 0, "");
+        Token Bonus = new Token("res/images/token/--.png", 0, "");
 
 
         //Se añaden las fichas A y E a la lista
