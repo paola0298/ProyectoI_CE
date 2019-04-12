@@ -241,34 +241,42 @@ public class Controller {
     /**
      * Este método le pide al servidor verificar si la palabra es válida.
      *
-     * @param word Palabra a verificar en el servidor.
      */
-    public void check_word(String word) {
-//        message = prepare();
-//        message.put("action", "CHECK_WORD");
-//        message.put("match_id", current_match_id);
-//        message.put("word", word);
-//
-//        response = client.connect(message);
-//
-//        if (response.get("response").equals("VALID")) {
-//            System.out.println("The word is valid");
-//        } else {
-//            System.out.println("Try again");
-//        }
-        gui.createWord(grid);
-//        gui.test(grid);
-    }
+    public int check_word(LinkedList<Token> tokenList) {
+        String word = gui.createWord(grid);
+        int score = calculateScore(tokenList);
 
-    /**
-     * Este método verifica si ya es el turno del jugador.
-     */
-    public void check_turn() {
         message = prepare();
-        message.put("action", "CHECK_TURN");
+        message.put("action", "CHECK_WORD");
         message.put("match_id", current_match_id);
+        message.put("word", word);
+        message.put("score", score);
+
         response = client.connect(message);
 
+        if (response.get("status").equals("VALID")) {
+            System.out.println("The word is valid");
+            deserialize();
+            updatePlayers();
+            updateTokens();
+            return 1;
+            //darle los puntos al jugador y ponerse en espera
+        } else if (response.get("status").equals("NOT_FOUND")){
+            System.out.println("Try again");
+            // preguntarle al usuario si desea intentar otra vez o llamar al experto
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    private int calculateScore(LinkedList<Token> tokenList) {
+        int score = 0;
+        for (int i = 0; i < tokenList.getSize(); i++){
+            score+= tokenList.get(i).getScore();
+        }
+
+        return score;
     }
 
     public void callExpert(String phoneNum, String wordToCheck) {

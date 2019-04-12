@@ -253,7 +253,15 @@ public class Scrabble extends Application {
             //tomar palabra creada y enviarla al servidor
 //            System.out.println("The word is: ");
             if (unlockedControls) {
-                controller.check_word("Not implemented..");
+                int response = controller.check_word(lettersList);
+                if (response == 1){
+                    lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
+                } else if (response == 0){
+                    //Colocar el alert para que el usuario decida que hacer
+                } else{
+                    //colocar alert informando error
+                }
+
             }
         });
 
@@ -317,13 +325,6 @@ public class Scrabble extends Application {
         showID.showAndWait();
     }
 
-    public void test(Token[][] grid){
-        Thread thread = new Thread(() -> {
-            createWord(grid);
-        });
-        thread.setDaemon(true);
-        thread.start();
-    }
 
     public String createWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
@@ -382,7 +383,7 @@ public class Scrabble extends Application {
         }
 
 
-        lettersList = new LinkedList<>();
+
         System.out.println("Final word " + word.toString());
         return word.toString();
     }
@@ -445,13 +446,17 @@ public class Scrabble extends Application {
             scoreLabel = new Text("Puntos: ");
             userScore = new Text(String.valueOf(player.getScore()));
             userScoreBox.getChildren().addAll(scoreLabel, userScore);
-            playerBox.getChildren().clear();
             playerBox.getChildren().addAll(userName, userImage, userScoreBox);
 
 
             if (player.getplayerId().equals(controller.getPlayerInstance().getplayerId())) {
 
-                Platform.runLater(() -> this.actualPlayerInfoContainer.getChildren().add(playerBox));
+                Platform.runLater(() -> {
+                    System.out.println(this.actualPlayerInfoContainer.getChildren());
+                    ImageView scrabbleButton = (ImageView) this.actualPlayerInfoContainer.getChildren().get(1);
+                    this.actualPlayerInfoContainer.getChildren().clear();
+                    this.actualPlayerInfoContainer.getChildren().addAll(tokenBox, scrabbleButton, playerBox);
+                });
 //                this.actualPlayerInfoContainer.getChildren().add(playerBox);
             } else {
                 switch (c) {

@@ -128,7 +128,11 @@ public class Server {
                     break;
 
                 case "CHECK_WORD":
-                    response = checkWord(); //TODO actualizar el metodo segun los datos que se necesiten
+                    String word = msg.getString("word");
+                    String matchId = msg.getString("match_id");
+                    int score = msg.getInt("score");
+                    String playerId = msg.getString("player_id");
+                    response = checkWord(word, matchId, playerId, score); //TODO actualizar el metodo segun los datos que se necesiten
                     break;
 
                 case "CALL_EXPERT":
@@ -243,17 +247,17 @@ public class Server {
 
         if (game != null) {
             if (game.addPlayer(newPlayer)) {
-                obj.put("status", "SUCCESS");
-                obj.put("player_id", newPlayer.getplayerId());
                 //TODO send game data to client
                 try {
+                    obj.put("status", "SUCCESS");
+                    obj.put("player_id", newPlayer.getplayerId());
                     String gameSer = mapper.writeValueAsString(game);
                     String playerSer = mapper.writeValueAsString(newPlayer);
                     obj.put("game", gameSer);
                     obj.put("player", playerSer);
 
                 } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                    obj.put("status", "FAILED");
                 }
             } else {
                 obj.put("status", "FAILED");
@@ -291,7 +295,37 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkWord(){ return new JSONObject(); }
+    private JSONObject checkWord(String word, String matchId, String PlayerId, int score){
+        JSONObject obj = new JSONObject();
+        Game game = findGame(matchId);
+        ObjectMapper mapper = new ObjectMapper();
+
+        if (game != null){
+            if (WordDictionary.search(word)){
+                Player actualPlayer = game.getActualPlayer();
+                int actualScore = actualPlayer.getScore();
+                actualPlayer.setScore(actualScore+score);
+
+                try {
+                    obj.put("status", "VALID");
+
+                    String gameSer = mapper.writeValueAsString(game);
+                    String playerSer = mapper.writeValueAsString(actualPlayer);
+                    obj.put("game", gameSer);
+                    obj.put("player", playerSer);
+
+                } catch (JsonProcessingException e) {
+                    obj.put("status", "FAILED");
+                }
+            }else {
+                obj.put("status", "NOT_FOUND");
+            }
+        } else{
+            obj.put("status", "FAILED");
+        }
+
+        return obj;
+    }
 
     private JSONObject callExpert(JSONObject msg) {
         JSONObject obj = new JSONObject();
