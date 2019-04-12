@@ -27,6 +27,7 @@ public class Controller {
 
     /**
      * Este método es el constructor de la clase
+     *
      * @param gui La interfaz que va a controlar la clase
      */
     public Controller(Scrabble gui) {
@@ -59,29 +60,38 @@ public class Controller {
         this.playerName = playerName;
     }
 
-    public void addToken(Token tokenToAdd, int row, int column){
+    public void addToken(Token tokenToAdd, int row, int column) {
         grid[column][row] = tokenToAdd;
     }
 
+    public void removeToken(int row, int column) {
+        grid[column][row] = null;
+    }
+
+    public Token getToken(int row, int column) {
+        return grid[column][row];
+    }
+
     /**
-     * @param flag Bandera que determina si se va a eliminar (false) o agregar (true) un token
+     * @param flag  Bandera que determina si se va a eliminar (false) o agregar (true) un token
      * @param token Token que se va a agregar o eliminar
      * @return Nueva lista de tokens actualizada
      */
-    public LinkedList<Token> updateTokenList(boolean flag, Token token){
+    public void updateTokenList(boolean flag, Token token) {
+        //TODO llamar este metodo cuando se coloca una ficha en el tablero o se elimina
         LinkedList<Token> actualList = getPlayerInstance().getTokenlist();
 
-        if (flag){
+        if (flag) {
             actualList.addLast(token);
-        }
-        else {
+        } else {
             actualList.remove(token);
         }
-        return actualList;
+        playerInstance.setTokenlist(actualList);
     }
 
     /**
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
+     *
      * @param max_players Cantidad máxima de jugadores en la partida.
      */
     public boolean create_match(String max_players) {
@@ -97,7 +107,9 @@ public class Controller {
             player_id = response.getString("player_id");
             current_match_id = response.getString("game_id");
             deserialize();
+
             updatePlayers();
+            updateTokens();
             grid = actualGame.getGrid();
             return true;
         } else {
@@ -106,13 +118,25 @@ public class Controller {
         }
     }
 
-    private void updatePlayers(){
+    private void updatePlayers() {
         LinkedList<Player> actualPlayers = actualGame.getPlayers();
         gui.playerLoader2(actualPlayers);
     }
 
+    public void updateTokens() {
+        LinkedList<Token> actualtoken = playerInstance.getTokenlist();
+        gui.tokenLoader(actualtoken);
+    }
+
+    public void updateInterface() {
+        updateTokens();
+        gui.matrixLoader(grid);
+    }
+
+
     /**
      * Este método le pide al servidor unir al jugador a una partida existente.
+     *
      * @param match_id El identificador de la partida a la que se desea unir
      */
     public boolean join_match(String match_id) {
@@ -131,6 +155,7 @@ public class Controller {
             this.current_match_id = match_id;
             deserialize();
             updatePlayers();
+            updateTokens();
             grid = actualGame.getGrid();
             return true;
         } else {
@@ -143,7 +168,7 @@ public class Controller {
      * Deserializa los objetos recibidos desde el servidor
      */
     private void deserialize() {
-        ObjectMapper objectMapper =  new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         String stringGame = response.getString("game");
         String stringPlayer = response.getString("player");
 
@@ -177,22 +202,26 @@ public class Controller {
 
     /**
      * Este método le pide al servidor verificar si la palabra es válida.
+     *
      * @param word Palabra a verificar en el servidor.
      */
     public void check_word(String word) {
-        message = prepare();
-        message.put("action", "CHECK_WORD");
-        message.put("match_id", current_match_id);
-        message.put("word", word);
-
-        response = client.connect(message);
-
-        if (response.get("response").equals("VALID")) {
-            System.out.println("The word is valid");
-        } else {
-            System.out.println("Try again");
-        }
+//        message = prepare();
+//        message.put("action", "CHECK_WORD");
+//        message.put("match_id", current_match_id);
+//        message.put("word", word);
+//
+//        response = client.connect(message);
+//
+//        if (response.get("response").equals("VALID")) {
+//            System.out.println("The word is valid");
+//        } else {
+//            System.out.println("Try again");
+//        }
+        gui.searchWord(grid);
+//        gui.test(grid);
     }
+
 
     /**
      * Este método verifica si ya es el turno del jugador.
@@ -205,7 +234,7 @@ public class Controller {
 
     }
 
-    public void callExpert(){
+    public void callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
         response = client.connect(message);
@@ -213,6 +242,7 @@ public class Controller {
 
     /**
      * Este método prepara un nuevo objeto JSON para usar en los pedidos al servidor.
+     *
      * @return Objeto JSON base para generar cada pedido al servidor.
      */
     private JSONObject prepare() {
@@ -238,7 +268,7 @@ public class Controller {
         }
     }
 
-    private void initialize1(){
+    private void initialize1() {
         client = new Client("localhost", 6307);
     }
 

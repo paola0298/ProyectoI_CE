@@ -8,7 +8,6 @@ public class Game {
     private int maxPlayers;
     private Token[][] grid;
     private String actualPlayer;
-
     private LinkedList<Player> players;
 
     public Game(){}

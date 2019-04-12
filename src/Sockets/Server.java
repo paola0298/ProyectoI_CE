@@ -46,7 +46,8 @@ public class Server {
      * @param port Puerto en el cual el servidor esta escuchando
      */
     public Server(int port){
-        init();
+        fillTokenList();
+//        init();
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -353,23 +354,6 @@ public class Server {
         }else{
             System.out.println("The word already exist");
         }
-    }
-
-    public Game getActualGame(String matchID){
-        Node<Game> temp = gamesList.getHead();
-        while(temp!=null){
-            if (temp.getValue().getGameID().equals(matchID)){
-                return temp.getValue();
-            } else
-                temp = temp.getNext();
-        }
-
-        return null;
-    }
-
-    public LinkedList<Token> updateTokenList(boolean flag, Token token, String matchID, String playerID){
-        return new LinkedList<>();
-
     }
 
     /**

@@ -6,9 +6,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class Player{
     private String playerId;
     private String name;
-    private int score;
-    private LinkedList<Token> tokenlist;
 
+    private int score;
+
+    private LinkedList<Token> tokenlist;
     public Player(){ }
 
     public Player(String name) {
@@ -18,6 +19,10 @@ public class Player{
 
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public String getplayerId() {

@@ -3,8 +3,8 @@ package Structures;
 public class  LinkedList<T> {
 
     private int size;
-
     private Node<T> head;
+
     public LinkedList(){
         this.size = 0;
         this.head = null;
