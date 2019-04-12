@@ -201,7 +201,8 @@ public class Controller {
             waitTurn();
             return true;
         } else {
-            System.out.println("Could not join match");
+            System.out.println("Could not join match \n" + response.get("status"));
+
             return false;
         }
     }
