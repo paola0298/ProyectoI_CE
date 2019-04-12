@@ -803,11 +803,15 @@ public class Scrabble extends Application {
                 if (actualMatrix[i][j] != null) {
                     Token actualToken = actualMatrix[i][j];
                     ImageView image = loadImageView(actualToken.getImagePath(), 30, 30);
-                    child.getChildren().clear();
-                    child.getChildren().add(image);
+                    Platform.runLater(() -> {
+                        child.getChildren().clear();
+                        child.getChildren().add(image);
+                    });
+
                 } else {
                     if (child.getChildren().size() == 1) {
-                        child.getChildren().clear();
+                        Platform.runLater(() -> child.getChildren().clear());
+
                     }
                 }
 
