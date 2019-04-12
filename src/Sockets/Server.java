@@ -158,6 +158,11 @@ public class Server {
                     sendResponse(response.toString(), con);
                     break;
 
+                case "PASS_TURN":
+                    response = passTurn(msg.getString("match_id"));
+                    sendResponse(response.toString(), con);
+                    break;
+
                 case "DISCONNECT":
                     response = disconnect();
                     sendResponse(response.toString(), con);
@@ -176,6 +181,16 @@ public class Server {
             }
         }
 
+    }
+
+    private JSONObject passTurn(String gameId) {
+        JSONObject obj = new JSONObject();
+        Game actualGame = findGame(gameId);
+        actualGame.nextPlayer();
+
+        obj.put("status", "SUCCESS");
+
+        return obj;
     }
 
     private Game findGame(String gameId) {

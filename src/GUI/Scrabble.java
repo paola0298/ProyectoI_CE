@@ -259,30 +259,38 @@ public class Scrabble extends Application {
                     controller.updateInterface();
 
                 } else if (response == 0){
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Palabra invalida");
-                    alert.setHeaderText(null);
-                    alert.setContentText("¿Qué deseas hacer?");
+                    int option = showOptions();
 
-                    ButtonType expert = new ButtonType("Enviar un mensaje al experto");
-                    ButtonType retry = new ButtonType("Reintentar");
-                    ButtonType pass = new ButtonType("Pasar turno");
-
-                    alert.getButtonTypes().setAll(expert, retry, pass);
-
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == expert){
-                        System.out.println("Llamando al experto...");
-                    } else if (result.get() == retry){
+                    if (option == 0) {      //Llamar experto
+                        if (controller.callExpert()) {
+                            System.out.println("Esperando la respuesta del experto");
+                            showAlert("Esperando la respuesta del experto",
+                                    "Información",
+                                    Alert.AlertType.INFORMATION);
+                        } else {
+                            System.out.println("No se puede contactar al experto en este momento");
+                            showAlert("No se puede contactar al experto en este momento",
+                                    "Error de conexión",
+                                    Alert.AlertType.ERROR);
+                        }
+                    } else if (option == 1) {
+                        //Reintentar
                         System.out.println("Intentando nuevamente...");
-                    } else {
-                        System.out.println("Pasar turno...");
-                    }
 
-                    //Colocar el alert para que el usuario decida que hacer
+                    } else {
+                        //Pasar turno
+                        // Regresar todas las fichas de la matriz al contenedor de fichas
+                        System.out.println("Pasar turno...");
+                        if (!controller.passTurn()) {
+                            showAlert("Ocurrió un error al contactar con el servidor, inténtalo de nuevo",
+                                    "Error de conexión",
+                                    Alert.AlertType.ERROR);
+                        }
+                    }
 
                 } else{
                     //colocar alert informando error
+                    showAlert("No se pudo conectar con el servidor", "Error de conexión", Alert.AlertType.ERROR);
 
                 }
 
@@ -341,6 +349,38 @@ public class Scrabble extends Application {
 
     }
 
+    private int showOptions() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Palabra invalida");
+        alert.setHeaderText(null);
+        alert.setContentText("¿Qué deseas hacer?");
+
+        ButtonType expert = new ButtonType("Contactar al experto");
+        ButtonType retry = new ButtonType("Reintentar");
+        ButtonType pass = new ButtonType("Pasar turno");
+
+        alert.getButtonTypes().setAll(expert, retry, pass);
+        int optionSelected = 1;
+        boolean selected = false;
+
+        while (!selected) {
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == expert) {
+                    selected = true;
+                    optionSelected = 0;
+                } else if (result.get() == retry) {
+                    selected = true;
+                    optionSelected = 1;
+                } else {
+                    selected = true;
+                    optionSelected = 2;
+                }
+            }
+        }
+        return optionSelected;
+    }
+
     public void gameDisconnected() {
         System.out.println("The client was disconnected from the server");
     }
@@ -356,10 +396,7 @@ public class Scrabble extends Application {
 
     public String createWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
-
         System.out.println("Lista actual " + lettersList.toString());
-
-
         int temp = 0;
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
@@ -370,13 +407,10 @@ public class Scrabble extends Application {
 //
 //                Token next = actualMatrix[i][temp+1];
 ////                System.out.println(next);
-
-
                 if (find(token)) {
                     word.append(token.getLetter());
 //                    System.out.println("Actual token " + token.getLetter() +  "\n");
                 }
-
 //                else if (!find(token) && token != null){
 //                    Token down = actualMatrix[i][j+1];
 //                    System.out.println("Letra actual " + token.getLetter());
@@ -406,7 +440,6 @@ public class Scrabble extends Application {
 //                temp++;
 
 //                System.out.println("\n");
-
             }
         }
 
