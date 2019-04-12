@@ -325,33 +325,27 @@ public class Scrabble extends Application {
 
     public void searchWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
-        ObservableList<Node> list = matrixContainer.getChildren();
-//        try {
-            for (int i = 0; i < 15; i++) {
-                for (int j = 0; j < 15; j++) {
 
-//                    HBox box = (HBox) list.get((i * 15 + j) + 1);
-//                    Platform.runLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            box.setStyle("-fx-background-color: red");
-//
-//                        }
-//                    });
+        int temp = 0;
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                Token token = actualMatrix[i][j];
+                if (temp>=15){
+                    temp = 0;
+                }
 
-                    Token token = actualMatrix[i][j];
+                Token next = actualMatrix[i][temp+1];;
 
-                    if (find(token)) {
-//                        Thread.sleep(500);
-//                        box.setStyle("-fx-background-color: green");
-                        word.append(token.getLetter());
-                    }
-//                    Thread.sleep(200);
+                if (find(token)) {
+                    word.append(token.getLetter());
+                }
+
+                if (!find(token) && next!=null){
+                    word.append(token.getLetter());
                 }
             }
-//        }catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        }
+
 
         lettersList = new LinkedList<>();
         System.out.println(word.toString());
