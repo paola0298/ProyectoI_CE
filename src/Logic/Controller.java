@@ -3,9 +3,9 @@ package Logic;
 import GUI.Scrabble;
 import Sockets.Client;
 import Structures.LinkedList;
+import Structures.CircularList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -23,6 +23,7 @@ public class Controller {
     private Game actualGame;
     private Player playerInstance;
     private Token[][] grid;
+    private String current_player_id; //para el case no tokens
 
 
     /**
@@ -119,7 +120,7 @@ public class Controller {
     }
 
     private void updatePlayers() {
-        LinkedList<Player> actualPlayers = actualGame.getPlayers();
+        CircularList<Player> actualPlayers = actualGame.getPlayers();
         gui.playerLoader2(actualPlayers);
     }
 
@@ -272,4 +273,16 @@ public class Controller {
         client = new Client("localhost", 6307);
     }
 
+    private void noTokens( String Game_ID, String Player_ID){
+        message = prepare();
+        message.put("action", "NO_TOKENS");
+        message.put("match_id", current_match_id);
+        message.put("player_id", current_player_id);
+        response = client.connect(message);
+
+
+
+    }
+
 }
+

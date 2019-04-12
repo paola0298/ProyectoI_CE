@@ -4,6 +4,7 @@ import Logic.Controller;
 import Logic.Player;
 import Logic.Token;
 import Structures.LinkedList;
+import Structures.CircularList;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -380,7 +381,7 @@ public class Scrabble extends Application {
     /**
      * Carga en la interfaz los jugadores presentes en la partida
      */
-    public void playerLoader2(LinkedList<Player> playersToLoad) {
+    public void playerLoader2(CircularList<Player> playersToLoad) {
         ImageView userImage;
         Text scoreLabel;
         Text userScore;

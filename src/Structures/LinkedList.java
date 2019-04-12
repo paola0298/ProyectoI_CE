@@ -119,6 +119,9 @@ public class  LinkedList<T> {
     public int getSize() {
         return size;
     }
+    public void setSize(int number){
+        this.size = number;
+    }
 
 
     public static void main(String[] args) {

@@ -22,7 +22,7 @@ import java.util.Random;
 /**
  * @author Paola
  * @version 1.0
- *
+ * <p>
  * La clase Server realiza la conexión con el cliente, además envía y recibe mensajes
  */
 public class Server {
@@ -45,7 +45,7 @@ public class Server {
     /**
      * @param port Puerto en el cual el servidor esta escuchando
      */
-    public Server(int port){
+    public Server(int port) {
         fillTokenList();
 //        init();
         try {
@@ -58,7 +58,7 @@ public class Server {
     /**
      * @return La conexion con el cliente
      */
-    public Socket clientConnection(){
+    public Socket clientConnection() {
         Socket con = null;
         try {
             con = serverSocket.accept();
@@ -71,7 +71,7 @@ public class Server {
     /**
      * @return El mensaje recibido del cliente
      */
-    public String receiveDataFromClient(Socket con){
+    public String receiveDataFromClient(Socket con) {
         String actualMessage = "";
         try {
             DataInputStream inputStream = new DataInputStream(con.getInputStream());
@@ -86,9 +86,9 @@ public class Server {
 
     /**
      * @param response Respuesta para el cliente
-     * @param con Conexion con el cliente
+     * @param con      Conexion con el cliente
      */
-    public void sendResponse(String response, Socket con){
+    public void sendResponse(String response, Socket con) {
         try {
             DataOutputStream outputStream = new DataOutputStream(con.getOutputStream());
             outputStream.writeUTF(response);
@@ -101,9 +101,9 @@ public class Server {
     /**
      * Escucha las conexiones del cliente
      */
-    public void connectionListener(){
+    public void connectionListener() {
 
-        while (this.isRunning){
+        while (this.isRunning) {
             System.out.println("Esperando conexión");
             Socket con = clientConnection();
             System.out.println("Conexion establecida");
@@ -120,7 +120,7 @@ public class Server {
                     int maxPlayers = Integer.parseInt(msg.getString("max_players"));
                     playerName = msg.getString("player_name");
                     response = createMatch(maxPlayers, playerName);
-                    sendResponse(response.toString( ), con);
+                    sendResponse(response.toString(), con);
 
                     break;
                 case "JOIN_MATCH":
@@ -147,6 +147,14 @@ public class Server {
                     response = disconnect();
                     sendResponse(response.toString(), con);
                     break;
+                case "NO_TOKENS":
+                    String match_ID = msg.getString("current_match_id");
+                    String player_ID = msg.getString("current_player_id");
+                  //  response = pickWinner(match_ID, player_ID);
+
+                   // sendResponse(response.toString(), con);
+
+
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
@@ -164,11 +172,12 @@ public class Server {
 
     /**
      * Método para crear una nueva partida
+     *
      * @param maxPlayers Cantidad máxima de jugadores para la partida
      * @param playerName Nombre del jugador que crea la partida
      * @return Objeto Json para enviarlo al cliente
      */
-    private JSONObject createMatch(int maxPlayers, String playerName){
+    private JSONObject createMatch(int maxPlayers, String playerName) {
         JSONObject jsonObject = new JSONObject();
         String serializedGame = "";
         String serializedPlayer = "";
@@ -197,7 +206,8 @@ public class Server {
 
     /**
      * Este método agrega un nuevo jugador a la partida
-     * @param id Identificador del jugador a agregar
+     *
+     * @param id   Identificador del jugador a agregar
      * @param name Nombre del jugador a agregar
      * @return Objeto Json para enviarlo al cliente
      */
@@ -206,7 +216,7 @@ public class Server {
         Game game;
         String serializedGame = "";
         String serializedPlayer = "";
-        for (int i=0; i<gamesList.getSize(); i++) {
+        for (int i = 0; i < gamesList.getSize(); i++) {
             if (gamesList.get(i).getGameID().equals(id)) {
                 game = gamesList.get(i);
                 Player player = new Player(name);
@@ -233,7 +243,9 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkWord(){ return new JSONObject(); }
+    private JSONObject checkWord() {
+        return new JSONObject();
+    }
 
     private JSONObject callExpert(JSONObject msg) {
         JSONObject obj = new JSONObject();
@@ -316,7 +328,9 @@ public class Server {
         return obj;
     }
 
-    private JSONObject disconnect() { return new JSONObject(); }
+    private JSONObject disconnect() {
+        return new JSONObject();
+    }
 
     private LinkedList<Token> generateTokens() {
 
@@ -333,20 +347,20 @@ public class Server {
         return tokenList; //TODO generar lista de tokens para el jugador
     }
 
-    public void addWordDictonary(String newWord){
-        if(!WordDictionary.search(newWord)){
+    public void addWordDictonary(String newWord) {
+        if (!WordDictionary.search(newWord)) {
             WordDictionary.addWord(newWord);
-        }else{
+        } else {
             System.out.println("The word already exist");
         }
     }
 
     /**
-     *Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
-     * @author Brayan
+     * Se completa la lista que contiene todas las fichas disponibles para el juego, se agrupan las fichas que comparten la frecuencia en la que aparecen
      *
+     * @author Brayan
      */
-    public void fillTokenList(){
+    public void fillTokenList() {
         Token A = new Token("/res/images/token/A.png", 1, "A");
         Token E = new Token("/res/images/token/E.png", 1, "E");
         Token O = new Token("/res/images/token/O.png", 1, "O");
@@ -379,34 +393,34 @@ public class Server {
 
 
         //Se añaden las fichas A y E a la lista
-        for (int ae = 1;ae <= 12; ae++){
+        for (int ae = 1; ae <= 12; ae++) {
             tokenInstances.addLast(A);
             tokenInstances.addFirst(E);
         }
         //Se añade la ficha O a la lista
-        for (int o = 1;o <= 9;o++){
+        for (int o = 1; o <= 9; o++) {
             this.tokenInstances.addFirst(O);
         }
         //Se añaden las fichas I y S a la lista
-        for (int is = 1;is <= 6;is++){
+        for (int is = 1; is <= 6; is++) {
             this.tokenInstances.addFirst(I);
             this.tokenInstances.addFirst(S);
         }
         //Se añaden las fichas N,R,U,D a la lista
-        for (int nrud = 1;nrud <= 5;nrud++){
+        for (int nrud = 1; nrud <= 5; nrud++) {
             this.tokenInstances.addFirst(N);
             this.tokenInstances.addFirst(R);
             this.tokenInstances.addFirst(U);
             this.tokenInstances.addFirst(D);
         }
         //Se añaden las fichas L,T,C a la lista
-        for (int ltc = 1;ltc <= 4;ltc++){
+        for (int ltc = 1; ltc <= 4; ltc++) {
             this.tokenInstances.addFirst(L);
             this.tokenInstances.addFirst(T);
             this.tokenInstances.addFirst(C);
         }
         //Se añaden las fichas G,B,M,P,H a la lista
-        for (int gbmph = 1;gbmph <= 2;gbmph++){
+        for (int gbmph = 1; gbmph <= 2; gbmph++) {
             this.tokenInstances.addFirst(G);
             this.tokenInstances.addFirst(B);
             this.tokenInstances.addFirst(M);
@@ -414,7 +428,7 @@ public class Server {
             this.tokenInstances.addFirst(H);
         }
         //Se añaden las fichas F,V,Y,CH,Q,J,LL,Ñ,RR,X,Z a la lista
-        for (int fvychqjllñrrxz = 1;fvychqjllñrrxz <= 1;fvychqjllñrrxz++){
+        for (int fvychqjllñrrxz = 1; fvychqjllñrrxz <= 1; fvychqjllñrrxz++) {
             this.tokenInstances.addFirst(F);
             this.tokenInstances.addFirst(V);
             this.tokenInstances.addFirst(Y);
@@ -428,7 +442,7 @@ public class Server {
             this.tokenInstances.addFirst(Z);
 
         }
-        for (int bonus = 1;bonus <= 2;bonus++){
+        for (int bonus = 1; bonus <= 2; bonus++) {
             this.tokenInstances.addFirst(Bonus);
         }
 
@@ -441,13 +455,13 @@ public class Server {
     private void init() {
         LinkedList<Token> letters = new LinkedList<>();
         this.letterInfo = new int[][]{
-                {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,5,1,1,1,1,4,4,8,4,10,5,8,8,8}, //Valores
-                {12,2,4,5,12,1,2,2,6,1,1,4,2,5,9,2,1,5,6,4,5,1,2,1,1,1,1,1,1,1} //Repeticiones
+                {1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 5, 1, 1, 1, 1, 4, 4, 8, 4, 10, 5, 8, 8, 8}, //Valores
+                {12, 2, 4, 5, 12, 1, 2, 2, 6, 1, 1, 4, 2, 5, 9, 2, 1, 5, 6, 4, 5, 1, 2, 1, 1, 1, 1, 1, 1, 1} //Repeticiones
         };
 
         char letter = 'A';
-        for (int i=0; i<26; i++) {
-            letters.addLast(new Token("/res/images/token/"+ letter + ".png", letterInfo[0][i], String.valueOf(letter)));
+        for (int i = 0; i < 26; i++) {
+            letters.addLast(new Token("/res/images/token/" + letter + ".png", letterInfo[0][i], String.valueOf(letter)));
             letter += 1;
         }
         letters.addLast(new Token("-", 5, "CH"));
@@ -462,31 +476,31 @@ public class Server {
         LinkedList<Token> list = new LinkedList<>();
         Random random = new Random();
 
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             int range = random.nextInt(100);
             int iter;
             int type;
-            if (range<=31) {
+            if (range <= 31) {
 
                 iter = random.nextInt(count(12));
                 type = 12;
-            } else if (32<range && range<=54) {
+            } else if (32 < range && range <= 54) {
 
                 iter = random.nextInt(count(9));
                 type = 9;
-            } else if (54<range && range<=69) {
+            } else if (54 < range && range <= 69) {
 
                 iter = random.nextInt(count(6));
                 type = 6;
-            } else if (69<range && range<=82) {
+            } else if (69 < range && range <= 82) {
 
                 iter = random.nextInt(count(5));
                 type = 5;
-            } else if (82<range && range<=92) {
+            } else if (82 < range && range <= 92) {
 
                 iter = random.nextInt(count(4));
                 type = 4;
-            } else if (92<range && range<=97) {
+            } else if (92 < range && range <= 97) {
 
                 iter = random.nextInt(count(2));
                 type = 2;
@@ -503,7 +517,7 @@ public class Server {
 
     private int count(int element) {
         int e = 0;
-        for(int i:letterInfo[1]) {
+        for (int i : letterInfo[1]) {
             if (i == element) {
                 e++;
             }
@@ -515,7 +529,7 @@ public class Server {
     private Token findOccurrence(int iter, int type) {
         int index = 0;
         int c = 0;
-        for (int element:letterInfo[1]) {
+        for (int element : letterInfo[1]) {
             if (c == iter) {
                 break;
             } else if (element == type) {
@@ -525,6 +539,19 @@ public class Server {
         }
         return tokenInstances.get(index);
     }
+
+    //private JSONObject pickWinner(String Match_ID, String Player_ID) {
+//        JSONObject obj = new JSONObject();
+//        Game actualGame = ;
+//        Player possible_Winner = actualGame.access_by_id(Player_ID);
+//        if (actualGame.hasTop_Points(possible_Winner)) {
+//            obj.put("noTokensresult", "WINNER");
+//
+//        } else {
+//            obj.put("noTokensresult", "LOST");
+//        }
+//        return obj;
+    //}
 
     public static void main(String[] args) {
         int port = 6307;
