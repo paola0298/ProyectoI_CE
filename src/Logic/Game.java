@@ -25,7 +25,7 @@ public class Game {
 
     public boolean addPlayer(Player player) {
         if (players.getSize() < maxPlayers) {
-            players.addLast(player);
+            players.addLast(player);////////////////////////////////////////////////////////Brayan
             return true;
         } else {
             return false;
@@ -52,12 +52,14 @@ public class Game {
         for (int i = 0; i <= players.getSize(); i++){
             element = players.get(i);
             if (element.getplayerId() != player_id){
-
+                System.out.println("IF");
             } else{
+                System.out.println("ELSE");
                 break;
             }
 
-        }return element;
+        }
+        System.out.println(element);return element;
 //
     }
     public boolean hasTop_Points(Player poss_winner){
@@ -77,13 +79,15 @@ public class Game {
     public static void main (String [] args){
         Game juego = new Game(3);
         Player brayan = new Player("Brayan");
-        brayan.setScore(10);
+        brayan.setScore(20);
+        String brayanid = brayan.getplayerId();
         Player hazel = new Player("Hazel");
-        brayan.setScore(15);
+        hazel.setScore(15);
 
         juego.addPlayer(brayan);
         juego.addPlayer(hazel);
-        juego.hasTop_Points(hazel);
+        juego.access_by_id(brayanid);
+
 
 
 
