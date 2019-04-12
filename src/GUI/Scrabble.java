@@ -6,10 +6,8 @@ import Logic.Token;
 import Structures.LinkedList;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -22,7 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.Time;
+import java.util.Optional;
 
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
@@ -258,9 +256,29 @@ public class Scrabble extends Application {
 
                 if (response == 1){
                     lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
-
+                    controller.updateInterface();
 
                 } else if (response == 0){
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Palabra invalida");
+                    alert.setHeaderText(null);
+                    alert.setContentText("¿Qué deseas hacer?");
+
+                    ButtonType expert = new ButtonType("Enviar un mensaje al experto");
+                    ButtonType retry = new ButtonType("Reintentar");
+                    ButtonType pass = new ButtonType("Pasar turno");
+
+                    alert.getButtonTypes().setAll(expert, retry, pass);
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == expert){
+                        System.out.println("Llamando al experto...");
+                    } else if (result.get() == retry){
+                        System.out.println("Intentando nuevamente...");
+                    } else {
+                        System.out.println("Pasar turno...");
+                    }
+
                     //Colocar el alert para que el usuario decida que hacer
 
                 } else{

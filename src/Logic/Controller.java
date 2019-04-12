@@ -260,7 +260,9 @@ public class Controller {
             message.put("score", score);
 
             String gameSer = mapper.writeValueAsString(actualGame);
+            String playerSer = mapper.writeValueAsString(playerInstance);
             message.put("game", gameSer);
+            message.put("player", playerSer);
 
         } catch (JsonProcessingException e) {
             return -1;

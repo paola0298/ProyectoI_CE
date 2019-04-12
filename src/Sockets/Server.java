@@ -132,8 +132,9 @@ public class Server {
                     String matchId = msg.getString("match_id");
                     int score = msg.getInt("score");
                     String game = msg.getString("game");
+                    String player = msg.getString("player");
 
-                    response = checkWord(game, word, matchId, score);
+                    response = checkWord(game, word, matchId, score, player);
                     sendResponse(response.toString(), con);
                     break;
 
@@ -297,7 +298,7 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkWord(String playerGame, String word, String matchId, int score){
+    private JSONObject checkWord(String playerGame, String word, String matchId, int score, String playerInstance){
         JSONObject obj = new JSONObject();
         Game actualGame = findGame(matchId);
         ObjectMapper mapper = new ObjectMapper();
@@ -305,6 +306,9 @@ public class Server {
         try {
 
             Game gameData = mapper.readValue(playerGame, Game.class);
+            Player playerData = mapper.readValue(playerInstance, Player.class);
+            LinkedList<Token> tokenList = playerData.getTokenlist();
+
             System.out.println("Word to search: \"" + word + "\"");
             if (WordDictionary.search(word)){
                 System.out.println("Word found");
@@ -319,6 +323,7 @@ public class Server {
 
                 Player actualPlayer = actualGame.getActualPlayer();
                 actualPlayer.addScore(score);
+                actualPlayer.setTokenlist(tokenList);
 
                 actualGame.nextPlayer();
 
