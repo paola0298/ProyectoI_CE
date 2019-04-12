@@ -46,7 +46,8 @@ public class Server {
      * @param port Puerto en el cual el servidor esta escuchando
      */
     public Server(int port){
-        init();
+//        init();
+        fillTokenList();
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -135,18 +136,19 @@ public class Server {
                     playerName = msg.getString("player_name");
                     response = createMatch(maxPlayers, playerName);
                     sendResponse(response.toString( ), con);
-
                     break;
+
                 case "JOIN_MATCH":
                     String matchID = msg.getString("match_id");
                     playerName = msg.getString("player_name");
                     response = joinMatch(matchID, playerName);
                     sendResponse(response.toString(), con);
-
                     break;
+
                 case "CHECK_WORD":
                     response = checkWord(); //TODO actualizar el metodo segun los datos que se necesiten
                     break;
+
                 case "CALL_EXPERT":
                     response = callExpert(msg); //TODO actualizar el metodo segun los datos que se necesiten
                     sendResponse(response.toString(), con);
@@ -161,6 +163,11 @@ public class Server {
                     response = disconnect();
                     sendResponse(response.toString(), con);
                     break;
+
+                case "CHECK_TURN":
+                    response = checkTurn(msg.getString("match_id"), msg.getString("player_id"));
+                    break;
+
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
@@ -184,8 +191,8 @@ public class Server {
      */
     private JSONObject createMatch(int maxPlayers, String playerName){
         JSONObject jsonObject = new JSONObject();
-        String serializedGame = "";
         String serializedPlayer = "";
+        String serializedGame = "";
         Game newGame = new Game(maxPlayers);
         gamesList.addLast(newGame);
         Player newPlayer = new Player(playerName);
@@ -314,8 +321,26 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkTurn() {
-        return new JSONObject();
+    private JSONObject checkTurn(String matchID, String playerID) {
+        JSONObject obj = new JSONObject();
+        Game actualGame = findGame(matchID);
+
+        if (actualGame.getActualPlayer().getplayerId().equals(playerID)) {
+            obj.put("status", true);
+        } else {
+            obj.put("status", false);
+        }
+        return obj;
+    }
+
+    private Game findGame(String matchID) {
+        Game actualGame = null;
+        for (int i=0; i<gamesList.getSize(); i++) {
+            if (gamesList.get(i).getGameID().equals(matchID)) {
+                actualGame = gamesList.get(i);
+            }
+        }
+        return actualGame;
     }
 
     private JSONObject expertService() {
@@ -541,7 +566,6 @@ public class Server {
         }
         return e;
     }
-
 
     private Token findOccurrence(int iter, int type) {
         int index = 0;

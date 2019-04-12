@@ -9,7 +9,7 @@ public class Player{
     private int score;
     private LinkedList<Token> tokenlist;
 
-    public Player(){ }
+    public Player(){}
 
     public Player(String name) {
         this.playerId = RandomStringUtils.randomAlphanumeric(6);
@@ -18,6 +18,10 @@ public class Player{
 
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public String getplayerId() {

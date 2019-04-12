@@ -1,11 +1,11 @@
 package Structures;
 
-public class  LinkedList<T> {
+public class LinkedList<T> {
 
     private int size;
-
     private Node<T> head;
-    public LinkedList(){
+
+    public LinkedList() {
         this.size = 0;
         this.head = null;
     }
@@ -14,31 +14,31 @@ public class  LinkedList<T> {
         return head;
     }
 
-    public void addLast(T value){
+    public void addLast(T value) {
         Node<T> newElement = new Node<>(value);
 
-        if (this.head==null){
+        if (this.head == null) {
             this.head = newElement;
         } else {
-           Node<T> temp = this.head;
-           while(temp.getNext()!=null)
-               temp = temp.getNext();
-           temp.setNext(newElement);
+            Node<T> temp = this.head;
+            while (temp.getNext() != null)
+                temp = temp.getNext();
+            temp.setNext(newElement);
         }
         this.size++;
     }
 
-    public void addFirst(T value){
+    public void addFirst(T value) {
         Node<T> newElement = new Node<>(value);
         newElement.setNext(this.head);
         this.head = newElement;
         this.size++;
     }
 
-    public boolean deleteLast(){
-        if (this.head!=null){
+    public boolean deleteLast() {
+        if (this.head != null) {
             Node<T> temp = this.head;
-            while(temp.getNext().getNext()!=null){
+            while (temp.getNext().getNext() != null) {
                 temp = temp.getNext();
             }
             temp.setNext(null);
@@ -48,8 +48,8 @@ public class  LinkedList<T> {
         return false;
     }
 
-    public boolean deleteFirst(){
-        if (this.head != null){
+    public boolean deleteFirst() {
+        if (this.head != null) {
             this.head = this.head.getNext();
             this.size--;
             return true;
@@ -57,39 +57,39 @@ public class  LinkedList<T> {
         return false;
     }
 
-    public boolean remove(T element){
-        if (element == this.head.getValue()){
+    public boolean remove(T element) {
+        if (element == this.head.getValue()) {
             deleteFirst();
         } else {
             Node<T> temp = this.head.getNext();
             Node<T> prev = this.head;
 
-            while(temp!= null){
-                if (temp.getValue() == element){
+            while (temp != null) {
+                if (temp.getValue() == element) {
                     prev.setNext(temp.getNext());
                     this.size--;
                     return true;
                 } else
                     prev = temp;
-                    temp = temp.getNext();
+                temp = temp.getNext();
             }
         }
         return false;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("[");
         Node<T> temp = this.head;
-        if (temp == null){
+        if (temp == null) {
             buffer.append("]");
             return buffer.toString();
-        }else {
+        } else {
             int i = 0;
             while (temp != null) {
                 buffer.append(temp.getValue());
-                if(i!=size-1)
+                if (i != size - 1)
                     buffer.append(", ");
                 else
                     buffer.append("]");
@@ -100,9 +100,9 @@ public class  LinkedList<T> {
         return buffer.toString();
     }
 
-    public T get(int index){
+    public T get(int index) {
         Node<T> tmp = this.head;
-        for(int i=0; i<index  && tmp.getNext()!= null; i++){
+        for (int i = 0; i < index && tmp.getNext() != null; i++) {
             tmp = tmp.getNext();
         }
         return tmp.getValue();

@@ -13,7 +13,6 @@ public class Token {
         this.letter = letter;
     }
 
-
     public String getImagePath() {
         return imagePath;
     }

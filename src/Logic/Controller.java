@@ -27,6 +27,7 @@ public class Controller {
 
     /**
      * Este método es el constructor de la clase
+     *
      * @param gui La interfaz que va a controlar la clase
      */
     public Controller(Scrabble gui) {
@@ -59,22 +60,21 @@ public class Controller {
         this.playerName = playerName;
     }
 
-    public void addToken(Token tokenToAdd, int row, int column){
+    public void addToken(Token tokenToAdd, int row, int column) {
         grid[column][row] = tokenToAdd;
     }
 
     /**
-     * @param flag Bandera que determina si se va a eliminar (false) o agregar (true) un token
+     * @param flag  Bandera que determina si se va a eliminar (false) o agregar (true) un token
      * @param token Token que se va a agregar o eliminar
      * @return Nueva lista de tokens actualizada
      */
-    public LinkedList<Token> updateTokenList(boolean flag, Token token){
+    public LinkedList<Token> updateTokenList(boolean flag, Token token) {
         LinkedList<Token> actualList = getPlayerInstance().getTokenlist();
 
-        if (flag){
+        if (flag) {
             actualList.addLast(token);
-        }
-        else {
+        } else {
             actualList.remove(token);
         }
         return actualList;
@@ -82,6 +82,7 @@ public class Controller {
 
     /**
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
+     *
      * @param max_players Cantidad máxima de jugadores en la partida.
      */
     public boolean create_match(String max_players) {
@@ -106,16 +107,18 @@ public class Controller {
         }
     }
 
-    private void updatePlayers(){
-        LinkedList<Player> actualPlayers = actualGame.getPlayers();
-        gui.playerLoader2(actualPlayers);
+    private void updatePlayers() {
+//        CircularList<Player> actualPlayers = actualGame.getPlayers();
+//        gui.playerLoader2(actualPlayers);
     }
 
     /**
      * Este método le pide al servidor unir al jugador a una partida existente.
+     *
      * @param match_id El identificador de la partida a la que se desea unir
      */
     public boolean join_match(String match_id) {
+        System.out.println("Contacting server to join match");
         message = prepare();
         message.put("action", "JOIN_MATCH");
         message.put("player_name", this.playerName);
@@ -123,7 +126,7 @@ public class Controller {
 
         response = client.connect(message);
 
-        System.out.println(response.toString());
+        System.out.println(response.toString(2));
 
         if (response.getBoolean("status")) {
             System.out.println("Joined match succesfully");
@@ -177,6 +180,7 @@ public class Controller {
 
     /**
      * Este método le pide al servidor verificar si la palabra es válida.
+     *
      * @param word Palabra a verificar en el servidor.
      */
     public void check_word(String word) {
@@ -205,7 +209,7 @@ public class Controller {
 
     }
 
-    public void callExpert(){
+    public void callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
         response = client.connect(message);
@@ -238,8 +242,41 @@ public class Controller {
         }
     }
 
-    private void initialize1(){
-        client = new Client("localhost", 6307);
+    /**
+     * Este método se conecta con el servidor cada 2 segundos para verificar si ya es el turno del jugador
+     */
+//    private void waitingTurn() {
+//        Thread caller = new Thread(() -> {
+//            boolean isTurn = false;
+//            while (!isTurn) {
+//                try {
+//                    message = prepare();
+//                    message.put("action", "CHECK_TURN");
+//                    message.put("match_id", current_match_id);
+//                    response = client.connect(message);
+//
+//                    if (response.getBoolean("status")) {
+//                        isTurn = true;
+//                    }
+//                    Thread.sleep(2000);
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            //TODO método a llamar para desbloquear la interfaz i.e unlockGUI();
+//            unlockGUI();
+//        });
+//
+//        caller.setDaemon(true);
+//        caller.start();
+//    }
+
+    private void unlockGUI() {
+        gui.unlock(true);
+    }
+    private void lockGUI(){
+        gui.unlock(false);
     }
 
 }

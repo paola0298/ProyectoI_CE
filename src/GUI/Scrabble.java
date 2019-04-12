@@ -3,8 +3,8 @@ package GUI;
 import Logic.Controller;
 import Logic.Player;
 import Logic.Token;
+import Structures.CircularList;
 import Structures.LinkedList;
-import Structures.Node;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,13 +31,13 @@ public class Scrabble extends Application {
     private HBox tokenBox;
     private ImageView letterSelected = null;
     private Token selectedToken = null;
+    private boolean controlsUnlocked = false;
 
     private BorderPane gameScreenContainer; //Ventana del juego.
     private GridPane matrixContainer; // Matríz del juego
     private VBox joinMatchContainer; //Ventana de unión a partida existente.
     private VBox initialWindow; // Ventana inicial
     private BorderPane newMatchWindow; //Ventana de partida nueva
-
 
     private String word = null;
     private LinkedList<LinkedList<String>> actualLetters;
@@ -196,7 +196,7 @@ public class Scrabble extends Application {
                 String selected = comboBox.getItems().get(i);
                 if (controller.create_match(selected)) {
                     gameScreenContainer.toFront();
-//                    playerLoader2();
+
                     tokenLoader();
                     String message = "El código de la partida es: " + controller.getCurrent_match_id();
                     showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
@@ -248,8 +248,10 @@ public class Scrabble extends Application {
         scrabbleImageButton.setFitWidth(150);
         scrabbleImageButton.setFitHeight(150);
         scrabbleImageButton.setOnMouseClicked(mouseEvent -> {
-            //tomar palabra creada y enviarla al servidor
-            System.out.println("The word is: ");
+            if (controlsUnlocked) {
+                //tomar palabra creada y enviarla al servidor
+                System.out.println("The word is: ");
+            }
         });
 
         // contenedores
@@ -354,7 +356,7 @@ public class Scrabble extends Application {
     /**
      * Carga en la interfaz los jugadores presentes en la partida
      */
-    public void playerLoader2(LinkedList<Player> playersToLoad) {
+    public void playerLoader2(CircularList<Player> playersToLoad) {
         ImageView userImage;
         Text scoreLabel;
         Text userScore;
@@ -590,10 +592,12 @@ public class Scrabble extends Application {
             ImageView letter = loadImageView(token.getImagePath(), 80, 80);
 
             letter.setOnMouseClicked(mouseEvent -> {
-                if (selectedToken == token) {
-                    selectedToken = null;
-                } else {
-                    selectedToken = token;
+                if (controlsUnlocked) {
+                    if (selectedToken == token) {
+                        selectedToken = null;
+                    } else {
+                        selectedToken = token;
+                    }
                 }
             });
             tokenBox.getChildren().add(letter);
@@ -639,8 +643,9 @@ public class Scrabble extends Application {
                 HBox tokenContainer =  new HBox();
                 tokenContainer.setAlignment(Pos.CENTER);
                 tokenContainer.setOnMouseClicked(mouseEvent -> {
-                    int row = GridPane.getRowIndex(tokenContainer);
-                    int column = GridPane.getColumnIndex(tokenContainer);
+                    if (controlsUnlocked) {
+                        int row = GridPane.getRowIndex(tokenContainer);
+                        int column = GridPane.getColumnIndex(tokenContainer);
 
 //                    if (tokenContainer.getChildren().size()==0) {
 //                        if (letterSelected != null) {
@@ -664,13 +669,13 @@ public class Scrabble extends Application {
 //                        }
 //                    }
 
-                    if (tokenContainer.getChildren().size()==0){
-                        if (selectedToken != null){
-                            putImageOnContainer(tokenContainer);
+                        if (tokenContainer.getChildren().size() == 0) {
+                            if (selectedToken != null) {
+                                putImageOnContainer(tokenContainer);
+                            }
+                        } else {
+                            ImageView child = (ImageView) tokenContainer.getChildren().get(0);
                         }
-                    }
-                    else{
-                        ImageView child = (ImageView) tokenContainer.getChildren().get(0);
                     }
                 });
                 matrixContainer.add(tokenContainer, i, j);
@@ -710,6 +715,14 @@ public class Scrabble extends Application {
      */
     public void loadMatch() {
 
+    }
+
+    public void unlock(boolean unlock) {
+        if (unlock) {
+            controlsUnlocked = true;
+        } else {
+            controlsUnlocked = false;
+        }
     }
 
 

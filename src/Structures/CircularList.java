@@ -1,11 +1,14 @@
 package Structures;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 /**
  * Lista circular genérica
  *
  * @param <T> Tipo de dato a almacenar en la lista
  * @author marlon
  */
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class CircularList<T> {
     private int size;
     private Node<T> head;
