@@ -326,29 +326,62 @@ public class Scrabble extends Application {
     public void searchWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
 
+        System.out.println("Lista actual " + lettersList.toString());
+
+
         int temp = 0;
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 Token token = actualMatrix[i][j];
-                if (temp>=15){
+                if (temp==14){
                     temp = 0;
                 }
 
-                Token next = actualMatrix[i][temp+1];;
+                Token next = actualMatrix[i][temp+1];
+//                System.out.println(next);
+
 
                 if (find(token)) {
                     word.append(token.getLetter());
+//                    System.out.println("Actual token " + token.getLetter() +  "\n");
                 }
 
-                if (!find(token) && next!=null){
-                    word.append(token.getLetter());
+//                else if (!find(token) && token != null){
+//                    Token down = actualMatrix[i][j+1];
+//                    System.out.println("Letra actual " + token.getLetter());
+//                    try {
+//                        System.out.println("Down " + down.getLetter());
+//                    }catch (NullPointerException e){
+//                        System.out.println("Down null");
+//                    }
+//                    if (down != null){
+//                        Token downDown = actualMatrix[i][j+2];
+//
+//                        if (find(downDown)){
+//                            System.out.println("Agregando en cruz...");
+//                            word.append(down.getLetter());
+//                        }
+//
+//                    }
+
+//                    System.out.println("Adding existing");
+//                    word.append(token.getLetter());
                 }
+//                else if (next==null && word.toString().length()>0){
+//
+//                    System.out.println("Exit");
+//                    break;
+//                }
+                temp++;
+
+//                System.out.println("\n");
+
             }
         }
 
 
         lettersList = new LinkedList<>();
-        System.out.println(word.toString());
+        System.out.println("Final word " + word.toString());
     }
 
     private boolean find(Token tokenToSearch) {
