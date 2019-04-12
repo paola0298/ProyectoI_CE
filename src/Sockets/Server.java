@@ -131,8 +131,9 @@ public class Server {
                     String word = msg.getString("word");
                     String matchId = msg.getString("match_id");
                     int score = msg.getInt("score");
-                    String playerId = msg.getString("player_id");
-                    response = checkWord(word, matchId, playerId, score); //TODO actualizar el metodo segun los datos que se necesiten
+                    String game = msg.getString("game");
+                    response = checkWord(game, word, matchId, score);
+                    sendResponse(response.toString(), con);
                     break;
 
                 case "CALL_EXPERT":
@@ -295,32 +296,44 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkWord(String word, String matchId, String PlayerId, int score){
+    private JSONObject checkWord(String playerGame, String word, String matchId, int score){
         JSONObject obj = new JSONObject();
-        Game game = findGame(matchId);
+        Game actualGame = findGame(matchId);
+
         ObjectMapper mapper = new ObjectMapper();
 
-        if (game != null){
+        Game newGame = null;
+
+        try {
+            newGame = mapper.readValue(playerGame, Game.class);
+
             if (WordDictionary.search(word)){
-                Player actualPlayer = game.getActualPlayer();
-                int actualScore = actualPlayer.getScore();
-                actualPlayer.setScore(actualScore+score);
+                System.out.println("Palabra \"" +  word + "\" encontrada");
+                Player actualPlayer = newGame.getActualPlayer();
+                actualPlayer.addScore(score);
 
                 try {
-                    obj.put("status", "VALID");
 
-                    String gameSer = mapper.writeValueAsString(game);
+                    String gameSer = mapper.writeValueAsString(newGame);
                     String playerSer = mapper.writeValueAsString(actualPlayer);
+
+                    obj.put("status", "VALID");
                     obj.put("game", gameSer);
                     obj.put("player", playerSer);
+
+                    gamesList.remove(actualGame);
+                    gamesList.addLast(newGame);
+
+                    newGame.nextPlayer();
 
                 } catch (JsonProcessingException e) {
                     obj.put("status", "FAILED");
                 }
-            }else {
+            } else {
                 obj.put("status", "NOT_FOUND");
             }
-        } else{
+
+        } catch (IOException e) {
             obj.put("status", "FAILED");
         }
 

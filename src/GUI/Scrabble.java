@@ -253,13 +253,18 @@ public class Scrabble extends Application {
             //tomar palabra creada y enviarla al servidor
 //            System.out.println("The word is: ");
             if (unlockedControls) {
+
                 int response = controller.check_word(lettersList);
+
                 if (response == 1){
                     lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
+
                 } else if (response == 0){
                     //Colocar el alert para que el usuario decida que hacer
+
                 } else{
                     //colocar alert informando error
+
                 }
 
             }
@@ -461,24 +466,23 @@ public class Scrabble extends Application {
             } else {
                 switch (c) {
                     case 0:
-                        Platform.runLater(() -> this.rightPlayerInfoContainer.getChildren().add(playerBox));
-//                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        Platform.runLater(() -> {
+                            this.rightPlayerInfoContainer.getChildren().clear();
+                            this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        });
+//
                         break;
                     case 1:
                         Platform.runLater(() -> {
-//                            this.upPlayerInfoContainer.getChildren().clear();
+                            this.upPlayerInfoContainer.getChildren().clear();
                             this.upPlayerInfoContainer.getChildren().add(playerBox);
                         });
-//                        this.upPlayerInfoContainer.getChildren().clear();
-//                        this.upPlayerInfoContainer.getChildren().add(playerBox);
                         break;
                     case 2:
                         Platform.runLater(() -> {
-//                            this.leftPlayerInfoContainer.getChildren().clear();
+                            this.leftPlayerInfoContainer.getChildren().clear();
                             this.leftPlayerInfoContainer.getChildren().add(playerBox);
                         });
-//                        this.leftPlayerInfoContainer.getChildren().clear();
-//                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
                         break;
                 }
                 c++;
@@ -808,12 +812,12 @@ public class Scrabble extends Application {
 
     public void lockGui() {
         unlockedControls = false;
-        Platform.runLater(() -> gameScreenContainer.setStyle("-fx-background-color: gray;"));
+        Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: gray;"));
     }
 
     public void unlockGui() {
         unlockedControls = true;
-        Platform.runLater(() -> gameScreenContainer.setStyle("-fx-background-color: white;"));
+        Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: white;"));
     }
 
 //    private void addGestureToNewToken() {

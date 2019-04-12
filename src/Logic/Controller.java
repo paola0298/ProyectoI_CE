@@ -3,6 +3,8 @@ package Logic;
 import GUI.Scrabble;
 import Sockets.Client;
 import Structures.LinkedList;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -245,12 +247,21 @@ public class Controller {
     public int check_word(LinkedList<Token> tokenList) {
         String word = gui.createWord(grid);
         int score = calculateScore(tokenList);
+        ObjectMapper mapper = new ObjectMapper();
 
-        message = prepare();
-        message.put("action", "CHECK_WORD");
-        message.put("match_id", current_match_id);
-        message.put("word", word);
-        message.put("score", score);
+        try {
+            message = prepare();
+            message.put("action", "CHECK_WORD");
+            message.put("match_id", current_match_id);
+            message.put("word", word);
+            message.put("score", score);
+
+            String gameSer = mapper.writeValueAsString(actualGame);
+            message.put("game", gameSer);
+
+        } catch (JsonProcessingException e) {
+            return -1;
+        }
 
         response = client.connect(message);
 
@@ -259,6 +270,9 @@ public class Controller {
             deserialize();
             updatePlayers();
             updateTokens();
+            gui.lockGui();
+            waitTurn();
+
             return 1;
             //darle los puntos al jugador y ponerse en espera
         } else if (response.get("status").equals("NOT_FOUND")){
