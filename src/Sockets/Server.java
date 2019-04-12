@@ -97,7 +97,6 @@ public class Server {
         }
     }
 
-
     /**
      * Escucha las conexiones del cliente
      */
@@ -121,18 +120,17 @@ public class Server {
                     playerName = msg.getString("player_name");
                     response = createMatch(maxPlayers, playerName);
                     sendResponse(response.toString( ), con);
-
                     break;
+
                 case "JOIN_MATCH":
-                    String matchID = msg.getString("match_id");
-                    playerName = msg.getString("player_name");
-                    response = joinMatch(matchID, playerName);
+                    response = joinMatch(msg.getString("match_id"), msg.getString("player_name"));
                     sendResponse(response.toString(), con);
-
                     break;
+
                 case "CHECK_WORD":
                     response = checkWord(); //TODO actualizar el metodo segun los datos que se necesiten
                     break;
+
                 case "CALL_EXPERT":
                     response = callExpert(msg); //TODO actualizar el metodo segun los datos que se necesiten
                     sendResponse(response.toString(), con);
@@ -143,10 +141,21 @@ public class Server {
                     sendResponse(response.toString(), con);
                     break;
 
+                case "DID_EXPERT_ANSWER":
+                    response = expertAnswered(msg.getString("match_id"));
+                    sendResponse(response.toString(), con);
+                    break;
+
+                case "CHECK_TURN":
+                    response = checkTurn(msg.getString("match_id"), msg.getString("player_id"));
+                    sendResponse(response.toString(), con);
+                    break;
+
                 case "DISCONNECT":
                     response = disconnect();
                     sendResponse(response.toString(), con);
                     break;
+
                 default:
                     sendResponse("Palabra clave no encontrada", con);
             }
@@ -162,6 +171,30 @@ public class Server {
 
     }
 
+    private Game findGame(String gameId) {
+        Game game = null;
+        for (int i=0; i<gamesList.getSize(); i++) {
+            if (gamesList.get(i).getGameID().equals(gameId)) {
+                game = gamesList.get(i);
+            }
+        }
+        return game;
+    }
+
+    private JSONObject expertAnswered(String matchId) {
+        JSONObject obj = new JSONObject();
+
+        Game actualGame = findGame(matchId);
+        if (actualGame.didExpertAnswered()) {
+            obj.put("status", "ANSWERED");
+            obj.put("expert_answer", actualGame.getExpertAnswer());
+        } else {
+            obj.put("status", "CONTACTING");
+        }
+
+        return obj;
+    }
+
     /**
      * Método para crear una nueva partida
      * @param maxPlayers Cantidad máxima de jugadores para la partida
@@ -173,10 +206,10 @@ public class Server {
         String serializedGame = "";
         String serializedPlayer = "";
         Game newGame = new Game(maxPlayers);
-        gamesList.addLast(newGame);
         Player newPlayer = new Player(playerName);
         newPlayer.setTokenlist(generateTokens());
         newGame.addPlayer(newPlayer);
+        gamesList.addLast(newGame);
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -197,39 +230,64 @@ public class Server {
 
     /**
      * Este método agrega un nuevo jugador a la partida
-     * @param id Identificador del jugador a agregar
-     * @param name Nombre del jugador a agregar
+     * @param matchId Identificador del juego al que se desea unir
+     * @param playerName Nombre del jugador a agregar
      * @return Objeto Json para enviarlo al cliente
      */
-    private JSONObject joinMatch(String id, String name) {
+    private JSONObject joinMatch(String matchId, String playerName) {
         JSONObject obj = new JSONObject();
-        Game game;
-        String serializedGame = "";
-        String serializedPlayer = "";
-        for (int i=0; i<gamesList.getSize(); i++) {
-            if (gamesList.get(i).getGameID().equals(id)) {
-                game = gamesList.get(i);
-                Player player = new Player(name);
-                player.setTokenlist(generateTokens());
+        Game game = findGame(matchId);
+        Player newPlayer = new Player(playerName);
+        newPlayer.setTokenlist(generateTokens());
+        ObjectMapper mapper = new ObjectMapper();
 
-                ObjectMapper mapper = new ObjectMapper();
-
+        if (game != null) {
+            if (game.addPlayer(newPlayer)) {
+                obj.put("status", "SUCCESS");
+                obj.put("player_id", newPlayer.getplayerId());
+                //TODO send game data to client
                 try {
-                    serializedGame = mapper.writeValueAsString(game);
-                    serializedPlayer = mapper.writeValueAsString(player);
-                    obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
-                    obj.put("player_id", player.getplayerId());
-                    obj.put("game", serializedGame);
-                    obj.put("player", serializedPlayer);
+                    String gameSer = mapper.writeValueAsString(game);
+                    String playerSer = mapper.writeValueAsString(newPlayer);
+                    obj.put("game", gameSer);
+                    obj.put("player", playerSer);
 
-                    return obj;
                 } catch (JsonProcessingException e) {
-                    obj.put("status", "FAILED");
-                    return obj;
+                    e.printStackTrace();
                 }
+            } else {
+                obj.put("status", "FAILED");
             }
+        } else {
+            obj.put("status", "FAILED");
         }
-        obj.put("status", false);
+
+//        String serializedGame = "";
+//        String serializedPlayer = "";
+//        for (int i=0; i<gamesList.getSize(); i++) {
+//            if (gamesList.get(i).getGameID().equals(id)) {
+//                game = gamesList.get(i);
+//                Player player = new Player(name);
+//                player.setTokenlist(generateTokens());
+//
+//                ObjectMapper mapper = new ObjectMapper();
+//
+//                try {
+//                    serializedGame = mapper.writeValueAsString(game);
+//                    serializedPlayer = mapper.writeValueAsString(player);
+//                    obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
+//                    obj.put("player_id", player.getplayerId());
+//                    obj.put("game", serializedGame);
+//                    obj.put("player", serializedPlayer);
+//
+//                    return obj;
+//                } catch (JsonProcessingException e) {
+//                    obj.put("status", "FAILED");
+//                    return obj;
+//                }
+//            }
+//        }
+//        obj.put("status", false);
         return obj;
     }
 
@@ -300,8 +358,32 @@ public class Server {
         return obj;
     }
 
-    private JSONObject checkTurn() {
-        return new JSONObject();
+    private JSONObject checkTurn(String gameId, String playerId) {
+        JSONObject obj = new JSONObject();
+        Game actualGame = findGame(gameId);
+        Player actualPlayer = actualGame.getActualPlayer();
+        ObjectMapper mapper = new ObjectMapper();
+
+        if (actualPlayer.getplayerId().equals(playerId)) {
+            if (actualGame.getPlayers().getSize() == 1) {
+                obj.put("status", "FAILED");
+            } else {
+                obj.put("status", "SUCCESS");
+                //TODO send game and player data to client
+                try {
+                    String gameSer = mapper.writeValueAsString(actualGame);
+                    String playerSer = mapper.writeValueAsString(actualPlayer);
+                    obj.put("game", gameSer);
+                    obj.put("player", playerSer);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else{
+            obj.put("status", "FAILED");
+        }
+
+        return obj;
     }
 
     private JSONObject expertService() {
@@ -450,10 +532,10 @@ public class Server {
             letters.addLast(new Token("/res/images/token/"+ letter + ".png", letterInfo[0][i], String.valueOf(letter)));
             letter += 1;
         }
-        letters.addLast(new Token("-", 5, "CH"));
-        letters.addLast(new Token("-", 8, "LL"));
-        letters.addLast(new Token("-", 8, "Ñ"));
-        letters.addLast(new Token("-", 8, "RR"));
+        letters.addLast(new Token("/res/images/token/CH.png", 5, "CH"));
+        letters.addLast(new Token("/res/images/token/LL.png", 8, "LL"));
+        letters.addLast(new Token("/res/images/token/Ñ.png", 8, "Ñ"));
+        letters.addLast(new Token("/res/images/token/RR.png", 8, "RR"));
 
         this.tokenInstances = letters;
     }

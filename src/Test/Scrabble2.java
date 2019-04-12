@@ -1,4 +1,4 @@
-package GUI;
+package Test;
 
 import Logic.Controller;
 import Logic.Player;
@@ -24,9 +24,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.Time;
 
-public class Scrabble extends Application {
+public class Scrabble2 extends Application {
     private String cwd = System.getProperty("user.dir");
-    private Controller controller;
+    private Controller2 controller;
     private VBox rightPlayerInfoContainer;
     private VBox leftPlayerInfoContainer;
     private VBox upPlayerInfoContainer;
@@ -48,7 +48,7 @@ public class Scrabble extends Application {
 
     @Override
     public void start(Stage stage) {
-        controller = new Controller(this);
+        controller = new Controller2(this);
 
         // En este panel va a meter sus paneles con su parte de la interfaz.
         StackPane mainLayout = new StackPane();
@@ -72,7 +72,7 @@ public class Scrabble extends Application {
     }
 
     public void show() {
-        launch(Scrabble.class);
+        launch(GUI.Scrabble.class);
     }
 
     private void init_initialWindow() {
@@ -328,62 +328,29 @@ public class Scrabble extends Application {
     public void searchWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
 
-        System.out.println("Lista actual " + lettersList.toString());
-
-
         int temp = 0;
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 Token token = actualMatrix[i][j];
-                if (temp==14){
+                if (temp>=15){
                     temp = 0;
                 }
 
-                Token next = actualMatrix[i][temp+1];
-//                System.out.println(next);
-
+                Token next = actualMatrix[i][temp+1];;
 
                 if (find(token)) {
                     word.append(token.getLetter());
-//                    System.out.println("Actual token " + token.getLetter() +  "\n");
                 }
 
-//                else if (!find(token) && token != null){
-//                    Token down = actualMatrix[i][j+1];
-//                    System.out.println("Letra actual " + token.getLetter());
-//                    try {
-//                        System.out.println("Down " + down.getLetter());
-//                    }catch (NullPointerException e){
-//                        System.out.println("Down null");
-//                    }
-//                    if (down != null){
-//                        Token downDown = actualMatrix[i][j+2];
-//
-//                        if (find(downDown)){
-//                            System.out.println("Agregando en cruz...");
-//                            word.append(down.getLetter());
-//                        }
-//
-//                    }
-
-//                    System.out.println("Adding existing");
-//                    word.append(token.getLetter());
+                if (!find(token) && next!=null){
+                    word.append(token.getLetter());
                 }
-//                else if (next==null && word.toString().length()>0){
-//
-//                    System.out.println("Exit");
-//                    break;
-//                }
-                temp++;
-
-//                System.out.println("\n");
-
             }
         }
 
 
         lettersList = new LinkedList<>();
-        System.out.println("Final word " + word.toString());
+        System.out.println(word.toString());
     }
 
     private boolean find(Token tokenToSearch) {
@@ -449,29 +416,19 @@ public class Scrabble extends Application {
 
             if (player.getplayerId().equals(controller.getPlayerInstance().getplayerId())) {
 
-                Platform.runLater(() -> this.actualPlayerInfoContainer.getChildren().add(playerBox));
-//                this.actualPlayerInfoContainer.getChildren().add(playerBox);
+                this.actualPlayerInfoContainer.getChildren().add(playerBox);
             } else {
                 switch (c) {
                     case 0:
-                        Platform.runLater(() -> this.rightPlayerInfoContainer.getChildren().add(playerBox));
-//                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
                         break;
                     case 1:
-                        Platform.runLater(() -> {
-                            this.upPlayerInfoContainer.getChildren().clear();
-                            this.upPlayerInfoContainer.getChildren().add(playerBox);
-                        });
-//                        this.upPlayerInfoContainer.getChildren().clear();
-//                        this.upPlayerInfoContainer.getChildren().add(playerBox);
+                        this.upPlayerInfoContainer.getChildren().clear();
+                        this.upPlayerInfoContainer.getChildren().add(playerBox);
                         break;
                     case 2:
-                        Platform.runLater(() -> {
-                            this.leftPlayerInfoContainer.getChildren().clear();
-                            this.leftPlayerInfoContainer.getChildren().add(playerBox);
-                        });
-//                        this.leftPlayerInfoContainer.getChildren().clear();
-//                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
+                        this.leftPlayerInfoContainer.getChildren().clear();
+                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
                         break;
                 }
                 c++;
@@ -655,9 +612,7 @@ public class Scrabble extends Application {
         //TODO actualizar logica
 //        tokenBox.getChildren().clear();
 
-        Platform.runLater(() -> tokenBox.getChildren().clear());
-//        tokenBox.getChildren().clear();
-        System.out.println("Lista de Tokens: " + tokenList);
+        tokenBox.getChildren().clear();
         for (int i = 0; i < tokenList.getSize(); i++) {
             Token token = tokenList.get(i);
 //            System.out.println("Adding token " + token.getLetter());
@@ -673,8 +628,7 @@ public class Scrabble extends Application {
                     }
                 }
             });
-            Platform.runLater(() -> tokenBox.getChildren().add(letter));
-//            tokenBox.getChildren().add(letter);
+            tokenBox.getChildren().add(letter);
 
         }
     }
@@ -841,5 +795,10 @@ public class Scrabble extends Application {
 
     }
 
+    public static void main(String[] args) {
+        Scrabble2 scrabble2 = new Scrabble2();
+        scrabble2.show();
+    }
 
 }
+
