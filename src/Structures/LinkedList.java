@@ -120,6 +120,21 @@ public class  LinkedList<T> {
         return size;
     }
 
+    public T nextOf(T element) {
+        Node<T> temp = head;
+        for (int i=0; i<size; i++) {
+            if (temp.getValue() == element) {
+                if (temp.getNext() == null) {
+                    return head.getValue();
+                } else {
+                    return temp.getNext().getValue();
+                }
+            }
+            temp = temp.getNext();
+        }
+        return null;
+    }
+
 
     public static void main(String[] args) {
         LinkedList<Integer> list = new LinkedList<>();

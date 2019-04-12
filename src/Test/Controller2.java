@@ -1,6 +1,9 @@
-package Logic;
+package Test;
 
 import GUI.Scrabble;
+import Logic.Game;
+import Logic.Player;
+import Logic.Token;
 import Sockets.Client;
 import Structures.LinkedList;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +13,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Controller {
+public class Controller2 {
     private JSONObject message;
     private JSONObject response;
     private String cwd = System.getProperty("user.dir");
     private Client client;
-    private Scrabble gui;
+    private Scrabble2 gui;
 
     private String playerName = "-";
     private String player_id = "-";
@@ -30,7 +33,7 @@ public class Controller {
      *
      * @param gui La interfaz que va a controlar la clase
      */
-    public Controller(Scrabble gui) {
+    public Controller2(Scrabble2 gui) {
         this.gui = gui;
         initialize();
     }
@@ -185,6 +188,8 @@ public class Controller {
 
         response = client.connect(message);
 
+//        System.out.println(response.toString());
+
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
@@ -260,6 +265,7 @@ public class Controller {
 //        gui.test(grid);
     }
 
+
     /**
      * Este método verifica si ya es el turno del jugador.
      */
@@ -271,56 +277,10 @@ public class Controller {
 
     }
 
-    public void callExpert(String phoneNum, String wordToCheck) {
+    public void callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
-        message.put("match_id", current_match_id);
-        message.put("expert_phone", phoneNum);
-        message.put("word_to_check", wordToCheck);
-
         response = client.connect(message);
-
-        if (response.get("status").equals("CONTACTING")) {
-            System.out.println("Waiting for expert to answer");
-            checkOnExpert();
-            gui.lockGui();
-        }
-    }
-
-    public void checkOnExpert() {
-        Thread caller = new Thread(() -> {
-            boolean check = true;
-            while (check) {
-                try {
-                    message = prepare();
-                    message.put("action", "DID_EXPERT_ANSWER");
-                    message.put("match_id", current_match_id);
-
-                    response = client.connect(message);
-
-                    if (response.get("status").equals("ANSWERED")) {
-                        System.out.println("El experto ya respondió");
-                        check = false;
-                        showExpertAnswer(response.getString("expert_answer"));
-
-                    } else {
-                        System.out.println("Aún no ha respondido el experto");
-                    }
-                    Thread.sleep(2000);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            gui.unlockGui();
-        });
-
-        caller.setDaemon(true);
-        caller.start();
-    }
-
-    private void showExpertAnswer(String answer) {
-
     }
 
     /**

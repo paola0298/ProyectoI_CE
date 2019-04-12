@@ -7,8 +7,15 @@ public class Game {
     private String gameID;
     private int maxPlayers;
     private Token[][] grid;
-    private String actualPlayer;
+    private Player actualPlayer;
     private LinkedList<Player> players;
+
+    //Expert related attributes
+    boolean contactExpert = false;
+    private boolean receivedAnswer = false;
+    String expertPhone = "";
+    String wordToCheck = "";
+    String expertAnswer = "";
 
     public Game(){}
 
@@ -17,20 +24,31 @@ public class Game {
         this.gameID = RandomStringUtils.randomAlphanumeric(6);
         this.maxPlayers = maxPlayers;
         this.grid = new Token[15][15];
-        this.actualPlayer = "-";
+        this.actualPlayer = null;
     }
 
     public boolean addPlayer(Player player) {
         if (players.getSize() < maxPlayers) {
             players.addLast(player);
+            if (players.getSize() == 1) {
+                actualPlayer = player;
+            }
             return true;
         } else {
             return false;
         }
     }
 
-    public void removePlayer() {
+    public void removePlayer(Player player) {
+        players.remove(player);
+    }
 
+    public void nextPlayer() {
+        actualPlayer = players.nextOf(actualPlayer);
+    }
+
+    public Player getActualPlayer() {
+        return actualPlayer;
     }
 
     public LinkedList<Player> getPlayers() {
@@ -43,6 +61,14 @@ public class Game {
 
     public Token[][] getGrid() {
         return grid;
+    }
+
+    public boolean didExpertAnswered() {
+        return receivedAnswer;
+    }
+
+    public String getExpertAnswer() {
+        return expertAnswer;
     }
 
 }
