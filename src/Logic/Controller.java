@@ -256,7 +256,7 @@ public class Controller {
 //        } else {
 //            System.out.println("Try again");
 //        }
-        gui.searchWord(grid);
+        gui.createWord(grid);
 //        gui.test(grid);
     }
 

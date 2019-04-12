@@ -319,13 +319,13 @@ public class Scrabble extends Application {
 
     public void test(Token[][] grid){
         Thread thread = new Thread(() -> {
-            searchWord(grid);
+            createWord(grid);
         });
         thread.setDaemon(true);
         thread.start();
     }
 
-    public void searchWord(Token[][] actualMatrix) {
+    public String createWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
 
         System.out.println("Lista actual " + lettersList.toString());
@@ -335,12 +335,12 @@ public class Scrabble extends Application {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 Token token = actualMatrix[i][j];
-                if (temp==14){
-                    temp = 0;
-                }
-
-                Token next = actualMatrix[i][temp+1];
-//                System.out.println(next);
+//                if (temp==14){
+//                    temp = 0;
+//                }
+//
+//                Token next = actualMatrix[i][temp+1];
+////                System.out.println(next);
 
 
                 if (find(token)) {
@@ -368,13 +368,13 @@ public class Scrabble extends Application {
 
 //                    System.out.println("Adding existing");
 //                    word.append(token.getLetter());
-                }
+
 //                else if (next==null && word.toString().length()>0){
 //
 //                    System.out.println("Exit");
 //                    break;
 //                }
-                temp++;
+//                temp++;
 
 //                System.out.println("\n");
 
@@ -384,6 +384,7 @@ public class Scrabble extends Application {
 
         lettersList = new LinkedList<>();
         System.out.println("Final word " + word.toString());
+        return word.toString();
     }
 
     private boolean find(Token tokenToSearch) {
@@ -444,6 +445,7 @@ public class Scrabble extends Application {
             scoreLabel = new Text("Puntos: ");
             userScore = new Text(String.valueOf(player.getScore()));
             userScoreBox.getChildren().addAll(scoreLabel, userScore);
+            playerBox.getChildren().clear();
             playerBox.getChildren().addAll(userName, userImage, userScoreBox);
 
 
@@ -459,7 +461,7 @@ public class Scrabble extends Application {
                         break;
                     case 1:
                         Platform.runLater(() -> {
-                            this.upPlayerInfoContainer.getChildren().clear();
+//                            this.upPlayerInfoContainer.getChildren().clear();
                             this.upPlayerInfoContainer.getChildren().add(playerBox);
                         });
 //                        this.upPlayerInfoContainer.getChildren().clear();
@@ -467,7 +469,7 @@ public class Scrabble extends Application {
                         break;
                     case 2:
                         Platform.runLater(() -> {
-                            this.leftPlayerInfoContainer.getChildren().clear();
+//                            this.leftPlayerInfoContainer.getChildren().clear();
                             this.leftPlayerInfoContainer.getChildren().add(playerBox);
                         });
 //                        this.leftPlayerInfoContainer.getChildren().clear();
