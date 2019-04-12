@@ -6,6 +6,7 @@ import Structures.LinkedList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -154,7 +155,7 @@ public class Controller {
                         isTurn = true;
                         deserialize();
                         updatePlayers();
-                        updateTokens();
+                        updateInterface();
                         grid = actualGame.getGrid();
 
                     } else {
@@ -164,9 +165,10 @@ public class Controller {
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (JSONException e) {
+                    gui.gameDisconnected();
                 }
             }
-            //TODO método a llamar para desbloquear la interfaz i.e unlockGUI();
             gui.unlockGui();
         });
 
@@ -247,6 +249,7 @@ public class Controller {
     public int check_word(LinkedList<Token> tokenList) {
         String word = gui.createWord(grid);
         int score = calculateScore(tokenList);
+
         ObjectMapper mapper = new ObjectMapper();
 
         try {

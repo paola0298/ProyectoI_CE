@@ -132,6 +132,7 @@ public class Server {
                     String matchId = msg.getString("match_id");
                     int score = msg.getInt("score");
                     String game = msg.getString("game");
+
                     response = checkWord(game, word, matchId, score);
                     sendResponse(response.toString(), con);
                     break;
@@ -165,7 +166,7 @@ public class Server {
                     sendResponse("Palabra clave no encontrada", con);
             }
 
-            System.out.println("Cantidad de juegos creados " + gamesList.getSize());
+//            System.out.println("Cantidad de juegos creados " + gamesList.getSize());
             try {
                 con.close();
                 System.out.println("Conexión finalizada");
@@ -299,32 +300,36 @@ public class Server {
     private JSONObject checkWord(String playerGame, String word, String matchId, int score){
         JSONObject obj = new JSONObject();
         Game actualGame = findGame(matchId);
-
         ObjectMapper mapper = new ObjectMapper();
 
-        Game newGame = null;
-
         try {
-            newGame = mapper.readValue(playerGame, Game.class);
 
+            Game gameData = mapper.readValue(playerGame, Game.class);
+            System.out.println("Word to search: \"" + word + "\"");
             if (WordDictionary.search(word)){
-                System.out.println("Palabra \"" +  word + "\" encontrada");
-                Player actualPlayer = newGame.getActualPlayer();
+                System.out.println("Word found");
+//                Player actualPlayer = newGame.getActualPlayer();
+//                System.out.println("ActualPlayer server instance: " + actualPlayer);
+//                actualPlayer.addScore(score);
+//                newGame.nextPlayer();
+//
+//                System.out.println("Players list: " + newGame.getPlayers());
+
+                actualGame.setGrid(gameData.getGrid());
+
+                Player actualPlayer = actualGame.getActualPlayer();
                 actualPlayer.addScore(score);
+
+                actualGame.nextPlayer();
 
                 try {
 
-                    String gameSer = mapper.writeValueAsString(newGame);
+                    String gameSer = mapper.writeValueAsString(actualGame);
                     String playerSer = mapper.writeValueAsString(actualPlayer);
 
                     obj.put("status", "VALID");
                     obj.put("game", gameSer);
                     obj.put("player", playerSer);
-
-                    gamesList.remove(actualGame);
-                    gamesList.addLast(newGame);
-
-                    newGame.nextPlayer();
 
                 } catch (JsonProcessingException e) {
                     obj.put("status", "FAILED");
@@ -334,6 +339,7 @@ public class Server {
             }
 
         } catch (IOException e) {
+            System.out.println("ERROR: " + e.getMessage());
             obj.put("status", "FAILED");
         }
 

@@ -44,11 +44,18 @@ public class Game {
     }
 
     public void nextPlayer() {
-        actualPlayer = players.nextOf(actualPlayer);
+        System.out.println("[Game]");
+//        System.out.println("List: " + players);
+        System.out.println("ActualPlayer game instance: " + actualPlayer);
+        Player nextPlayer = players.nextOf(this.actualPlayer);
+//        System.out.println("Next player: " + nextPlayer);
+//        System.out.println("List: " + players);
+        this.actualPlayer = nextPlayer;
+
     }
 
     public Player getActualPlayer() {
-        return actualPlayer;
+        return this.actualPlayer;
     }
 
     public LinkedList<Player> getPlayers() {
@@ -69,6 +76,42 @@ public class Game {
 
     public String getExpertAnswer() {
         return expertAnswer;
+    }
+
+    public void setActualPlayer(Player actualPlayer) {
+        this.actualPlayer = actualPlayer;
+    }
+
+    public Player getPlayer(String playerId) {
+        Player player = null;
+
+        for (int i=0; i<players.getSize(); i++) {
+            if (players.get(i).getplayerId().equals(playerId)) {
+                player = players.get(i);
+            }
+        }
+
+        return player;
+    }
+
+    public void setGrid(Token[][] grid) {
+        this.grid = grid;
+    }
+
+
+    public static void main(String[] args) {
+        Player player = new Player("Paola");
+        Player player1 = new Player("Marlon");
+
+        Game game = new Game(2);
+        game.addPlayer(player);
+        game.addPlayer(player1);
+
+        System.out.println("Actual player " + game.getActualPlayer().getName());
+        game.nextPlayer();
+        System.out.println("Actual player " + game.getActualPlayer().getName());
+
+        System.out.println(game.getPlayers());
     }
 
 }

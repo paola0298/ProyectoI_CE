@@ -259,6 +259,7 @@ public class Scrabble extends Application {
                 if (response == 1){
                     lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
 
+
                 } else if (response == 0){
                     //Colocar el alert para que el usuario decida que hacer
 
@@ -320,6 +321,10 @@ public class Scrabble extends Application {
         gameScreenContainer.setRight(rightPlayerInfoContainer);
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
 
+    }
+
+    public void gameDisconnected() {
+        System.out.println("The client was disconnected from the server");
     }
 
     private void showAlert(String message, String title, Alert.AlertType type) {
@@ -389,8 +394,8 @@ public class Scrabble extends Application {
 
 
 
-        System.out.println("Final word " + word.toString());
-        return word.toString();
+        System.out.println("Final word " + word.toString().toLowerCase());
+        return word.toString().toLowerCase();
     }
 
     private boolean find(Token tokenToSearch) {
