@@ -35,27 +35,41 @@ public class Game {
     public void tokens(){ //Que hace este método?
 
     }
-
+    /**
+     * Con este método se obtiene el ID de la partida
+     * */
     public String getGameID() {
         return gameID;
     }
 
+    /**
+     * Con este método se modifica el ID de la partida
+     * */
     public void setGameID(String gameID) {
         this.gameID = gameID;
     }
 
+    /**
+     * Con este método se obtiene el máximo de jugadores
+     * */
     public int getMaxPlayers() {
         return maxPlayers;
     }
-
+    /**
+     * Con este método se modifica el máximo de jugadores
+     * */
     public void setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
     }
-
+    /**
+     * Con este método se obtiene la matriz donde se agregan las fichas
+     * */
     public Token[][] getGrid() {
         return grid;
     }
-
+    /**
+     * Con este método se modifica la matriz principal del juego
+     * */
     public void setGrid(Token[][] grid) {
         this.grid = grid;
     }
