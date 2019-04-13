@@ -1,55 +1,11 @@
-#label {
+.button {
+    -fx-font-size: 15px;
+}
+
+.label {
     -fx-font-size: 16px;
     -fx-text-alignment: center;
 }
-
 #join_message {
     -fx-text-fill: red;
-}
-
-#button {
-    -fx-cursor: hand;
-    -fx-background-color:
-            #090a0c,
-            linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%),
-            linear-gradient(#20262b, #191d22),
-            radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));
-    -fx-background-radius: 5,4,3,5;
-    -fx-background-insets: 0,1,2,0;
-    -fx-text-fill: white;
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
-    -fx-font-family: "Arial";
-    -fx-text-fill: linear-gradient(white, #d0d0d0);
-    -fx-font-size: 15px;
-    -fx-padding: 10 20 10 20;
-}
-
-/*.text-field {*/
-/*    -fx-border-color: grey;*/
-/*    -fx-border: 0 0 1 0; // top, right, bottom, left*/
-/*    -fx-background-color: transparent;*/
-/*}*/
-
-#text-field {
-    -fx-background-color: -fx-focus-color, -fx-background;
-    -fx-font-size: 15px;
-
-}
-
-#container-background {
-    -fx-background-color: white;
-}
-
-#combo-box-base {
-    -fx-background-color: transparent;
-    /*-fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, white;*/
-    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
-    -fx-background-radius: 3px, 3px, 2px, 1px;
-}
-
-#matrix {
-    -fx-background-color: white;
-    -fx-border-width: 2px;
-    -fx-border-color: black;
-
 }
