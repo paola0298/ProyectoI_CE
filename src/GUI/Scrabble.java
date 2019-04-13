@@ -22,6 +22,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Optional;
 
+/**
+ * La clase Scrabble se encarga de crear la parte gráfica del proyecto
+ */
 public class Scrabble extends Application {
     private String cwd = System.getProperty("user.dir");
     private Controller controller;
@@ -45,6 +48,10 @@ public class Scrabble extends Application {
 
     private LinkedList<Token> lettersList = new LinkedList<>();
 
+    /**
+     * Este método inicializa la interfaz
+     * @param stage
+     */
     @Override
     public void start(Stage stage) {
         controller = new Controller(this);
@@ -70,10 +77,16 @@ public class Scrabble extends Application {
 
     }
 
+    /**
+     * Método que será llamado para ejecutar la interfaz
+     */
     public void show() {
         launch(Scrabble.class);
     }
 
+    /**
+     * Método que crea la ventana principal del juego
+     */
     private void init_initialWindow() {
         /////////////////////////////Pantalla de Inicio//////////////////////
         /* Pantalla inicial donde el jugador puede elegir entre ingresar a un partida, o crear una propia
@@ -131,6 +144,9 @@ public class Scrabble extends Application {
 
     }
 
+    /**
+     * Método que crea la ventana para unirse a una nueva partida
+     */
     private void init_joinWindow() {
         ///////////////////Pantalla de unión a partida existente//////////////////////
         joinMatchContainer = new HBox();
@@ -182,6 +198,9 @@ public class Scrabble extends Application {
         joinMatchContainer.getChildren().addAll(buttonContainer, infoContainer, background);
     }
 
+    /**
+     * Método que crea la ventana para crear una nueva partida
+     */
     private void init_newMatchWindow() {
         /* Window for create a new game displays an comboBox for choose the number of players in the game */
         newMatchWindow = new BorderPane();
@@ -258,6 +277,9 @@ public class Scrabble extends Application {
         BorderPane.setMargin(startButton, new Insets(10, 10, 10, 10));
     }
 
+    /**
+     * @return Generá un contenedor y coloca el botón hacía atrás
+     */
     private HBox backButtonContainer() {
         HBox buttonContainer = new HBox();
         buttonContainer.setId("container-background");
@@ -272,6 +294,9 @@ public class Scrabble extends Application {
         return buttonContainer;
     }
 
+    /**
+     * Método que crea la ventana del juego
+     */
     private void init_gameWindow() {
         /////////////////////////////Pantalla de Juego//////////////////////
         gameScreenContainer = new BorderPane();
@@ -398,6 +423,11 @@ public class Scrabble extends Application {
 
     }
 
+    /**
+     * Este método es para consultarle al jugador que desea hacer en caso de que
+     * la palabra formada no sea válida
+     * @return Devuelve cada caso
+     */
     private int showOptions() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Palabra invalida");
@@ -430,10 +460,24 @@ public class Scrabble extends Application {
         return optionSelected;
     }
 
+    /**
+     * Método para sacar al jugador de la partida en caso de que haya un error con el servidor
+     */
     public void gameDisconnected() {
+
+        showAlert("Se ha perdido la conexión con el servidor, regresando al menú inicial",
+                "Conexión perdida", Alert.AlertType.ERROR);
+        initialWindow.toFront();
+        //TODO eliminar al jugador de la partida
         System.out.println("The client was disconnected from the server");
     }
 
+    /**
+     * Método que le muestra un mensaje al jugador
+     * @param message Mensaje que se va a mostrar en la alerta
+     * @param title El título del mensaje
+     * @param type el tipo de la alerta
+     */
     private void showAlert(String message, String title, Alert.AlertType type) {
         Alert showID = new Alert(type);
         showID.setTitle(title);
@@ -443,6 +487,11 @@ public class Scrabble extends Application {
     }
 
 
+    /**
+     * Método para construir la palabra que formó el jugador
+     * @param actualMatrix Matriz interna actual
+     * @return La palabra que formó el jugador
+     */
     public String createWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
         System.out.println("Lista actual " + lettersList.toString());
@@ -498,6 +547,11 @@ public class Scrabble extends Application {
         return word.toString().toLowerCase();
     }
 
+    /**
+     * Método que busca un Token en una lista determinada
+     * @param tokenToSearch  Token que se va a buscar
+     * @return True si la ficha se encontró, false en caso contrario
+     */
     private boolean find(Token tokenToSearch) {
         if (tokenToSearch!=null) {
             for (int i = 0; i < lettersList.getSize(); i++) {
@@ -511,6 +565,7 @@ public class Scrabble extends Application {
 
 
     /**
+     * Método que genera una imagen
      * @param relativePath Ruta de la imagen
      * @return El objeto de la imagen creada
      */
@@ -526,6 +581,7 @@ public class Scrabble extends Application {
 
     /**
      * Carga en la interfaz los jugadores presentes en la partida
+     * @param playersToLoad La lista de jugadores actuales
      */
     public void playerLoader2(LinkedList<Player> playersToLoad) {
         ImageView userImage;
@@ -751,6 +807,7 @@ public class Scrabble extends Application {
 
     /**
      * Método para cargar las imágenes de las fichas del jugador
+     * @param tokenList Lista con los tokens actuales del jugador
      */
     public void tokenLoader(LinkedList<Token> tokenList) {
 //        LinkedList<Token> tokenList = controller.getPlayerInstance().getTokenlist();
@@ -897,6 +954,10 @@ public class Scrabble extends Application {
         }
     }
 
+    /**
+     * Carga en la interfaz la matriz
+     * @param actualMatrix Matriz interna actual
+     */
     public void matrixLoader(Token[][] actualMatrix) {
         //i columna j fila
 
@@ -923,11 +984,17 @@ public class Scrabble extends Application {
         }
     }
 
+    /**
+     * Bloquea la interfaz mientras los otros jugadores tienen su turno
+     */
     public void lockGui() {
         unlockedControls = false;
         Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: gray;"));
     }
 
+    /**
+     * Desbloquea la interfaz para que el jugador actual pueda realizar su turno
+     */
     public void unlockGui() {
         unlockedControls = true;
         Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: white;"));

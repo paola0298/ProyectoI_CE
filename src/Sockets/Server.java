@@ -183,6 +183,11 @@ public class Server {
 
     }
 
+    /**
+     * Método que le pasa el turno al siguiente jugador
+     * @param gameId Identificador de la partida
+     * @return objeto json con la información
+     */
     private JSONObject passTurn(String gameId) {
         JSONObject obj = new JSONObject();
         Game actualGame = findGame(gameId);
@@ -193,6 +198,11 @@ public class Server {
         return obj;
     }
 
+    /**
+     * Busca un juego, con base en el id del juego
+     * @param gameId  identificador del juego
+     * @return Objeto Game
+     */
     private Game findGame(String gameId) {
         Game game = null;
         for (int i=0; i<gamesList.getSize(); i++) {
@@ -203,6 +213,11 @@ public class Server {
         return game;
     }
 
+    /**
+     * Método que verifica si el experto respondió
+     * @param matchId Identificador de la partida
+     * @return Objeto json con la respuesta
+     */
     private JSONObject expertAnswered(String matchId) {
         JSONObject obj = new JSONObject();
 
@@ -313,6 +328,15 @@ public class Server {
         return obj;
     }
 
+    /**
+     * Verifica que la palabra exista en el diccionario
+     * @param playerGame  Objeto serializado del juego
+     * @param word palabra que se va a verificar
+     * @param matchId Identificador de la partida
+     * @param score Puntuación de la palabra formada
+     * @param playerInstance Objeto serializado del jugador actual
+     * @return
+     */
     private JSONObject checkWord(String playerGame, String word, String matchId, int score, String playerInstance){
         JSONObject obj = new JSONObject();
         Game actualGame = findGame(matchId);
@@ -366,6 +390,11 @@ public class Server {
         return obj;
     }
 
+    /**
+     * Método que se pone en contacto con el experto
+     * @param msg El mensaje que se le desea enviar
+     * @return Json objet con la respuesta
+     */
     private JSONObject callExpert(JSONObject msg) {
         JSONObject obj = new JSONObject();
 
@@ -431,6 +460,12 @@ public class Server {
         return obj;
     }
 
+    /**
+     * Verifica si ya es el turno de un jugador específico
+     * @param gameId  Identificador de la partida
+     * @param playerId Indetificador del jugador
+     * @return
+     */
     private JSONObject checkTurn(String gameId, String playerId) {
         JSONObject obj = new JSONObject();
         Game actualGame = findGame(gameId);
@@ -471,8 +506,15 @@ public class Server {
         return obj;
     }
 
+    /**
+     * Método que elimina a un jugador de la partida
+     * @return Json object con la respuesta
+     */
     private JSONObject disconnect() { return new JSONObject(); }
 
+    /** Genera una lista de tokens
+     * @return  Lista de token
+     */
     private LinkedList<Token> generateTokens() {
 
         LinkedList<Token> tokenList = new LinkedList<>();
@@ -488,6 +530,10 @@ public class Server {
         return tokenList; //TODO generar lista de tokens para el jugador
     }
 
+    /**
+     * Agrega una nueva palabra al diccionario
+     * @param newWord  Palabra que se desea agregar
+     */
     public void addWordDictonary(String newWord){
         if(!WordDictionary.search(newWord)){
             WordDictionary.addWord(newWord);
@@ -589,6 +635,9 @@ public class Server {
 
     }
 
+    /**
+     * @return Retorna la lista de los tokens
+     */
     public LinkedList<Token> getTokenList() {
         return tokenInstances;
     }

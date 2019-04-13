@@ -17,8 +17,15 @@ public class Game {
     String wordToCheck = "";
     String expertAnswer = "";
 
+    /**
+     * Constructor por defecto
+     */
     public Game(){}
 
+    /**
+     * Constructor de la clase
+     * @param maxPlayers  Cantidad máxima de jugadores
+     */
     public Game(int maxPlayers) {
         this.players = new LinkedList<>();
         this.gameID = RandomStringUtils.randomAlphanumeric(6);
@@ -27,6 +34,11 @@ public class Game {
         this.actualPlayer = null;
     }
 
+    /**
+     * Método para agregar un jugador a la partida
+     * @param player  Nuevo jugador
+     * @return true si se pudo unir, false en caso contrario
+     */
     public boolean addPlayer(Player player) {
         if (players.getSize() < maxPlayers) {
             players.addLast(player);
@@ -39,10 +51,17 @@ public class Game {
         }
     }
 
+    /**
+     * Método para eliminar un jugador de la partida
+     * @param player el jugador a eliminar
+     */
     public void removePlayer(Player player) {
         players.remove(player);
     }
 
+    /**
+     * Se obtiene el siguiente jugador que tiene el turno
+     */
     public void nextPlayer() {
         System.out.println("[Game]");
 //        System.out.println("List: " + players);
@@ -54,18 +73,30 @@ public class Game {
 
     }
 
+    /**
+     * @return Retorna el jugador actual de la partida
+     */
     public Player getActualPlayer() {
         return this.actualPlayer;
     }
 
+    /**
+     * @return Retorna la lista con todos los jugadores de la partida
+     */
     public LinkedList<Player> getPlayers() {
         return players;
     }
 
+    /**
+     * @return Retorna el id del juego
+     */
     public String getGameID() {
         return gameID;
     }
 
+    /**
+     * @return Retorna la matriz/cuadricula del juego
+     */
     public Token[][] getGrid() {
         return grid;
     }
@@ -78,10 +109,20 @@ public class Game {
         return expertAnswer;
     }
 
+    /**
+     * Establece quien es el jugador actual
+     * @param actualPlayer jugador actual
+     */
     public void setActualPlayer(Player actualPlayer) {
         this.actualPlayer = actualPlayer;
     }
 
+
+    /**
+     * Obtiene el objeto jugador a partir del id
+     * @param playerId identificador del jugador
+     * @return Objeto tipo Player
+     */
     public Player getPlayer(String playerId) {
         Player player = null;
 
@@ -94,6 +135,9 @@ public class Game {
         return player;
     }
 
+    /**
+     * @param grid Establece la matriz de la partida
+     */
     public void setGrid(Token[][] grid) {
         this.grid = grid;
     }

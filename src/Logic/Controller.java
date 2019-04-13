@@ -60,23 +60,45 @@ public class Controller {
         return playerInstance;
     }
 
+    /**
+     * Este método le coloca el nombre al jugador
+     * @param playerName El nombre del jugador
+     */
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
+    /**
+     * Método para agregar un token a la matriz
+     * @param tokenToAdd  El token que se va a agregar
+     * @param row la fila en que se va a agregar
+     * @param column la columna en que se va a agregar
+     */
     public void addToken(Token tokenToAdd, int row, int column) {
         grid[column][row] = tokenToAdd;
     }
 
+    /**
+     * Método que elimina un elemento de la matriz
+     * @param row  fila en que se va a eliminar
+     * @param column columna en que se va a eliminar
+     */
     public void removeToken(int row, int column) {
         grid[column][row] = null;
     }
 
+    /**
+     *Método que obtiene un toque
+     * @param row  fila donde se encuentra el token
+     * @param column columna donde se encuentra el token
+     * @return El token buscado
+     */
     public Token getToken(int row, int column) {
         return grid[column][row];
     }
 
     /**
+     * Método que actualiz la lista de tokens del jugador
      * @param flag  Bandera que determina si se va a eliminar (false) o agregar (true) un token
      * @param token Token que se va a agregar o eliminar
      * @return Nueva lista de tokens actualizada
@@ -95,7 +117,6 @@ public class Controller {
 
     /**
      * Este método le pide al servidor crear una nueva partida con los jugadores máximos especificados
-     *
      * @param max_players Cantidad máxima de jugadores en la partida.
      */
     public boolean create_match(String max_players) {
@@ -123,16 +144,25 @@ public class Controller {
         }
     }
 
+    /**
+     * Método para actualizar los jugadores en la interfaz
+     */
     private void updatePlayers() {
         LinkedList<Player> actualPlayers = actualGame.getPlayers();
         gui.playerLoader2(actualPlayers);
     }
 
+    /**
+     * Método para actualizar los tokens en la interfaz
+     */
     public void updateTokens() {
         LinkedList<Token> actualtoken = playerInstance.getTokenlist();
         gui.tokenLoader(actualtoken);
     }
 
+    /**
+     * Método para actualizar la interfaz
+     */
     public void updateInterface() {
         updateTokens();
         gui.matrixLoader(grid);
@@ -244,9 +274,11 @@ public class Controller {
         }
     }
 
+
     /**
-     * Este método le pide al servidor verificar si la palabra es válida.
-     *
+     * Este método le consulta al servidor si la palabra es valida
+     * @param tokenList  la lista de tokens
+     * @return 1 si la palabra es correcta, 0 si no lo es, y -1 si ocurrió un error
      */
     public int check_word(LinkedList<Token> tokenList) {
         String word = gui.createWord(grid);
@@ -291,15 +323,22 @@ public class Controller {
         }
     }
 
+    /**
+     * @param tokenList Lista con las letras que conforman la palabra
+     * @return la puntuación de la palabra
+     */
     private int calculateScore(LinkedList<Token> tokenList) {
         int score = 0;
         for (int i = 0; i < tokenList.getSize(); i++){
             score+= tokenList.get(i).getScore();
         }
-
         return score;
     }
 
+    /**
+     * Método que realiza una consulta al experto
+     * @return true si pudo contactar al experto, false caso contrario
+     */
     public boolean callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
@@ -319,6 +358,9 @@ public class Controller {
         }
     }
 
+    /**
+     * @return true si pudo saltar el turno correctamente
+     */
     public boolean passTurn() {
         message = prepare();
         message.put("action", "PASS_TURN");
@@ -338,6 +380,9 @@ public class Controller {
 
     }
 
+    /**
+     * Método para recibir la respuesta del experto por 2 segundos
+     */
     public void checkOnExpert() {
         Thread caller = new Thread(() -> {
             boolean check = true;

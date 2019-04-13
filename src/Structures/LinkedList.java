@@ -5,15 +5,18 @@ public class  LinkedList<T> {
     private int size;
     private Node<T> head;
 
+    /**
+     * Constructor de la lista enlazada
+     */
     public LinkedList(){
         this.size = 0;
         this.head = null;
     }
 
-    public Node<T> getHead() {
-        return head;
-    }
-
+    /**
+     * Agrega un elemento al final de la lista
+     * @param value Valor a agregar
+     */
     public void addLast(T value){
         Node<T> newElement = new Node<>(value);
 
@@ -28,6 +31,9 @@ public class  LinkedList<T> {
         this.size++;
     }
 
+    /**Agrega un elemento al inicio de la lista
+     * @param value  Valor a agregar
+     */
     public void addFirst(T value){
         Node<T> newElement = new Node<>(value);
         newElement.setNext(this.head);
@@ -35,6 +41,9 @@ public class  LinkedList<T> {
         this.size++;
     }
 
+    /**Elimina el último elemento de la lista
+     * @return  true si se pudo eliminar, false en caso contrario
+     */
     public boolean deleteLast(){
         if (this.head!=null){
             Node<T> temp = this.head;
@@ -48,6 +57,10 @@ public class  LinkedList<T> {
         return false;
     }
 
+    /**
+     *  Elimina el primer elemento de la lista
+     * @return  true si se pudo eliminar, false en caso contrario
+     */
     public boolean deleteFirst(){
         if (this.head != null){
             this.head = this.head.getNext();
@@ -57,6 +70,11 @@ public class  LinkedList<T> {
         return false;
     }
 
+    /**
+     * Elimina en elemeno específico de la lista
+     * @param element  elemento a eliminar
+     * @return true si se pudo eliminar, false en caso contrario
+     */
     public boolean remove(T element){
         if (element == this.head.getValue()){
             deleteFirst();
@@ -77,6 +95,10 @@ public class  LinkedList<T> {
         return false;
     }
 
+    /**
+     * Método que imprime la lista
+     * @return Retorna un string con los elementos de la lista
+     */
     @Override
     public String toString(){
         StringBuilder buffer = new StringBuilder();
@@ -100,6 +122,11 @@ public class  LinkedList<T> {
         return buffer.toString();
     }
 
+    /**
+     * Se obtiene el valor a partir de una posición dada
+     * @param index  Índice para buscar el elemento
+     * @return elemento
+     */
     public T get(int index){
         Node<T> tmp = this.head;
         for(int i=0; i<index  && tmp.getNext()!= null; i++){
@@ -108,6 +135,11 @@ public class  LinkedList<T> {
         return tmp.getValue();
     }
 
+    /**
+     * Método que retorna un nodo en una posición dada
+     * @param index  posición donde se encuentra el nodo
+     * @return el nodo
+     */
     public Node<T> acces_index(int index) {
         Node<T> tmp = this.head;
         for (int i = 0; i < index && tmp.getNext() != null; i++) {
@@ -116,10 +148,17 @@ public class  LinkedList<T> {
         return tmp;
     }
 
+    /**
+     * @return retorna el tamño de la lista
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     * @param element Elemento actual
+     * @return Nodo que se encuentra a la par
+     */
     public T nextOf(T element) {
         Node<T> temp = head;
         for (int i=0; i<size; i++) {
