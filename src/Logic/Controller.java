@@ -259,14 +259,14 @@ public class Controller {
         message.put("action", "DISCONNECT");
         message.put("match_id", current_match_id);
 
-        response = client.connect(message);
+        client.connect(message);
 
-        if (response.get("status").equals("SUCCESS")) {
-            System.out.println("Disconnected successfully");
-            this.current_match_id = "-";
-        } else {
-            System.out.println("An error ocurred");
-        }
+//        if (response.get("status").equals("SUCCESS")) {
+//            System.out.println("Disconnected successfully");
+//            this.current_match_id = "-";
+//        } else {
+//            System.out.println("An error ocurred");
+//        }
     }
 
     /**
