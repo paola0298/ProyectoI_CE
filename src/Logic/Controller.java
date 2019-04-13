@@ -6,6 +6,7 @@ import Structures.LinkedList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -18,6 +19,7 @@ public class Controller {
     private String cwd = System.getProperty("user.dir");
     private Client client;
     private Scrabble gui;
+    private String expertPhone;
 
     private String playerName = "-";
     private String player_id = "-";
@@ -154,7 +156,7 @@ public class Controller {
                         isTurn = true;
                         deserialize();
                         updatePlayers();
-                        updateTokens();
+                        updateInterface();
                         grid = actualGame.getGrid();
 
                     } else {
@@ -164,9 +166,10 @@ public class Controller {
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (JSONException e) {
+                    gui.gameDisconnected();
                 }
             }
-            //TODO método a llamar para desbloquear la interfaz i.e unlockGUI();
             gui.unlockGui();
         });
 
@@ -199,7 +202,8 @@ public class Controller {
             waitTurn();
             return true;
         } else {
-            System.out.println("Could not join match");
+            System.out.println("Could not join match \n" + response.get("status"));
+
             return false;
         }
     }
@@ -247,6 +251,7 @@ public class Controller {
     public int check_word(LinkedList<Token> tokenList) {
         String word = gui.createWord(grid);
         int score = calculateScore(tokenList);
+
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -257,7 +262,9 @@ public class Controller {
             message.put("score", score);
 
             String gameSer = mapper.writeValueAsString(actualGame);
+            String playerSer = mapper.writeValueAsString(playerInstance);
             message.put("game", gameSer);
+            message.put("player", playerSer);
 
         } catch (JsonProcessingException e) {
             return -1;
@@ -293,12 +300,12 @@ public class Controller {
         return score;
     }
 
-    public void callExpert(String phoneNum, String wordToCheck) {
+    public boolean callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
         message.put("match_id", current_match_id);
-        message.put("expert_phone", phoneNum);
-        message.put("word_to_check", wordToCheck);
+        message.put("expert_phone", expertPhone);
+        message.put("word_to_check", gui.createWord(grid));
 
         response = client.connect(message);
 
@@ -306,7 +313,29 @@ public class Controller {
             System.out.println("Waiting for expert to answer");
             checkOnExpert();
             gui.lockGui();
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    public boolean passTurn() {
+        message = prepare();
+        message.put("action", "PASS_TURN");
+        message.put("match_id", current_match_id);
+
+        response = client.connect(message);
+
+        if (response.getString("status").equals("SUCCESS")) {
+            //TODO función para quitar la fichas de la matriz y regresarlas al contenedor
+            gui.lockGui();
+            waitTurn();
+            return true;
+        } else {
+            //Si ocurrió un error al conectarse con el servidor
+            return false;
+        }
+
     }
 
     public void checkOnExpert() {
@@ -332,6 +361,8 @@ public class Controller {
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (JSONException e) {
+                    gui.gameDisconnected();
                 }
             }
             gui.unlockGui();
@@ -366,6 +397,7 @@ public class Controller {
             props.load(stream);
             String host = props.get("host_ip").toString();
             int port = Integer.parseInt(props.get("host_port").toString());
+            this.expertPhone = props.get("expert_phone").toString();
             this.client = new Client(host, port);
             System.out.println("[Info] Settings initialized successfully");
         } catch (IOException e) {

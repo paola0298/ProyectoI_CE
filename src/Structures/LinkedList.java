@@ -145,10 +145,16 @@ public class  LinkedList<T> {
         list.addLast(2);
         list.addLast(3);
         list.addLast(4);
-        list.addFirst(100);
-        list.addFirst(200);
-        list.remove(100);
-        System.out.println(list.size);
+
+
         System.out.println(list);
+
+        System.out.println(list.nextOf(1));
+        System.out.println(list.nextOf(2));
+        System.out.println(list.nextOf(3));
+        System.out.println(list.nextOf(4));
+
+        System.out.println(list);
+
     }
 }

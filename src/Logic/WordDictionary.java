@@ -1,29 +1,30 @@
 package Logic;
 
 import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 
 public class WordDictionary {
 
-    public static boolean search(String word) {
+    public static boolean search(String wordToSearch) {
         try {
-            boolean found = false;
+
             FileInputStream inputStream = new FileInputStream("res/dictionary.txt");
             InputStreamReader streamReader = new InputStreamReader(inputStream);
             BufferedReader reader = new BufferedReader(streamReader);
-
-            while(!found) {
-                if (StringUtils.stripAccents(reader.readLine()).equals(word.toLowerCase())) {
-                    found = true;
-                } else if (reader.readLine() == null) {
-                    break;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = StringUtils.stripAccents(line);
+                if (line.equals(wordToSearch)) {
+                    reader.close();
+                    return true;
                 }
-            }
-            inputStream.close();
-            streamReader.close();
-            reader.close();
 
-            return found;
+
+            }
+
+            reader.close();
+            return false;
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -45,8 +46,7 @@ public class WordDictionary {
 
 
     public static void main(String[] args) {
-        boolean found = search("Hola");
-        addWord("Hola");
+        System.out.println(WordDictionary.search("te"));
     }
 
 }
