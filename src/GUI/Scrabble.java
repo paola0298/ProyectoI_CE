@@ -30,6 +30,7 @@ public class Scrabble extends Application {
     private VBox leftPlayerInfoContainer;
     private VBox upPlayerInfoContainer;
     private HBox actualPlayerInfoContainer;
+    private HBox actiosInMatch;
     private HBox tokenBox;
     private ImageView letterSelected = null;
     private Token selectedToken = null;
@@ -38,7 +39,7 @@ public class Scrabble extends Application {
 
     private BorderPane gameScreenContainer; //Ventana del juego.
     private GridPane matrixContainer; // Matríz del juego
-    private VBox joinMatchContainer; //Ventana de unión a partida existente.
+    private HBox joinMatchContainer; //Ventana de unión a partida existente.
     private VBox initialWindow; // Ventana inicial
     private BorderPane newMatchWindow; //Ventana de partida nueva
 
@@ -81,11 +82,13 @@ public class Scrabble extends Application {
         En esta ventana se especifíca cuantos jugadores tendrá la partida
          */
         initialWindow = new VBox();
-//        initialWindow.setStyle("-fx-background-color: #1a8c24;");
-        initialWindow.setStyle("-fx-background-color: white");
-        initialWindow.setAlignment(Pos.CENTER);
-        initialWindow.setSpacing(15);
-        initialWindow.setPadding(new Insets(15));
+        initialWindow.setAlignment(Pos.TOP_CENTER);
+        initialWindow.setSpacing(150);
+//        initialWindow.setPadding(new Insets(15));
+
+        VBox formContainer = new VBox();
+        formContainer.setAlignment(Pos.CENTER);
+        formContainer.setSpacing(15);
         // El usuario ingresa su nombre
         Label playerName = new Label("Introduzca su nombre:");
         TextField playerNameInput = new TextField();
@@ -114,39 +117,50 @@ public class Scrabble extends Application {
             }
         });
 
-        initialWindow.getChildren().addAll(playerName, playerNameInput, joinButton, newGameButton);
+
+        ImageView background = loadImageView("/res/images/letsPlay.jpg", 250, 1280);
+
+        // colocando estilo
+        initialWindow.setId("container-background");
+        playerNameInput.setId("text-field");
+        playerName.setId("label");
+        joinButton.setId("button");
+        newGameButton.setId("button");
+
+        formContainer.getChildren().addAll(playerName, playerNameInput, joinButton, newGameButton);
+        initialWindow.getChildren().addAll(background, formContainer);
+
     }
 
     private void init_joinWindow() {
         ///////////////////Pantalla de unión a partida existente//////////////////////
-        joinMatchContainer = new VBox();
+        joinMatchContainer = new HBox();
         joinMatchContainer.setStyle("-fx-background-color: white");
         joinMatchContainer.setAlignment(Pos.CENTER);
-        joinMatchContainer.setSpacing(15);
-        joinMatchContainer.setPadding(new Insets(15));
+        joinMatchContainer.setSpacing(200);
+        joinMatchContainer.setPadding(new Insets(5,0,0,0));
 
         HBox buttonContainer = backButtonContainer();
 
         VBox infoContainer = new VBox();
         infoContainer.setStyle("-fx-background-color: white");
-        infoContainer.setAlignment(Pos.TOP_CENTER);
+        infoContainer.setAlignment(Pos.CENTER);
         infoContainer.setSpacing(15);
-        infoContainer.setPadding(new Insets(15));
-        infoContainer.setPrefHeight(550);
+//        infoContainer.setPadding(new Insets(15));
+//        infoContainer.setPrefHeight(550);
 
         Label joinTitle = new Label("Ingresa el código de la partida");
         TextField joinTextField = new TextField();
         joinTextField.setMaxWidth(200);
         Button joinButton = new Button("Unirse");
         Label joinResponse = new Label("");
-        joinResponse.setId("join_message");
+
         joinButton.setOnAction(event -> {
             String match_id = joinTextField.getText();
             if (!match_id.equals("")) {
                 if (controller.join_match(match_id)) {
                     gameScreenContainer.toFront();
-//                    playerLoader2(); //TODO actualizar metodo
-//                    tokenLoader();
+//
                     String message = "El código de la partida es: " + controller.getCurrent_match_id();
                     showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
                 } else {
@@ -156,25 +170,33 @@ public class Scrabble extends Application {
                 showAlert("Debe ingresar el código de la partida a la que desea unirse", "Campo requerido", Alert.AlertType.ERROR);
             }
         });
+
+        ImageView background = loadImageView("/res/images/gameRoom.png", 550,550);
+
+        joinMatchContainer.setId("container-background");
+        infoContainer.setId("container-background");
+        joinTextField.setId("text-field");
+        joinTitle.setId("label");
+        joinButton.setId("button");
+
         infoContainer.getChildren().addAll(joinTitle, joinTextField, joinButton, joinResponse);
-        joinMatchContainer.getChildren().addAll(buttonContainer, infoContainer);
+        joinMatchContainer.getChildren().addAll(buttonContainer, infoContainer, background);
     }
 
     private void init_newMatchWindow() {
         /* Window for create a new game displays an comboBox for choose the number of players in the game */
         newMatchWindow = new BorderPane();
 
-        newMatchWindow.setPadding(new Insets(15, 20, 10, 10));
-        newMatchWindow.setBackground(new Background(new BackgroundFill(Color.rgb(47, 79, 79), CornerRadii.EMPTY, Insets.EMPTY)));
+        newMatchWindow.setPadding(new Insets(5, 10, 10, 5));
+
         //espacio del border pane al boton
 
         HBox buttonContainer = backButtonContainer();
+        HBox buttonBackground = new HBox();
+        buttonBackground.setAlignment(Pos.BOTTOM_RIGHT);
+        buttonBackground.setSpacing(350);
 
         Label numberPlayers = new Label("Seleccione la cantidad de jugadores");
-        numberPlayers.setPadding(new Insets(2, 2, 2, 2));
-        numberPlayers.setBackground(new Background(new BackgroundFill(Color.rgb(143, 188, 143), CornerRadii.EMPTY, Insets.EMPTY)));
-        numberPlayers.setTextFill(Color.rgb(34, 139, 34));
-        numberPlayers.setFont(new Font("Serif", 30));
         numberPlayers.setAlignment(Pos.CENTER);
 
         VBox matchOptionsContainer = new VBox();
@@ -186,11 +208,7 @@ public class Scrabble extends Application {
         comboBox.getItems().add("2");
         comboBox.getItems().add("3");
         comboBox.getItems().add("4");
-        comboBox.setBackground(new Background(new BackgroundFill(Color.rgb(46, 139, 87), CornerRadii.EMPTY, Insets.EMPTY)));
-        comboBox.setStyle("-fx-font: 30px \"Serif\";");
 
-        matchOptionsContainer.getChildren().addAll(numberPlayers, comboBox);
-        newMatchWindow.setCenter(matchOptionsContainer);
         Button startButton = new Button("Start Game");
         startButton.setOnMouseClicked(mouseEvent -> {
             int i = comboBox.getSelectionModel().getSelectedIndex();
@@ -211,12 +229,28 @@ public class Scrabble extends Application {
 
         });
 
-        startButton.setBackground(new Background(new BackgroundFill(Color.rgb(72, 209, 204), CornerRadii.EMPTY, Insets.EMPTY)));
-        startButton.setTextFill(Color.rgb(0, 100, 0));
-        startButton.setFont(new Font("Serif", 30));
-        startButton.setAlignment(Pos.CENTER_RIGHT);
-        newMatchWindow.setBottom(startButton);
+        ImageView background = loadImageView("/res/images/letters.jpg", 500, 744);
+
+        // Estilo
+        newMatchWindow.setId("container-background");
+        matchOptionsContainer.setId("container-background");
+        buttonBackground.setId("container-background");
+        numberPlayers.setId("label");
+        startButton.setId("button");
+        comboBox.setId("combo-box-base");
+        comboBox.setId("label");
+
+
+        startButton.setAlignment(Pos.BOTTOM_RIGHT);
+
+
+        matchOptionsContainer.getChildren().addAll(numberPlayers, comboBox);
+        buttonBackground.getChildren().addAll(background, startButton);
+        newMatchWindow.setBottom(buttonBackground);
+        newMatchWindow.setCenter(matchOptionsContainer);
         newMatchWindow.setLeft(buttonContainer);
+
+
         // Alignment.
         BorderPane.setAlignment(startButton, Pos.TOP_RIGHT);
         BorderPane.setAlignment(buttonContainer, Pos.TOP_LEFT);
@@ -227,10 +261,10 @@ public class Scrabble extends Application {
 
     private HBox backButtonContainer() {
         HBox buttonContainer = new HBox();
-        buttonContainer.setStyle("-fx-background-color: white");
+        buttonContainer.setId("container-background");
         buttonContainer.setAlignment(Pos.TOP_LEFT);
         buttonContainer.setPrefHeight(350);
-        ImageView backButton = loadImageView("/res/images/backButton.png", 50, 50);
+        ImageView backButton = loadImageView("/res/images/backButton.png", 60, 60);
         backButton.setOnMouseClicked(mouseEvent -> {
             initialWindow.toFront();
         });
@@ -257,7 +291,6 @@ public class Scrabble extends Application {
 
                 if (response == 1){
                     lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
-                    controller.updateInterface();
 
                 } else if (response == 0){
                     int option = showOptions();
@@ -315,33 +348,49 @@ public class Scrabble extends Application {
         upPlayerInfoContainer.setAlignment(Pos.CENTER);
         upPlayerInfoContainer.setPrefHeight(150);
 
+        actiosInMatch = new HBox();
+        actiosInMatch.setAlignment(Pos.CENTER);
+        actiosInMatch.setSpacing(20);
+
+        ImageView leaveMatch = loadImageView("/res/images/exitIcon.png", 60, 60);
+        leaveMatch.setOnMouseClicked(mouseEvent -> {
+            initialWindow.toFront();
+            //TODO hacer que el jugador se salga de la partida
+        });
+
         ImageView showInfoButton = loadImageView("/res/images/infoIcon.png", 60, 60);
         showInfoButton.setOnMouseClicked(mouseEvent -> {
             String message = "El código de la partida es: " + controller.getCurrent_match_id();
             showAlert(message, "Código de la partida", Alert.AlertType.INFORMATION);
         });
+        actiosInMatch.getChildren().addAll(leaveMatch, showInfoButton);
 
-        upPlayerInfoContainer.getChildren().addAll(showInfoButton);
 
         // contenedor de la cuadricula
         matrixContainer = new GridPane();
-        matrixContainer.setStyle("-fx-background-color: white;\n" +
-                "    -fx-border-width: 2px; -fx-border-color: black");
+//        matrixContainer.setStyle("-fx-background-color: white;\n" +
+//                "    -fx-border-width: 2px; -fx-border-color: black");
         matrixContainer.setGridLinesVisible(true);
 
         addColumnsAndRows();
         addBoxToGrid();
 
         rightPlayerInfoContainer = new VBox();
-        rightPlayerInfoContainer.setStyle("-fx-background-color: white");
         rightPlayerInfoContainer.setAlignment(Pos.CENTER);
         rightPlayerInfoContainer.setPrefWidth(150);
 
         leftPlayerInfoContainer = new VBox();
-        leftPlayerInfoContainer.setStyle("-fx-background-color: white");
         leftPlayerInfoContainer.setAlignment(Pos.CENTER);
         leftPlayerInfoContainer.setPrefWidth(150);
 
+        gameScreenContainer.setId("container-background");
+        upPlayerInfoContainer.setId("container-background");
+        matrixContainer.setId("container-background");
+        rightPlayerInfoContainer.setId("container-background");
+        leftPlayerInfoContainer.setId("container-background");
+        matrixContainer.setId("matrix");
+
+        upPlayerInfoContainer.getChildren().addAll(actiosInMatch);
         gameScreenContainer.setTop(upPlayerInfoContainer);
         gameScreenContainer.setBottom(actualPlayerInfoContainer);
         gameScreenContainer.setCenter(matrixContainer);
@@ -507,6 +556,12 @@ public class Scrabble extends Application {
             userScoreBox.setSpacing(10);
             scoreLabel = new Text("Puntos: ");
             userScore = new Text(String.valueOf(player.getScore()));
+
+            userName.setId("label");
+            userScore.setId("label");
+            scoreLabel.setId("label");
+
+
             userScoreBox.getChildren().addAll(scoreLabel, userScore);
             playerBox.getChildren().addAll(userName, userImage, userScoreBox);
 
@@ -532,7 +587,7 @@ public class Scrabble extends Application {
                     case 1:
                         Platform.runLater(() -> {
                             this.upPlayerInfoContainer.getChildren().clear();
-                            this.upPlayerInfoContainer.getChildren().add(playerBox);
+                            this.upPlayerInfoContainer.getChildren().addAll(actiosInMatch, playerBox);
                         });
                         break;
                     case 2:
@@ -546,8 +601,6 @@ public class Scrabble extends Application {
             }
 
         }
-
-
     }
 //    private void playerLoader() {
 //        // instanciar widgets;
