@@ -114,7 +114,7 @@ public class Game {
     }
 
     public boolean hasTop_Points(Player poss_winner) {
-        return poss_winner == hasTop_Points_aux();
+        return poss_winner == hasTop_Points_aux() && poss_winner.getTokenlist().getHead() == null;
     }
 
 
