@@ -238,4 +238,34 @@ public class Server {
         server.connectionListener();
 
     }
+
+
+
+
+//
+//    case "NO_TOKENS":
+//    String match_ID = msg.getString("current_match_id");
+//    String player_ID = msg.getString("current_player_id");
+//    //  response = pickWinner(match_ID, player_ID);
+
+    // sendResponse(response.toString(), con);
+
+
+
+
+
+
+    //private JSONObject pickWinner(String Match_ID, String Player_ID) {
+//        JSONObject obj = new JSONObject();
+//        Game actualGame = ;
+//        Player possible_Winner = actualGame.access_by_id(Player_ID);
+//        if (actualGame.hasTop_Points(possible_Winner)) {
+//            obj.put("noTokensresult", "WINNER");
+//
+//        } else {
+//            obj.put("noTokensresult", "LOST");
+//        }
+//        return obj;
+    //}
+
 }
