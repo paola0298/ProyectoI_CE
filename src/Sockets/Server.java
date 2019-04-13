@@ -167,6 +167,9 @@ public class Server {
                     response = disconnect();
                     sendResponse(response.toString(), con);
                     break;
+                case "NO_TOKENS":
+                    response = pickWinner("match_id","player_id" );
+                    sendResponse(response.toString(),con);
 
                 default:
                     sendResponse("Palabra clave no encontrada", con);
