@@ -309,6 +309,8 @@ public class Scrabble extends Application {
                         }
                     } else if (option == 1) {
                         //Reintentar
+                        controller.activateTokens(lettersList);
+                        System.out.println(lettersList);
                         System.out.println("Intentando nuevamente...");
 
                     } else {
@@ -357,6 +359,7 @@ public class Scrabble extends Application {
 
         ImageView leaveMatch = loadImageView("/res/images/exitIcon.png", 60, 60);
         leaveMatch.setOnMouseClicked(mouseEvent -> {
+            controller.leave_match();
             initialWindow.toFront();
             //TODO hacer que el jugador se salga de la partida
         });
@@ -606,146 +609,6 @@ public class Scrabble extends Application {
 
         }
     }
-//    private void playerLoader() {
-//        // instanciar widgets;
-//        ImageView userImage;
-//
-//        Text scoreLabel;
-//        Text userScore;
-//        Text userName;
-//
-//        LinkedList<ImageView> imageForUser = new LinkedList<>();
-//        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
-//        Node<ImageView> imageTemp = imageForUser.getHead();
-//
-//        // playersList
-//
-//        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
-//        Node<Player> playerTemp = actualPlayers.getHead();
-//        Player actualPlayer = controller.getPlayerInstance();
-//
-//        if (actualPlayer != playerTemp.getValue()) {
-//            actualPlayers.remove(actualPlayer);
-//            actualPlayers.addFirst(actualPlayer);
-//        }
-//
-//        int i = 0;
-//        while (playerTemp != null) {
-//            userImage = imageTemp.getValue();
-//            userImage.setFitHeight(100);
-//            userImage.setFitWidth(60);
-//
-//            VBox playersBox = new VBox();
-//            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(playerTemp.getValue().getName());
-//
-//            //puntuacion del usuario
-//            HBox userScoreBox = new HBox();
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreBox.setSpacing(10);
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            scoreLabel = new Text("Puntos:");
-//            String score = String.valueOf(playerTemp.getValue().getScore());
-//            userScore = new Text(score);
-//            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-//            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-//
-//            if (i==0){
-//                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (i==1){
-//                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (i == 2){
-//                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else {
-//                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
-//            }
-//
-//            imageTemp = imageTemp.getNext();
-//            playerTemp = playerTemp.getNext();
-//            i++;
-//
-//        }
-//
-////
-//
-////        int i = 0;
-////        while(temp!=null){
-////            userImage = imageForUser.acces_index(i).getValue();
-////            userImage.setFitHeight(100);
-////            userImage.setFitWidth(60);
-////
-////            VBox playersBox = new VBox();
-////            playersBox.setAlignment(Pos.CENTER);
-////            userName = new Text(temp.getValue().getName());
-////
-////            //puntuacion del usuario
-////            HBox userScoreBox = new HBox();
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            userScoreBox.setSpacing(10);
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            scoreLabel = new Text("Puntos:");
-////            String score = String.valueOf(temp.getValue().getScore());
-////            userScore = new Text(score);
-////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-////
-////        }
-//
-////
-//////         temporal, mientras se genera la lista de jugadores
-////        LinkedList<String> players =  new LinkedList<>();
-////        players.addLast("Hazel");
-////        players.addLast("Brayan");
-////        players.addLast("Marlon");
-////        players.addLast("Paola");
-////        Node<String> temp = players.getHead();
-////
-////        int cont = 0;
-////        int i = 0;
-////
-////        while(temp!=null){
-////
-////            userImage = imageForUser.acces_index(i).getValue();
-////            userImage.setFitHeight(100);
-////            userImage.setFitWidth(60);
-////
-////
-////            VBox playersBox = new VBox();
-////            playersBox.setAlignment(Pos.CENTER);
-////            userName = new Text(temp.getValue());
-////
-////            //puntuacion del usuario
-////            HBox userScoreBox = new HBox();
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            userScoreBox.setSpacing(10);
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            scoreLabel = new Text("Puntos:");
-////            userScore = new Text("50");
-////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-//
-////            if (cont==0){
-////                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else if (cont==1){
-////                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else if (cont == 2){
-////                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else {
-////                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
-////            }
-////
-////            temp = temp.getNext();
-////            cont++;
-////            i++;
-////        }
-//
-//
-//
-//
-//    }
 
     /**
      * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
@@ -932,7 +795,7 @@ public class Scrabble extends Application {
             }
         }
 
-        controller.deactivateTokens();
+//        controller.deactivateTokens();
     }
 
     public void lockGui() {

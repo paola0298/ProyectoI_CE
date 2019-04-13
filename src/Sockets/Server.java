@@ -164,7 +164,7 @@ public class Server {
                     break;
 
                 case "DISCONNECT":
-                    response = disconnect();
+                    response = disconnect(msg.getString("player_id"), msg.getString("match_id"));
                     sendResponse(response.toString(), con);
                     break;
 
@@ -343,6 +343,8 @@ public class Server {
                 actualPlayer.addScore(score);
                 actualPlayer.setTokenlist(tokenList);
 
+                actualGame.setGrid(deactivateTokens(actualGame.getGrid()));
+
                 actualGame.nextPlayer();
 
                 try {
@@ -367,6 +369,16 @@ public class Server {
         }
 
         return obj;
+    }
+
+    private Token[][] deactivateTokens(Token[][] grid) {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                if (grid[i][j] != null)
+                    grid[i][j].setActive(false);
+            }
+        }
+        return grid;
     }
 
     private JSONObject callExpert(JSONObject msg) {
@@ -474,7 +486,27 @@ public class Server {
         return obj;
     }
 
-    private JSONObject disconnect() { return new JSONObject(); }
+    /**
+     * Método que elimina a un jugador de la partida
+     * @return Json object con la respuesta
+     */
+    private JSONObject disconnect(String playerId, String matchId) {
+        JSONObject obj = new JSONObject();
+
+        Game actualGame = findGame(matchId);
+        for (int i=0; i<actualGame.getPlayers().getSize(); i++) {
+            Player actualPlayer = actualGame.getPlayers().get(i);
+            if (actualPlayer.getplayerId().equals(playerId)) {
+
+                if (actualGame.getActualPlayer() == actualPlayer) {
+                    actualGame.nextPlayer();
+                }
+
+                actualGame.removePlayer(actualPlayer);
+            }
+        }
+        return obj;
+    }
 
     private LinkedList<Token> generateTokens() {
 

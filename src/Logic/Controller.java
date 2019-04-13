@@ -443,6 +443,18 @@ public class Controller {
         }
     }
 
+    public void activateTokens(LinkedList<Token> tokenLinkedList){
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                Token actualToken = grid[i][j];
+                if (actualToken != null)
+                    if (find(actualToken, tokenLinkedList)) {
+                        actualToken.setActive(true);
+                    }
+            }
+        }
+    }
+
     private void initialize1() {
         client = new Client("localhost", 6307);
     }
