@@ -1,10 +1,11 @@
-package Logic;
+package Test;
 
 import GUI.Scrabble;
+import Logic.Game;
+import Logic.Player;
+import Logic.Token;
 import Sockets.Client;
 import Structures.LinkedList;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -12,12 +13,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Controller {
+public class Controller2 {
     private JSONObject message;
     private JSONObject response;
     private String cwd = System.getProperty("user.dir");
     private Client client;
-    private Scrabble gui;
+    private Scrabble2 gui;
 
     private String playerName = "-";
     private String player_id = "-";
@@ -32,7 +33,7 @@ public class Controller {
      *
      * @param gui La interfaz que va a controlar la clase
      */
-    public Controller(Scrabble gui) {
+    public Controller2(Scrabble2 gui) {
         this.gui = gui;
         initialize();
     }
@@ -187,6 +188,8 @@ public class Controller {
 
         response = client.connect(message);
 
+//        System.out.println(response.toString());
+
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
@@ -243,106 +246,41 @@ public class Controller {
     /**
      * Este método le pide al servidor verificar si la palabra es válida.
      *
+     * @param word Palabra a verificar en el servidor.
      */
-    public int check_word(LinkedList<Token> tokenList) {
-        String word = gui.createWord(grid);
-        int score = calculateScore(tokenList);
-        ObjectMapper mapper = new ObjectMapper();
+    public void check_word(String word) {
+//        message = prepare();
+//        message.put("action", "CHECK_WORD");
+//        message.put("match_id", current_match_id);
+//        message.put("word", word);
+//
+//        response = client.connect(message);
+//
+//        if (response.get("response").equals("VALID")) {
+//            System.out.println("The word is valid");
+//        } else {
+//            System.out.println("Try again");
+//        }
+        gui.searchWord(grid);
+//        gui.test(grid);
+    }
 
-        try {
-            message = prepare();
-            message.put("action", "CHECK_WORD");
-            message.put("match_id", current_match_id);
-            message.put("word", word);
-            message.put("score", score);
 
-            String gameSer = mapper.writeValueAsString(actualGame);
-            message.put("game", gameSer);
-
-        } catch (JsonProcessingException e) {
-            return -1;
-        }
-
+    /**
+     * Este método verifica si ya es el turno del jugador.
+     */
+    public void check_turn() {
+        message = prepare();
+        message.put("action", "CHECK_TURN");
+        message.put("match_id", current_match_id);
         response = client.connect(message);
 
-        if (response.get("status").equals("VALID")) {
-            System.out.println("The word is valid");
-            deserialize();
-            updatePlayers();
-            updateTokens();
-            gui.lockGui();
-            waitTurn();
-
-            return 1;
-            //darle los puntos al jugador y ponerse en espera
-        } else if (response.get("status").equals("NOT_FOUND")){
-            System.out.println("Try again");
-            // preguntarle al usuario si desea intentar otra vez o llamar al experto
-            return 0;
-        } else {
-            return -1;
-        }
     }
 
-    private int calculateScore(LinkedList<Token> tokenList) {
-        int score = 0;
-        for (int i = 0; i < tokenList.getSize(); i++){
-            score+= tokenList.get(i).getScore();
-        }
-
-        return score;
-    }
-
-    public void callExpert(String phoneNum, String wordToCheck) {
+    public void callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
-        message.put("match_id", current_match_id);
-        message.put("expert_phone", phoneNum);
-        message.put("word_to_check", wordToCheck);
-
         response = client.connect(message);
-
-        if (response.get("status").equals("CONTACTING")) {
-            System.out.println("Waiting for expert to answer");
-            checkOnExpert();
-            gui.lockGui();
-        }
-    }
-
-    public void checkOnExpert() {
-        Thread caller = new Thread(() -> {
-            boolean check = true;
-            while (check) {
-                try {
-                    message = prepare();
-                    message.put("action", "DID_EXPERT_ANSWER");
-                    message.put("match_id", current_match_id);
-
-                    response = client.connect(message);
-
-                    if (response.get("status").equals("ANSWERED")) {
-                        System.out.println("El experto ya respondió");
-                        check = false;
-                        showExpertAnswer(response.getString("expert_answer"));
-
-                    } else {
-                        System.out.println("Aún no ha respondido el experto");
-                    }
-                    Thread.sleep(2000);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            gui.unlockGui();
-        });
-
-        caller.setDaemon(true);
-        caller.start();
-    }
-
-    private void showExpertAnswer(String answer) {
-
     }
 
     /**

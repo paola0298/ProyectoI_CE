@@ -6,7 +6,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class Player{
     private String playerId;
     private String name;
-
     private int score;
 
     private LinkedList<Token> tokenlist;
@@ -15,6 +14,7 @@ public class Player{
     public Player(String name) {
         this.playerId = RandomStringUtils.randomAlphanumeric(6);
         this.name = name;
+        this.score = 0;
     }
 
     public int getScore() {
@@ -23,6 +23,10 @@ public class Player{
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void addScore(int scoreToAdd) {
+        this.score += scoreToAdd;
     }
 
     public String getplayerId() {

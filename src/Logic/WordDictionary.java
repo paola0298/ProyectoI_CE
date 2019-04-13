@@ -13,7 +13,7 @@ public class WordDictionary {
             BufferedReader reader = new BufferedReader(streamReader);
 
             while(!found) {
-                if (StringUtils.stripAccents(reader.readLine()).equals(word)) {
+                if (StringUtils.stripAccents(reader.readLine()).equals(word.toLowerCase())) {
                     found = true;
                 } else if (reader.readLine() == null) {
                     break;
