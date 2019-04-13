@@ -6,7 +6,10 @@ import Logic.Player;
 import Logic.Token;
 import Sockets.Client;
 import Structures.LinkedList;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -19,6 +22,7 @@ public class Controller2 {
     private String cwd = System.getProperty("user.dir");
     private Client client;
     private Scrabble2 gui;
+    private String expertPhone;
 
     private String playerName = "-";
     private String player_id = "-";
@@ -155,7 +159,7 @@ public class Controller2 {
                         isTurn = true;
                         deserialize();
                         updatePlayers();
-                        updateTokens();
+                        updateInterface();
                         grid = actualGame.getGrid();
 
                     } else {
@@ -165,9 +169,10 @@ public class Controller2 {
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (JSONException e) {
+                    gui.gameDisconnected();
                 }
             }
-            //TODO método a llamar para desbloquear la interfaz i.e unlockGUI();
             gui.unlockGui();
         });
 
@@ -188,8 +193,6 @@ public class Controller2 {
 
         response = client.connect(message);
 
-//        System.out.println(response.toString());
-
         if (response.get("status").equals("SUCCESS")) {
             System.out.println("Joined match succesfully");
             player_id = response.getString("player_id");
@@ -202,7 +205,8 @@ public class Controller2 {
             waitTurn();
             return true;
         } else {
-            System.out.println("Could not join match");
+            System.out.println("Could not join match \n" + response.get("status"));
+
             return false;
         }
     }
@@ -246,41 +250,133 @@ public class Controller2 {
     /**
      * Este método le pide al servidor verificar si la palabra es válida.
      *
-     * @param word Palabra a verificar en el servidor.
      */
-    public void check_word(String word) {
-//        message = prepare();
-//        message.put("action", "CHECK_WORD");
-//        message.put("match_id", current_match_id);
-//        message.put("word", word);
-//
-//        response = client.connect(message);
-//
-//        if (response.get("response").equals("VALID")) {
-//            System.out.println("The word is valid");
-//        } else {
-//            System.out.println("Try again");
-//        }
-        gui.searchWord(grid);
-//        gui.test(grid);
-    }
+    public int check_word(LinkedList<Token> tokenList) {
+        String word = gui.createWord(grid);
+        int score = calculateScore(tokenList);
 
+        ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * Este método verifica si ya es el turno del jugador.
-     */
-    public void check_turn() {
-        message = prepare();
-        message.put("action", "CHECK_TURN");
-        message.put("match_id", current_match_id);
+        try {
+            message = prepare();
+            message.put("action", "CHECK_WORD");
+            message.put("match_id", current_match_id);
+            message.put("word", word);
+            message.put("score", score);
+
+            String gameSer = mapper.writeValueAsString(actualGame);
+            String playerSer = mapper.writeValueAsString(playerInstance);
+            message.put("game", gameSer);
+            message.put("player", playerSer);
+
+        } catch (JsonProcessingException e) {
+            return -1;
+        }
+
         response = client.connect(message);
 
+        if (response.get("status").equals("VALID")) {
+            System.out.println("The word is valid");
+            deserialize();
+            updatePlayers();
+            updateTokens();
+            gui.lockGui();
+            waitTurn();
+
+            return 1;
+            //darle los puntos al jugador y ponerse en espera
+        } else if (response.get("status").equals("NOT_FOUND")){
+            System.out.println("Try again");
+            // preguntarle al usuario si desea intentar otra vez o llamar al experto
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
-    public void callExpert() {
+    private int calculateScore(LinkedList<Token> tokenList) {
+        int score = 0;
+        for (int i = 0; i < tokenList.getSize(); i++){
+            score+= tokenList.get(i).getScore();
+        }
+
+        return score;
+    }
+
+    public boolean callExpert() {
         message = prepare();
         message.put("action", "CALL_EXPERT");
+        message.put("match_id", current_match_id);
+        message.put("expert_phone", expertPhone);
+        message.put("word_to_check", gui.createWord(grid));
+
         response = client.connect(message);
+
+        if (response.get("status").equals("CONTACTING")) {
+            System.out.println("Waiting for expert to answer");
+            checkOnExpert();
+            gui.lockGui();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean passTurn() {
+        message = prepare();
+        message.put("action", "PASS_TURN");
+        message.put("match_id", current_match_id);
+
+        response = client.connect(message);
+
+        if (response.getString("status").equals("SUCCESS")) {
+            //TODO función para quitar la fichas de la matriz y regresarlas al contenedor
+            gui.lockGui();
+            waitTurn();
+            return true;
+        } else {
+            //Si ocurrió un error al conectarse con el servidor
+            return false;
+        }
+
+    }
+
+    public void checkOnExpert() {
+        Thread caller = new Thread(() -> {
+            boolean check = true;
+            while (check) {
+                try {
+                    message = prepare();
+                    message.put("action", "DID_EXPERT_ANSWER");
+                    message.put("match_id", current_match_id);
+
+                    response = client.connect(message);
+
+                    if (response.get("status").equals("ANSWERED")) {
+                        System.out.println("El experto ya respondió");
+                        check = false;
+                        showExpertAnswer(response.getString("expert_answer"));
+
+                    } else {
+                        System.out.println("Aún no ha respondido el experto");
+                    }
+                    Thread.sleep(2000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    gui.gameDisconnected();
+                }
+            }
+            gui.unlockGui();
+        });
+
+        caller.setDaemon(true);
+        caller.start();
+    }
+
+    private void showExpertAnswer(String answer) {
+
     }
 
     /**
@@ -304,6 +400,7 @@ public class Controller2 {
             props.load(stream);
             String host = props.get("host_ip").toString();
             int port = Integer.parseInt(props.get("host_port").toString());
+            this.expertPhone = props.get("expert_phone").toString();
             this.client = new Client(host, port);
             System.out.println("[Info] Settings initialized successfully");
         } catch (IOException e) {

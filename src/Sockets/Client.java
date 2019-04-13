@@ -38,6 +38,7 @@ public class Client {
         }
         if (this.clientSocket != null) {
             sendData(message.toString());
+
             return getData();
         } else {
             JSONObject obj = new JSONObject();
@@ -69,7 +70,9 @@ public class Client {
             return new JSONObject(is.readUTF());
         } catch (IOException e) {
             System.out.println("Error getting data: " + e.getMessage());
-            return new JSONObject();
+            JSONObject err = new JSONObject();
+            err.put("status", "ERROR");
+            return err;
         }
     }
 

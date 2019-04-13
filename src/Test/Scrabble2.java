@@ -6,10 +6,8 @@ import Logic.Token;
 import Structures.LinkedList;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -22,7 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.Time;
+import java.util.Optional;
 
 public class Scrabble2 extends Application {
     private String cwd = System.getProperty("user.dir");
@@ -72,7 +70,7 @@ public class Scrabble2 extends Application {
     }
 
     public void show() {
-        launch(GUI.Scrabble.class);
+        launch(Scrabble2.class);
     }
 
     private void init_initialWindow() {
@@ -253,7 +251,49 @@ public class Scrabble2 extends Application {
             //tomar palabra creada y enviarla al servidor
 //            System.out.println("The word is: ");
             if (unlockedControls) {
-                controller.check_word("Not implemented..");
+
+                int response = controller.check_word(lettersList);
+
+                if (response == 1){
+                    lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
+                    controller.updateInterface();
+
+                } else if (response == 0){
+                    int option = showOptions();
+
+                    if (option == 0) {      //Llamar experto
+                        if (controller.callExpert()) {
+                            System.out.println("Esperando la respuesta del experto");
+                            showAlert("Esperando la respuesta del experto",
+                                    "Información",
+                                    Alert.AlertType.INFORMATION);
+                        } else {
+                            System.out.println("No se puede contactar al experto en este momento");
+                            showAlert("No se puede contactar al experto en este momento",
+                                    "Error de conexión",
+                                    Alert.AlertType.ERROR);
+                        }
+                    } else if (option == 1) {
+                        //Reintentar
+                        System.out.println("Intentando nuevamente...");
+
+                    } else {
+                        //Pasar turno
+                        // Regresar todas las fichas de la matriz al contenedor de fichas
+                        System.out.println("Pasar turno...");
+                        if (!controller.passTurn()) {
+                            showAlert("Ocurrió un error al contactar con el servidor, inténtalo de nuevo",
+                                    "Error de conexión",
+                                    Alert.AlertType.ERROR);
+                        }
+                    }
+
+                } else{
+                    //colocar alert informando error
+                    showAlert("No se pudo conectar con el servidor", "Error de conexión", Alert.AlertType.ERROR);
+
+                }
+
             }
         });
 
@@ -309,6 +349,42 @@ public class Scrabble2 extends Application {
 
     }
 
+    private int showOptions() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Palabra invalida");
+        alert.setHeaderText(null);
+        alert.setContentText("¿Qué deseas hacer?");
+
+        ButtonType expert = new ButtonType("Contactar al experto");
+        ButtonType retry = new ButtonType("Reintentar");
+        ButtonType pass = new ButtonType("Pasar turno");
+
+        alert.getButtonTypes().setAll(expert, retry, pass);
+        int optionSelected = 1;
+        boolean selected = false;
+
+        while (!selected) {
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == expert) {
+                    selected = true;
+                    optionSelected = 0;
+                } else if (result.get() == retry) {
+                    selected = true;
+                    optionSelected = 1;
+                } else {
+                    selected = true;
+                    optionSelected = 2;
+                }
+            }
+        }
+        return optionSelected;
+    }
+
+    public void gameDisconnected() {
+        System.out.println("The client was disconnected from the server");
+    }
+
     private void showAlert(String message, String title, Alert.AlertType type) {
         Alert showID = new Alert(type);
         showID.setTitle(title);
@@ -317,40 +393,60 @@ public class Scrabble2 extends Application {
         showID.showAndWait();
     }
 
-    public void test(Token[][] grid){
-        Thread thread = new Thread(() -> {
-            searchWord(grid);
-        });
-        thread.setDaemon(true);
-        thread.start();
-    }
 
-    public void searchWord(Token[][] actualMatrix) {
+    public String createWord(Token[][] actualMatrix) {
         StringBuilder word = new StringBuilder();
-
+        System.out.println("Lista actual " + lettersList.toString());
         int temp = 0;
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 Token token = actualMatrix[i][j];
-                if (temp>=15){
-                    temp = 0;
-                }
-
-                Token next = actualMatrix[i][temp+1];;
-
+//                if (temp==14){
+//                    temp = 0;
+//                }
+//
+//                Token next = actualMatrix[i][temp+1];
+////                System.out.println(next);
                 if (find(token)) {
                     word.append(token.getLetter());
+//                    System.out.println("Actual token " + token.getLetter() +  "\n");
                 }
+//                else if (!find(token) && token != null){
+//                    Token down = actualMatrix[i][j+1];
+//                    System.out.println("Letra actual " + token.getLetter());
+//                    try {
+//                        System.out.println("Down " + down.getLetter());
+//                    }catch (NullPointerException e){
+//                        System.out.println("Down null");
+//                    }
+//                    if (down != null){
+//                        Token downDown = actualMatrix[i][j+2];
+//
+//                        if (find(downDown)){
+//                            System.out.println("Agregando en cruz...");
+//                            word.append(down.getLetter());
+//                        }
+//
+//                    }
 
-                if (!find(token) && next!=null){
-                    word.append(token.getLetter());
-                }
+//                    System.out.println("Adding existing");
+//                    word.append(token.getLetter());
+
+//                else if (next==null && word.toString().length()>0){
+//
+//                    System.out.println("Exit");
+//                    break;
+//                }
+//                temp++;
+
+//                System.out.println("\n");
             }
         }
 
 
-        lettersList = new LinkedList<>();
-        System.out.println(word.toString());
+
+        System.out.println("Final word " + word.toString().toLowerCase());
+        return word.toString().toLowerCase();
     }
 
     private boolean find(Token tokenToSearch) {
@@ -416,19 +512,33 @@ public class Scrabble2 extends Application {
 
             if (player.getplayerId().equals(controller.getPlayerInstance().getplayerId())) {
 
-                this.actualPlayerInfoContainer.getChildren().add(playerBox);
+                Platform.runLater(() -> {
+                    System.out.println(this.actualPlayerInfoContainer.getChildren());
+                    ImageView scrabbleButton = (ImageView) this.actualPlayerInfoContainer.getChildren().get(1);
+                    this.actualPlayerInfoContainer.getChildren().clear();
+                    this.actualPlayerInfoContainer.getChildren().addAll(tokenBox, scrabbleButton, playerBox);
+                });
+//                this.actualPlayerInfoContainer.getChildren().add(playerBox);
             } else {
                 switch (c) {
                     case 0:
-                        this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        Platform.runLater(() -> {
+                            this.rightPlayerInfoContainer.getChildren().clear();
+                            this.rightPlayerInfoContainer.getChildren().add(playerBox);
+                        });
+//
                         break;
                     case 1:
-                        this.upPlayerInfoContainer.getChildren().clear();
-                        this.upPlayerInfoContainer.getChildren().add(playerBox);
+                        Platform.runLater(() -> {
+                            this.upPlayerInfoContainer.getChildren().clear();
+                            this.upPlayerInfoContainer.getChildren().add(playerBox);
+                        });
                         break;
                     case 2:
-                        this.leftPlayerInfoContainer.getChildren().clear();
-                        this.leftPlayerInfoContainer.getChildren().add(playerBox);
+                        Platform.runLater(() -> {
+                            this.leftPlayerInfoContainer.getChildren().clear();
+                            this.leftPlayerInfoContainer.getChildren().add(playerBox);
+                        });
                         break;
                 }
                 c++;
@@ -612,7 +722,9 @@ public class Scrabble2 extends Application {
         //TODO actualizar logica
 //        tokenBox.getChildren().clear();
 
-        tokenBox.getChildren().clear();
+        Platform.runLater(() -> tokenBox.getChildren().clear());
+//        tokenBox.getChildren().clear();
+        System.out.println("Lista de Tokens: " + tokenList);
         for (int i = 0; i < tokenList.getSize(); i++) {
             Token token = tokenList.get(i);
 //            System.out.println("Adding token " + token.getLetter());
@@ -628,7 +740,8 @@ public class Scrabble2 extends Application {
                     }
                 }
             });
-            tokenBox.getChildren().add(letter);
+            Platform.runLater(() -> tokenBox.getChildren().add(letter));
+//            tokenBox.getChildren().add(letter);
 
         }
     }
@@ -741,11 +854,15 @@ public class Scrabble2 extends Application {
                 if (actualMatrix[i][j] != null) {
                     Token actualToken = actualMatrix[i][j];
                     ImageView image = loadImageView(actualToken.getImagePath(), 30, 30);
-                    child.getChildren().clear();
-                    child.getChildren().add(image);
+                    Platform.runLater(() -> {
+                        child.getChildren().clear();
+                        child.getChildren().add(image);
+                    });
+
                 } else {
                     if (child.getChildren().size() == 1) {
-                        child.getChildren().clear();
+                        Platform.runLater(() -> child.getChildren().clear());
+
                     }
                 }
 
@@ -755,12 +872,12 @@ public class Scrabble2 extends Application {
 
     public void lockGui() {
         unlockedControls = false;
-        Platform.runLater(() -> gameScreenContainer.setStyle("-fx-background-color: gray;"));
+        Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: gray;"));
     }
 
     public void unlockGui() {
         unlockedControls = true;
-        Platform.runLater(() -> gameScreenContainer.setStyle("-fx-background-color: white;"));
+        Platform.runLater(() -> actualPlayerInfoContainer.setStyle("-fx-background-color: white;"));
     }
 
 //    private void addGestureToNewToken() {
@@ -800,5 +917,5 @@ public class Scrabble2 extends Application {
         scrabble2.show();
     }
 
-}
 
+}
