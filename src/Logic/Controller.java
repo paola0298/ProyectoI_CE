@@ -437,7 +437,8 @@ public class Controller {
     public void deactivateTokens() {
         for (int i=0; i<15; i++) {
             for (int j=0; j<15; j++) {
-                grid[i][j].setActive(false);
+                if (grid[i][j] != null)
+                    grid[i][j].setActive(false);
             }
         }
     }

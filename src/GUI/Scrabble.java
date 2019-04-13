@@ -878,6 +878,7 @@ public class Scrabble extends Application {
                             }
                         } else {
                             Token actualToken = controller.getToken(row, column);
+                            System.out.println("Token " + actualToken.getLetter() + ", is Active " + actualToken.isActive());
                             if (actualToken.isActive()) {
                                 controller.updateTokenList(true, actualToken);
                                 System.out.println("Removing");
@@ -930,6 +931,8 @@ public class Scrabble extends Application {
 
             }
         }
+
+        controller.deactivateTokens();
     }
 
     public void lockGui() {

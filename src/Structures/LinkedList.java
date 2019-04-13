@@ -58,6 +58,9 @@ public class  LinkedList<T> {
     }
 
     public boolean remove(T element){
+        if (this.head == null){
+            return false;
+        }
         if (element == this.head.getValue()){
             deleteFirst();
         } else {
