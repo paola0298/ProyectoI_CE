@@ -76,6 +76,31 @@ public class Controller {
         return grid[column][row];
     }
 
+    public void returnTokens(LinkedList<Token> tokenList) {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                Token token = grid[i][j];
+                if (find(token, tokenList)) {
+                    updateTokenList(true, token);
+                    removeToken(j, i);
+                    tokenList.remove(token);
+                }
+            }
+        }
+
+    }
+
+    private boolean find(Token tokenToSearch, LinkedList<Token> list) {
+        if (tokenToSearch!=null) {
+            for (int i = 0; i < list.getSize(); i++) {
+                if (tokenToSearch == list.get(i)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * @param flag  Bandera que determina si se va a eliminar (false) o agregar (true) un token
      * @param token Token que se va a agregar o eliminar
@@ -156,8 +181,8 @@ public class Controller {
                         isTurn = true;
                         deserialize();
                         updatePlayers();
-                        updateInterface();
                         grid = actualGame.getGrid();
+                        updateInterface();
 
                     } else {
                         System.out.println("Aún no es tu turno");
@@ -196,8 +221,8 @@ public class Controller {
             this.current_match_id = match_id;
             deserialize();
             updatePlayers();
-            updateInterface();
             grid = actualGame.getGrid();
+            updateInterface();
             gui.lockGui();
             waitTurn();
             return true;
@@ -276,6 +301,7 @@ public class Controller {
             System.out.println("The word is valid");
             deserialize();
             updatePlayers();
+            grid = actualGame.getGrid();
             updateInterface();
             gui.lockGui();
             waitTurn();
@@ -319,7 +345,10 @@ public class Controller {
         }
     }
 
-    public boolean passTurn() {
+    /**
+     * @return true si pudo saltar el turno correctamente
+     */
+    public boolean passTurn(LinkedList<Token> tokenList) {
         message = prepare();
         message.put("action", "PASS_TURN");
         message.put("match_id", current_match_id);
@@ -327,7 +356,8 @@ public class Controller {
         response = client.connect(message);
 
         if (response.getString("status").equals("SUCCESS")) {
-            //TODO función para quitar la fichas de la matriz y regresarlas al contenedor
+            returnTokens(tokenList);
+            updateInterface();
             gui.lockGui();
             waitTurn();
             return true;
@@ -335,7 +365,6 @@ public class Controller {
             //Si ocurrió un error al conectarse con el servidor
             return false;
         }
-
     }
 
     public void checkOnExpert() {
@@ -402,6 +431,14 @@ public class Controller {
             System.out.println("[Info] Settings initialized successfully");
         } catch (IOException e) {
             System.out.println("[Error] Could not read settings");
+        }
+    }
+
+    public void deactivateTokens() {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                grid[i][j].setActive(false);
+            }
         }
     }
 

@@ -289,6 +289,7 @@ public class Scrabble extends Application {
                 int response = controller.check_word(lettersList);
 
                 if (response == 1){
+                    controller.deactivateTokens();
                     lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
 
                 } else if (response == 0){
@@ -314,7 +315,10 @@ public class Scrabble extends Application {
                         //Pasar turno
                         // Regresar todas las fichas de la matriz al contenedor de fichas
                         System.out.println("Pasar turno...");
-                        if (!controller.passTurn()) {
+                        controller.returnTokens(lettersList);
+
+
+                        if (!controller.passTurn(lettersList)) {
                             showAlert("Ocurrió un error al contactar con el servidor, inténtalo de nuevo",
                                     "Error de conexión",
                                     Alert.AlertType.ERROR);
@@ -397,6 +401,7 @@ public class Scrabble extends Application {
         gameScreenContainer.setLeft(leftPlayerInfoContainer);
 
     }
+
 
     private int showOptions() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -780,6 +785,7 @@ public class Scrabble extends Application {
         System.out.println("Lista de Tokens: " + tokenList);
         for (int i = 0; i < tokenList.getSize(); i++) {
             Token token = tokenList.get(i);
+            token.setActive(true);
 //            System.out.println("Adding token " + token.getLetter());
             ImageView letter = loadImageView(token.getImagePath(), 80, 80);
 
@@ -872,20 +878,23 @@ public class Scrabble extends Application {
                             }
                         } else {
                             Token actualToken = controller.getToken(row, column);
-                            controller.updateTokenList(true, actualToken);
-                            System.out.println("Removing");
-                            controller.removeToken(row, column);
-                            lettersList.remove(actualToken);
+                            if (actualToken.isActive()) {
+                                controller.updateTokenList(true, actualToken);
+                                System.out.println("Removing");
+                                controller.removeToken(row, column);
+                                lettersList.remove(actualToken);
 
 
-                            if (selectedToken != null) {
+                                if (selectedToken != null) {
 //                            putImageOnContainer(tokenContainer);
-                                controller.updateTokenList(false, selectedToken);
-                                controller.addToken(selectedToken, row, column);
-                                lettersList.addLast(selectedToken);
-                                selectedToken = null;
+                                    controller.updateTokenList(false, selectedToken);
+                                    controller.addToken(selectedToken, row, column);
+                                    lettersList.addLast(selectedToken);
+                                    selectedToken = null;
+                                }
                             }
                         }
+
 
                         controller.updateInterface();
 

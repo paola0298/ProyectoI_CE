@@ -242,6 +242,7 @@ public class Server {
             jsonObject.put("player", serializedPlayer);
             jsonObject.put("game_id", newGame.getGameID());
             jsonObject.put("player_id", newPlayer.getplayerId());
+            System.out.println(serializedGame);
             return jsonObject;
         } catch (JsonProcessingException e) {
             jsonObject.put("status", "FAILED");
@@ -273,6 +274,8 @@ public class Server {
                     String playerSer = mapper.writeValueAsString(newPlayer);
                     obj.put("game", gameSer);
                     obj.put("player", playerSer);
+
+                    System.out.println("Serialized game " + gameSer);
 
                 } catch (JsonProcessingException e) {
                     obj.put("status", "FAILED");
@@ -530,7 +533,7 @@ public class Server {
         Token RR = new Token("/res/images/token/RR.png", 8, "RR");
         Token X = new Token("/res/images/token/X.png", 8, "X");
         Token Z = new Token("/res/images/token/Z.png", 10, "Z");
-        Token Bonus = new Token("res/images/token/wildcard.png", 0, "");
+        Token Bonus = new Token("/res/images/token/wildcard.png", 0, "");
 
 
         //Se añaden las fichas A y E a la lista

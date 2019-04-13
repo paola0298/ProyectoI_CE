@@ -4,6 +4,7 @@ public class Token {
     private String imagePath;
     private int score;
     private String letter;
+    private boolean isActive;
 
     public Token(){}
 
@@ -11,6 +12,7 @@ public class Token {
         this.imagePath = imagePath;
         this.score = score;
         this.letter = letter;
+        this.isActive = false;
     }
 
 
@@ -24,5 +26,13 @@ public class Token {
 
     public String getLetter() {
         return letter;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
