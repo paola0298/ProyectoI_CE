@@ -196,7 +196,7 @@ public class Controller {
             this.current_match_id = match_id;
             deserialize();
             updatePlayers();
-            updateTokens();
+            updateInterface();
             grid = actualGame.getGrid();
             gui.lockGui();
             waitTurn();
@@ -276,7 +276,7 @@ public class Controller {
             System.out.println("The word is valid");
             deserialize();
             updatePlayers();
-            updateTokens();
+            updateInterface();
             gui.lockGui();
             waitTurn();
 
