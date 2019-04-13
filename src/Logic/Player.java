@@ -56,4 +56,8 @@ public class Player{
     public void setTokenlist(LinkedList<Token> tokenlist) {
         this.tokenlist = tokenlist;
     }
+
+    public boolean getScore() {
+        return false;
+    }
 }

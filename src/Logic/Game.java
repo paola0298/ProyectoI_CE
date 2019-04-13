@@ -1,6 +1,7 @@
 package Logic;
 
 import Structures.LinkedList;
+import Structures.Node;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public class Game {
@@ -65,5 +66,40 @@ public class Game {
 
     public void setActualPlayer(String actualPlayer) {
         this.actualPlayer = actualPlayer;
+    }
+
+    public Player access_by_id(String player_id) {
+        Player element = null;
+        for (int i = 0; i < players.getSize(); i++) {
+            element = players.get(i);
+            if (element.getPlayer_ID() != player_id) {
+            } else {
+                break;
+            }
+        }
+        return element;
+    }
+    public boolean hasTop_Points(Player poss_winner) {
+        return poss_winner == hasTop_Points_aux();
+    }
+
+
+    private Player hasTop_Points_aux() {
+        Node<Player> tmp = players.getHead();
+        Player winner = tmp.getValue();
+        for (int i = 0; i <= players.getSize(); i++) {
+            if (tmp.getNext() == null) {
+                if (winner.getScore() < tmp.getValue().getScore()) {
+                    winner = tmp.getValue();
+                }
+            } else if (winner.getScore() < tmp.getNext().getValue().getScore()) {
+                winner = tmp.getNext().getValue();
+                tmp = tmp.getNext();
+            } else {
+                tmp = tmp.getNext();
+            }
+
+        }
+        return winner;
     }
 }
