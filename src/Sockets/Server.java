@@ -680,6 +680,36 @@ public class Server {
         }
         return tokenInstances.get(index);
     }
+    private Game getGame(String match_id) {
+        Game game = null;
+        for(int i = 0; 9 <= gamesList.getSize(); i++ ){
+            String id = gamesList.acces_index(i).getValue().getGameID();
+            if (match_id.equals(id)){
+                game = gamesList.acces_index(i).getValue();
+            }else{
+                game = null;
+            }
+
+        }return game;
+
+    }
+
+
+    private JSONObject pickWinner(String Match_ID, String Player_ID) {
+        JSONObject obj = new JSONObject();
+        Game actualGame;
+        actualGame = getGame(Match_ID);
+        Player possible_Winner = actualGame.access_by_id(Player_ID);
+        if (actualGame.hasTop_Points(possible_Winner)) {
+            obj.put("noTokensresult", "WINNER");
+
+        } else {
+            obj.put("noTokensresult", "LOST");
+        }
+        return obj;
+    }
+
+
 
     public static void main(String[] args) {
         int port = 6307;
@@ -711,17 +741,5 @@ public class Server {
 
 
 
-    //private JSONObject pickWinner(String Match_ID, String Player_ID) {
-//        JSONObject obj = new JSONObject();
-//        Game actualGame = ;
-//        Player possible_Winner = actualGame.access_by_id(Player_ID);
-//        if (actualGame.hasTop_Points(possible_Winner)) {
-//            obj.put("noTokensresult", "WINNER");
-//
-//        } else {
-//            obj.put("noTokensresult", "LOST");
-//        }
-//        return obj;
-    //}
 
 }

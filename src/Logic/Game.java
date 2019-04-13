@@ -1,6 +1,7 @@
 package Logic;
 
 import Structures.LinkedList;
+import Structures.Node;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public class Game {
@@ -17,7 +18,8 @@ public class Game {
     String wordToCheck = "";
     String expertAnswer = "";
 
-    public Game(){}
+    public Game() {
+    }
 
     public Game(int maxPlayers) {
         this.players = new LinkedList<>();
@@ -74,7 +76,7 @@ public class Game {
         return receivedAnswer;
     }
 
-<<<<<<< HEAD
+
     public String getExpertAnswer() {
         return expertAnswer;
     }
@@ -86,7 +88,7 @@ public class Game {
     public Player getPlayer(String playerId) {
         Player player = null;
 
-        for (int i=0; i<players.getSize(); i++) {
+        for (int i = 0; i < players.getSize(); i++) {
             if (players.get(i).getplayerId().equals(playerId)) {
                 player = players.get(i);
             }
@@ -97,6 +99,42 @@ public class Game {
 
     public void setGrid(Token[][] grid) {
         this.grid = grid;
+    }
+
+    public Player access_by_id(String player_id) {
+        Player element = null;
+        for (int i = 0; i < players.getSize(); i++) {
+            element = players.get(i);
+            if (element.getplayerId() != player_id) {
+            } else {
+                break;
+            }
+        }
+        return element;
+    }
+
+    public boolean hasTop_Points(Player poss_winner) {
+        return poss_winner == hasTop_Points_aux();
+    }
+
+
+    private Player hasTop_Points_aux() {
+        Node<Player> tmp = players.getHead();
+        Player winner = tmp.getValue();
+        for (int i = 0; i <= players.getSize(); i++) {
+            if (tmp.getNext() == null) {
+                if (winner.getScore() < tmp.getValue().getScore()) {
+                    winner = tmp.getValue();
+                }
+            } else if (winner.getScore() < tmp.getNext().getValue().getScore()) {
+                winner = tmp.getNext().getValue();
+                tmp = tmp.getNext();
+            } else {
+                tmp = tmp.getNext();
+            }
+
+        }
+        return winner;
     }
 
 
@@ -114,42 +152,5 @@ public class Game {
 
         System.out.println(game.getPlayers());
     }
-
-=======
-
-
-
-
-
-//
-//    public Player access_by_id(String player_id){
-//        Player element = null;
-//        for (int i = 0; i <= players.getSize(); i++){
-//            element = players.get(i);
-//            if (element.getplayerId() != player_id){
-//                System.out.println("IF");
-//            } else{
-//                System.out.println("ELSE");
-//                break;
-//            }
-//
-//        }
-//        System.out.println(element);return element;
-////
-//    }
-//    public boolean hasTop_Points(Player poss_winner){
-//        for (int i = 0; i <= players.getSize(); i++){
-//            Player element = players.get(i);
-//            if (poss_winner.getScore() <= players.getCurrent().getScore()){
-//                return false;
-//
-//            }else{
-//                break;
-//            }
-//
-//
-//        }return true;
-//
-//    }
->>>>>>> Añado cambios que van en connection
 }
+
