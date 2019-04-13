@@ -2,7 +2,6 @@ package Sockets;
 
 import org.json.JSONObject;
 
-import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -17,7 +16,6 @@ public class Client {
     private int port;
     private String host;
     private Socket clientSocket;
-    private JSONObject defaultjson;
 
     /**
      * @param host Dirección IP del servidor.
@@ -26,27 +24,25 @@ public class Client {
     public Client(String host, int port) {
         this.port = port;
         this.host = host;
-        this.defaultjson = new JSONObject();
-        this.defaultjson.put("player_id", "-");
     }
 
     /**
      * @param message Mensaje a enviar al servidor.
      * @return Mensaje recibido del servidor.
      */
-    public String connect(String message) {
+    public JSONObject connect(JSONObject message) {
         try {
             this.clientSocket = new Socket(this.host, this.port);
         } catch (IOException e) {
             System.out.println("Error opening socket: " + e.getMessage());
         }
         if (this.clientSocket != null) {
-            sendData(message);
+            sendData(message.toString());
             return getData();
         } else {
             JSONObject obj = new JSONObject();
             obj.put("status", "CONNECTION_REFUSED");
-            return obj.toString();
+            return obj;
         }
     }
 
@@ -67,18 +63,20 @@ public class Client {
      * Este método recibe la información enviada del servidor.
      * @return Información enviada del servidor.
      */
-    private String getData() {
+    private JSONObject getData() {
         try {
             DataInputStream is = new DataInputStream(this.clientSocket.getInputStream());
-            return is.readUTF();
+            return new JSONObject(is.readUTF());
         } catch (IOException e) {
             System.out.println("Error getting data: " + e.getMessage());
-            return null;
+            return new JSONObject();
         }
     }
 
+
     public static void main(String[] args) {
-        Client client = new Client("192.168.02.6", 6307);
+        /*
+        Client client = new Client("192.168.100.24", 6307);
         boolean flag = true;
         while (flag) {
             String msg = JOptionPane.showInputDialog(null, "Message");
@@ -92,7 +90,39 @@ public class Client {
             } else {
                 System.out.println(response);
             }
+
         }
+        */
+        int action = 0;
+
+        Client client = new Client("localhost", 7123);
+        JSONObject obj = new JSONObject();
+        obj.put("action", "CALL_EXPERT");
+        obj.put("player_id", "jugador1");
+        switch (action) {
+            case 0:
+                obj.put("status", "REQUESTING");
+
+                obj.put("phone", "50671766731");
+                obj.put("word", "Ratón");
+                JSONObject response = client.connect(obj);
+                System.out.println(response.toString(2));
+                break;
+            case 1:
+                while (true) {
+                    obj.put("status", "WAITING");
+                    JSONObject res = client.connect(obj);
+                    if (res.getString("status").equals("ANSWERED")) {
+                        System.out.println(res.toString(2));
+                        break;
+                    } else {
+                        System.out.println("Waiting..");
+                    }
+                }
+                break;
+        }
+
+
     }
 
 }

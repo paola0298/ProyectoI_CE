@@ -1,39 +1,48 @@
 package Logic;
 
-
 import Structures.LinkedList;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.Random;
+public class Player{
+    private String playerId;
+    private String name;
+    private int score;
 
-public class Player {
-    String Player_ID;
-    String Name;
-    LinkedList<Token> tokenlist;
+    private LinkedList<Token> tokenlist;
+    public Player(){ }
 
     public Player(String name) {
-        create_ID();
-        Name = name;
+        this.playerId = RandomStringUtils.randomAlphanumeric(6);
+        this.name = name;
+        this.score = 0;
     }
 
-    public void create_ID (){
-        this.Player_ID = RandomStringUtils.randomAlphanumeric(6);
-
+    public int getScore() {
+        return score;
     }
-    public void assign_tokens(LinkedList<Token> tokensList){
-        int ind;
-        Random random = new Random();
-        ind = random.nextInt(100)+1;
-        System.out.println(ind);
 
+    public void setScore(int score) {
+        this.score = score;
     }
-    public static void main(String [] args ){
-        int ind;
-        Random random = new Random();
-        ind = random.nextInt(100)+1;
-        System.out.println(ind);
 
-
-
+    public void addScore(int scoreToAdd) {
+        this.score += scoreToAdd;
     }
+
+    public String getplayerId() {
+        return playerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LinkedList<Token> getTokenlist() {
+        return tokenlist;
+    }
+
+    public void setTokenlist(LinkedList<Token> tokenlist) {
+        this.tokenlist = tokenlist;
+    }
+
 }

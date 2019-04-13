@@ -27,3 +27,6 @@ out/
 
 #Idea folder
 .idea/
+
+#IntelliJ files
+*.iml

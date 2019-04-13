@@ -1,15 +1,18 @@
 package Logic;
 
 public class Token {
-    String imagePath;
-    int score;
-    String letter;
+    private String imagePath;
+    private int score;
+    private String letter;
+
+    public Token(){}
 
     public Token(String imagePath, int score, String letter) {
         this.imagePath = imagePath;
         this.score = score;
         this.letter = letter;
     }
+
 
     public String getImagePath() {
         return imagePath;
@@ -19,7 +22,7 @@ public class Token {
         return score;
     }
 
-    public String getWords() {
+    public String getLetter() {
         return letter;
     }
 }

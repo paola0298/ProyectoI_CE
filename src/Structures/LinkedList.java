@@ -1,6 +1,6 @@
 package Structures;
 
-public class LinkedList<T> {
+public class  LinkedList<T> {
 
     private int size;
     private Node<T> head;
@@ -8,6 +8,10 @@ public class LinkedList<T> {
     public LinkedList(){
         this.size = 0;
         this.head = null;
+    }
+
+    public Node<T> getHead() {
+        return head;
     }
 
     public void addLast(T value){
@@ -53,7 +57,7 @@ public class LinkedList<T> {
         return false;
     }
 
-    public boolean deleteElement(T element){
+    public boolean remove(T element){
         if (element == this.head.getValue()){
             deleteFirst();
         } else {
@@ -73,13 +77,67 @@ public class LinkedList<T> {
         return false;
     }
 
-    public void printList(){
+    @Override
+    public String toString(){
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("[");
         Node<T> temp = this.head;
-        while (temp!=null){
-            System.out.println(temp.getValue());
+        if (temp == null){
+            buffer.append("]");
+            return buffer.toString();
+        }else {
+            int i = 0;
+            while (temp != null) {
+                buffer.append(temp.getValue());
+                if(i!=size-1)
+                    buffer.append(", ");
+                else
+                    buffer.append("]");
+                temp = temp.getNext();
+                i++;
+            }
+        }
+        return buffer.toString();
+    }
+
+    public T get(int index){
+        Node<T> tmp = this.head;
+        for(int i=0; i<index  && tmp.getNext()!= null; i++){
+            tmp = tmp.getNext();
+        }
+        return tmp.getValue();
+    }
+
+    public Node<T> acces_index(int index) {
+        Node<T> tmp = this.head;
+        for (int i = 0; i < index && tmp.getNext() != null; i++) {
+            tmp = tmp.getNext();
+        }
+        return tmp;
+    }
+
+    public int getSize() {
+        return size;
+    }
+    public void setSize(int number){
+        this.size = number;
+    }
+
+    public T nextOf(T element) {
+        Node<T> temp = head;
+        for (int i=0; i<size; i++) {
+            if (temp.getValue() == element) {
+                if (temp.getNext() == null) {
+                    return head.getValue();
+                } else {
+                    return temp.getNext().getValue();
+                }
+            }
             temp = temp.getNext();
         }
+        return null;
     }
+
 
     public static void main(String[] args) {
         LinkedList<Integer> list = new LinkedList<>();
@@ -87,9 +145,16 @@ public class LinkedList<T> {
         list.addLast(2);
         list.addLast(3);
         list.addLast(4);
-        list.addFirst(100);
-        list.addFirst(200);
-        list.deleteElement(100);
-        list.printList();
+
+
+        System.out.println(list);
+
+        System.out.println(list.nextOf(1));
+        System.out.println(list.nextOf(2));
+        System.out.println(list.nextOf(3));
+        System.out.println(list.nextOf(4));
+
+        System.out.println(list);
+
     }
 }
