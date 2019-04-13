@@ -4,9 +4,12 @@ import Logic.Game;
 import Logic.Player;
 import Logic.Token;
 import Logic.WordDictionary;
+import Structures.ExpertRequests;
 import Structures.LinkedList;
 import Structures.Node;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -31,16 +34,6 @@ public class Server {
     private LinkedList<Game> gamesList = new LinkedList<>();
     private LinkedList<Token> tokenInstances = new LinkedList<>();
     private int[][] letterInfo;
-
-    //TODO estos atributos deben ir dentro de la clase Game, para que sea específico de cada partida.
-    String expertAnswer;
-    boolean contact_expert = false;
-    boolean waiting_ex_response = false;
-    boolean receivedAnswer = false;
-    String expert_phone = "";
-    String expert_word = "";
-    String player_id = "";
-
 
     /**
      * @param port Puerto en el cual el servidor esta escuchando
@@ -119,7 +112,7 @@ public class Server {
                     int maxPlayers = Integer.parseInt(msg.getString("max_players"));
                     playerName = msg.getString("player_name");
                     response = createMatch(maxPlayers, playerName);
-                    sendResponse(response.toString( ), con);
+                    sendResponse(response.toString(), con);
                     break;
 
                 case "JOIN_MATCH":
@@ -139,12 +132,21 @@ public class Server {
                     break;
 
                 case "CALL_EXPERT":
-                    response = callExpert(msg); //TODO actualizar el metodo segun los datos que se necesiten
+                    response = callExpert(msg.getString("match_id"),
+                            msg.getString("expert_phone"),
+                            msg.getString("word_to_check"),
+                            msg.getInt("word_score"),
+                            msg.getString("game"),
+                            msg.getString("player"));
                     sendResponse(response.toString(), con);
                     break;
 
                 case "EXPERT_SERVICE":
-                    response = expertService();
+                    if (msg.getString("status").equals("STANDBY")) {
+                        response = expertService();
+                    } else {
+                        response = checkExpertAnswers(msg.getString("requests"));
+                    }
                     sendResponse(response.toString(), con);
                     break;
 
@@ -164,7 +166,7 @@ public class Server {
                     break;
 
                 case "DISCONNECT":
-                    response = disconnect();
+                    response = disconnect(msg.getString("player_id"), msg.getString("match_id"));
                     sendResponse(response.toString(), con);
                     break;
 
@@ -220,15 +222,45 @@ public class Server {
      */
     private JSONObject expertAnswered(String matchId) {
         JSONObject obj = new JSONObject();
-
         Game actualGame = findGame(matchId);
+        ObjectMapper mapper = new ObjectMapper();
+
         if (actualGame.didExpertAnswered()) {
-            obj.put("status", "ANSWERED");
-            obj.put("expert_answer", actualGame.getExpertAnswer());
+            try {
+                obj.put("status", "VALID");
+                obj.put("expert_answer", actualGame.getExpertAnswer());
+
+                if (actualGame.getExpertAnswer().equals("S") || actualGame.getExpertAnswer().equals("s")) {
+
+                    Game dataGame = mapper.readValue(actualGame.getGameString(), Game.class);
+                    Player playerData = mapper.readValue(actualGame.getPlayerString(), Player.class);
+
+                    LinkedList<Token> tokenList = playerData.getTokenlist();
+
+                    actualGame.setGrid(dataGame.getGrid());
+                    Player actualPlayer = actualGame.getActualPlayer();
+                    actualPlayer.addScore(actualGame.getWordScore());
+                    actualPlayer.setTokenlist(tokenList);
+
+                    actualGame.nextPlayer();
+
+                    String gameSer = mapper.writeValueAsString(actualGame);
+                    String playerSer = mapper.writeValueAsString(actualPlayer);
+
+                    obj.put("game", gameSer);
+                    obj.put("player", playerSer);
+
+                } else {
+                    obj.put("status", "INVALID");
+                    actualGame.nextPlayer();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             obj.put("status", "CONTACTING");
         }
-
         return obj;
     }
 
@@ -240,13 +272,14 @@ public class Server {
      */
     private JSONObject createMatch(int maxPlayers, String playerName){
         JSONObject jsonObject = new JSONObject();
-        String serializedGame = "";
-        String serializedPlayer = "";
+        String serializedGame;
+        String serializedPlayer;
         Game newGame = new Game(maxPlayers);
         Player newPlayer = new Player(playerName);
         newPlayer.setTokenlist(generateTokens());
         newGame.addPlayer(newPlayer);
         gamesList.addLast(newGame);
+
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
@@ -257,6 +290,8 @@ public class Server {
             jsonObject.put("player", serializedPlayer);
             jsonObject.put("game_id", newGame.getGameID());
             jsonObject.put("player_id", newPlayer.getplayerId());
+            System.out.println("Players: " + newGame.getPlayers());
+            System.out.println("Serialized game: " + serializedGame);
             return jsonObject;
         } catch (JsonProcessingException e) {
             jsonObject.put("status", "FAILED");
@@ -280,7 +315,6 @@ public class Server {
 
         if (game != null) {
             if (game.addPlayer(newPlayer)) {
-                //TODO send game data to client
                 try {
                     obj.put("status", "SUCCESS");
                     obj.put("player_id", newPlayer.getplayerId());
@@ -299,32 +333,6 @@ public class Server {
             obj.put("status", "FAILED");
         }
 
-//        String serializedGame = "";
-//        String serializedPlayer = "";
-//        for (int i=0; i<gamesList.getSize(); i++) {
-//            if (gamesList.get(i).getGameID().equals(id)) {
-//                game = gamesList.get(i);
-//                Player player = new Player(name);
-//                player.setTokenlist(generateTokens());
-//
-//                ObjectMapper mapper = new ObjectMapper();
-//
-//                try {
-//                    serializedGame = mapper.writeValueAsString(game);
-//                    serializedPlayer = mapper.writeValueAsString(player);
-//                    obj.put("status", game.addPlayer(player)); //Status define si el jugador pudo ingresar o no a la partida
-//                    obj.put("player_id", player.getplayerId());
-//                    obj.put("game", serializedGame);
-//                    obj.put("player", serializedPlayer);
-//
-//                    return obj;
-//                } catch (JsonProcessingException e) {
-//                    obj.put("status", "FAILED");
-//                    return obj;
-//                }
-//            }
-//        }
-//        obj.put("status", false);
         return obj;
     }
 
@@ -335,7 +343,7 @@ public class Server {
      * @param matchId Identificador de la partida
      * @param score Puntuación de la palabra formada
      * @param playerInstance Objeto serializado del jugador actual
-     * @return
+     * @return Mensaje en formato json
      */
     private JSONObject checkWord(String playerGame, String word, String matchId, int score, String playerInstance){
         JSONObject obj = new JSONObject();
@@ -351,12 +359,6 @@ public class Server {
             System.out.println("Word to search: \"" + word + "\"");
             if (WordDictionary.search(word)){
                 System.out.println("Word found");
-//                Player actualPlayer = newGame.getActualPlayer();
-//                System.out.println("ActualPlayer server instance: " + actualPlayer);
-//                actualPlayer.addScore(score);
-//                newGame.nextPlayer();
-//
-//                System.out.println("Players list: " + newGame.getPlayers());
 
                 actualGame.setGrid(gameData.getGrid());
 
@@ -390,81 +392,93 @@ public class Server {
         return obj;
     }
 
+
     /**
      * Método que se pone en contacto con el experto
-     * @param msg El mensaje que se le desea enviar
+     * @param matchId Id de la partida actual
+     * @param expertPhone Teléfono del experto
+     * @param wordToCheck Palabra a verificar
      * @return Json objet con la respuesta
      */
-    private JSONObject callExpert(JSONObject msg) {
+    private JSONObject callExpert(String matchId, String expertPhone, String wordToCheck, int wordScore, String gameString, String playerString) {
         JSONObject obj = new JSONObject();
+        Game actualGame = findGame(matchId);
 
-//        if (msg.getString("status").equals("WAITING")) {
-//            if (!expertAnswer.equals("")) {
-//                response.put("status", "ANSWERED");
-//                response.put("WORD_STATUS", expertAnswer);
-//                contact_expert = false;
-//                expert_phone = "";
-//                expert_word = "";
-//                player_id = "";
-//            } else {
-//                response.put("status", "CONTACTING");
-//            }
-//        } else {
-//            contact_expert = true;
-//            expert_phone = msg.getString("phone");
-//            expert_word = msg.getString("word");
-//            player_id = msg.getString("player_id");
-//
-//            response.put("status", "CONTACTING");
-//        }
-//
-//        sendResponse(response.toString(), con);
-//        System.out.println("Esperando a contactar experto");
-//        break;
-//        case "CHECK_TURN":
-//        response = checkTurn(); //TODO actualizar el metodo segun los datos que se necesiten
-//        sendResponse(response.toString(), con);
-//        break;
-//        case "EXPERT_SERVICE":
-//        response = expertService(); //TODO actualizar el metodo segun los datos que se necesiten
-//
-//        if (!contact_expert && !waiting_ex_response) {
-//            response.put("status", "NO");
-//
-//        } else if (contact_expert && !waiting_ex_response){
-//            contact_expert = false;
-//            waiting_ex_response = true;
-//            response.put("status", "SEND_SMS");
-//            response.put("phone", expert_phone);
-//            response.put("word", expert_word);
-//        } else {
-//            if (msg.getString("status").equals("WAITING")) {
-//                response.put("status", "WAITING");
-//            } else if (msg.getString("status").equals("ANSWERED")) {
-//                waiting_ex_response = false;
-//                expertAnswer = msg.getString("expert_answer");
-//            }
-//        }
-        if (!receivedAnswer) {
-            expert_phone = msg.getString("phone");
-            expert_word = msg.getString("word");
-            player_id = msg.getString("player_id");
-            contact_expert = true;
-            obj.put("status", "CONTACTING");
-        } else {
-            obj.put("status", "ANSWERED");
-            obj.put("word_status", expertAnswer);
-        }
-
+        actualGame.setContactExpert(true);
+        actualGame.setExpertPhone(expertPhone);
+        actualGame.setWordToCheck(wordToCheck);
+        actualGame.setWordScore(wordScore);
+        actualGame.setGameString(gameString);
+        actualGame.setPlayerString(playerString);
+        obj.put("status", "CONTACTING");
 
         return obj;
     }
+
+    private JSONObject expertService() {
+        JSONObject obj = new JSONObject();
+        ExpertRequests requests = checkExpertRequests();
+        ObjectMapper mapper = new ObjectMapper();
+
+        if (requests.getSize() == 0) {
+            obj.put("status", "STANDBY");
+        } else {
+            try {
+                String requestsSer = mapper.writeValueAsString(requests);
+                obj.put("status", "CONTACT");
+                obj.put("requests", requestsSer);
+            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//                System.out.println("Error en ExpertService()");
+                obj.put("status", "INT_ERROR");
+                obj.put("error", e.getMessage());
+            }
+        }
+        return obj;
+    }
+
+    private ExpertRequests checkExpertRequests() {
+        ExpertRequests requests = new ExpertRequests();
+
+        for (int i=0; i<gamesList.getSize(); i++) {
+            Game game = gamesList.get(i);
+            if (game.isContactExpert()) {
+                String expertPhone = game.getExpertPhone();
+                String wordToCheck = game.getWordToCheck();
+                String matchId = game.getGameID();
+                requests.addRequest(matchId, expertPhone, wordToCheck);
+            }
+        }
+        return requests;
+    }
+
+    private JSONObject checkExpertAnswers(String requests) {
+        JSONObject obj = new JSONObject();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            ExpertRequests requestsList = mapper.readValue(requests, ExpertRequests.class);
+            for (int i=0; i<requestsList.getSize(); i++) {
+                String[] request = requestsList.getRequest(i);
+                Game actualGame = findGame(request[0]);
+                actualGame.setContactExpert(false);
+                actualGame.setReceivedAnswer(true);
+                actualGame.setExpertAnswer(request[3]);
+            }
+            obj.put("status", "STANDBY");
+        } catch (IOException e) {
+//            e.printStackTrace();
+            obj.put("status", "INT_ERROR");
+            obj.put("error", e.getMessage());
+        }
+        return obj;
+    }
+
 
     /**
      * Verifica si ya es el turno de un jugador específico
      * @param gameId  Identificador de la partida
      * @param playerId Indetificador del jugador
-     * @return
+     * @return Mensaje en formato json
      */
     private JSONObject checkTurn(String gameId, String playerId) {
         JSONObject obj = new JSONObject();
@@ -477,7 +491,6 @@ public class Server {
                 obj.put("status", "FAILED");
             } else {
                 obj.put("status", "SUCCESS");
-                //TODO send game and player data to client
                 try {
                     String gameSer = mapper.writeValueAsString(actualGame);
                     String playerSer = mapper.writeValueAsString(actualPlayer);
@@ -494,23 +507,27 @@ public class Server {
         return obj;
     }
 
-    private JSONObject expertService() {
-        JSONObject obj = new JSONObject();
-
-        if (!contact_expert) {
-            obj.put("status", "NO");
-        } else {
-            obj.put("status", "SEND_SMS");
-        }
-
-        return obj;
-    }
-
     /**
      * Método que elimina a un jugador de la partida
      * @return Json object con la respuesta
      */
-    private JSONObject disconnect() { return new JSONObject(); }
+    private JSONObject disconnect(String playerId, String matchId) {
+        JSONObject obj = new JSONObject();
+
+        Game actualGame = findGame(matchId);
+        for (int i=0; i<actualGame.getPlayers().getSize(); i++) {
+            Player actualPlayer = actualGame.getPlayers().get(i);
+            if (actualPlayer.getplayerId().equals(playerId)) {
+
+                if (actualGame.getActualPlayer() == actualPlayer) {
+                    actualGame.nextPlayer();
+                }
+
+                actualGame.removePlayer(actualPlayer);
+            }
+        }
+        return obj;
+    }
 
     /** Genera una lista de tokens
      * @return  Lista de token
@@ -527,7 +544,7 @@ public class Server {
             tokenList.addLast(random_token.getValue());
         }
 
-        return tokenList; //TODO generar lista de tokens para el jugador
+        return tokenList;
     }
 
     /**
@@ -731,7 +748,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        int port = 6307;
+        int port = 9810;
         Server server = new Server(port);
 //        System.out.println("Servidor iniciado en puerto " + port);
         server.connectionListener();

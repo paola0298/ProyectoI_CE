@@ -11,11 +11,14 @@ public class Game {
     private LinkedList<Player> players;
 
     //Expert related attributes
-    boolean contactExpert = false;
+    private boolean contactExpert = false;
     private boolean receivedAnswer = false;
-    String expertPhone = "";
-    String wordToCheck = "";
-    String expertAnswer = "";
+    private String expertPhone = "";
+    private String wordToCheck = "";
+    private String expertAnswer = "";
+    private String gameString = "";
+    private String playerString = "";
+    private int wordScore = 0;
 
     /**
      * Constructor por defecto
@@ -40,11 +43,11 @@ public class Game {
      * @return true si se pudo unir, false en caso contrario
      */
     public boolean addPlayer(Player player) {
-        if (players.getSize() < maxPlayers) {
-            players.addLast(player);
-            if (players.getSize() == 1) {
+        if (this.players.getSize() < this.maxPlayers) {
+            if (this.players.getSize() == 0) {
                 actualPlayer = player;
             }
+            this.players.addLast(player);
             return true;
         } else {
             return false;
@@ -158,4 +161,59 @@ public class Game {
         System.out.println(game.getPlayers());
     }
 
+    public boolean isContactExpert() {
+        return contactExpert;
+    }
+
+    public void setContactExpert(boolean contactExpert) {
+        this.contactExpert = contactExpert;
+    }
+
+    public void setReceivedAnswer(boolean receivedAnswer) {
+        this.receivedAnswer = receivedAnswer;
+    }
+
+    public String getExpertPhone() {
+        return expertPhone;
+    }
+
+    public void setExpertPhone(String expertPhone) {
+        this.expertPhone = expertPhone;
+    }
+
+    public String getWordToCheck() {
+        return wordToCheck;
+    }
+
+    public void setWordToCheck(String wordToCheck) {
+        this.wordToCheck = wordToCheck;
+    }
+
+    public void setExpertAnswer(String expertAnswer) {
+        this.expertAnswer = expertAnswer;
+    }
+
+    public int getWordScore() {
+        return wordScore;
+    }
+
+    public void setWordScore(int wordScore) {
+        this.wordScore = wordScore;
+    }
+
+    public String getGameString() {
+        return gameString;
+    }
+
+    public void setGameString(String gameString) {
+        this.gameString = gameString;
+    }
+
+    public String getPlayerString() {
+        return playerString;
+    }
+
+    public void setPlayerString(String playerString) {
+        this.playerString = playerString;
+    }
 }

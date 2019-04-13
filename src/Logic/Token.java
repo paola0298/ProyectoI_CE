@@ -4,6 +4,7 @@ public class Token {
     private String imagePath;
     private int score;
     private String letter;
+    private boolean isActive;
 
     /**
      * Constructor por defecto
@@ -20,6 +21,7 @@ public class Token {
         this.imagePath = imagePath;
         this.score = score;
         this.letter = letter;
+        this.isActive = false;
     }
 
 
@@ -42,5 +44,23 @@ public class Token {
      */
     public String getLetter() {
         return letter;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    @Override
+    public String toString() {
+
+        return "[Letter:" +
+                letter +
+                ",Active:" +
+                isActive +
+                "]";
     }
 }

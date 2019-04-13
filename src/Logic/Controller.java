@@ -6,6 +6,7 @@ import Structures.LinkedList;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.control.Alert;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -104,7 +105,6 @@ public class Controller {
      * @return Nueva lista de tokens actualizada
      */
     public void updateTokenList(boolean flag, Token token) {
-        //TODO llamar este metodo cuando se coloca una ficha en el tablero o se elimina
         LinkedList<Token> actualList = getPlayerInstance().getTokenlist();
 
         if (flag) {
@@ -149,6 +149,7 @@ public class Controller {
      */
     private void updatePlayers() {
         LinkedList<Player> actualPlayers = actualGame.getPlayers();
+        System.out.println("Updated players: " + actualPlayers);
         gui.playerLoader2(actualPlayers);
     }
 
@@ -156,8 +157,8 @@ public class Controller {
      * Método para actualizar los tokens en la interfaz
      */
     public void updateTokens() {
-        LinkedList<Token> actualtoken = playerInstance.getTokenlist();
-        gui.tokenLoader(actualtoken);
+        LinkedList<Token> actualtokens = playerInstance.getTokenlist();
+        gui.tokenLoader(actualtokens);
     }
 
     /**
@@ -248,6 +249,7 @@ public class Controller {
 
         try {
             actualGame = objectMapper.readValue(stringGame, Game.class);
+            System.out.println(actualGame.getPlayers());
             playerInstance = objectMapper.readValue(stringPlayer, Player.class);
 
         } catch (IOException e) {
@@ -274,6 +276,24 @@ public class Controller {
         }
     }
 
+    private boolean find(Token tokenToSearch, LinkedList<Token> list) {
+        if (tokenToSearch!=null) {
+            for (int i = 0; i < list.getSize(); i++) {
+                if (tokenToSearch == list.get(i)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void deactivateTokens() {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                grid[i][j].setActive(false);
+            }
+        }
+    }
 
     /**
      * Este método le consulta al servidor si la palabra es valida
@@ -282,6 +302,9 @@ public class Controller {
      */
     public int check_word(LinkedList<Token> tokenList) {
         String word = gui.createWord(grid);
+
+//        String word = buildWord(tokenList); not done
+
         int score = calculateScore(tokenList);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -305,6 +328,7 @@ public class Controller {
         response = client.connect(message);
 
         if (response.get("status").equals("VALID")) {
+            deactivateTokens();
             System.out.println("The word is valid");
             deserialize();
             updatePlayers();
@@ -327,7 +351,7 @@ public class Controller {
      * @param tokenList Lista con las letras que conforman la palabra
      * @return la puntuación de la palabra
      */
-    private int calculateScore(LinkedList<Token> tokenList) {
+    public int calculateScore(LinkedList<Token> tokenList) {
         int score = 0;
         for (int i = 0; i < tokenList.getSize(); i++){
             score+= tokenList.get(i).getScore();
@@ -336,32 +360,9 @@ public class Controller {
     }
 
     /**
-     * Método que realiza una consulta al experto
-     * @return true si pudo contactar al experto, false caso contrario
-     */
-    public boolean callExpert() {
-        message = prepare();
-        message.put("action", "CALL_EXPERT");
-        message.put("match_id", current_match_id);
-        message.put("expert_phone", expertPhone);
-        message.put("word_to_check", gui.createWord(grid));
-
-        response = client.connect(message);
-
-        if (response.get("status").equals("CONTACTING")) {
-            System.out.println("Waiting for expert to answer");
-            checkOnExpert();
-            gui.lockGui();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * @return true si pudo saltar el turno correctamente
      */
-    public boolean passTurn() {
+    public boolean passTurn(LinkedList<Token> tokenList) {
         message = prepare();
         message.put("action", "PASS_TURN");
         message.put("match_id", current_match_id);
@@ -369,7 +370,7 @@ public class Controller {
         response = client.connect(message);
 
         if (response.getString("status").equals("SUCCESS")) {
-            //TODO función para quitar la fichas de la matriz y regresarlas al contenedor
+            returnTokens(tokenList);
             gui.lockGui();
             waitTurn();
             return true;
@@ -377,13 +378,50 @@ public class Controller {
             //Si ocurrió un error al conectarse con el servidor
             return false;
         }
+    }
 
+    /**
+     * Método que realiza una consulta al experto
+     * @return true si pudo contactar al experto, false caso contrario
+     */
+    public boolean callExpert(LinkedList<Token> tokenList) {
+
+        message = prepare();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            message.put("action", "CALL_EXPERT");
+            message.put("match_id", current_match_id);
+            message.put("expert_phone", expertPhone);
+            message.put("word_to_check", gui.createWord(grid));
+            message.put("word_score", calculateScore(tokenList));
+
+            String gameSer = mapper.writeValueAsString(actualGame);
+            String playerSer = mapper.writeValueAsString(playerInstance);
+
+            message.put("game", gameSer);
+            message.put("player", playerSer);
+
+        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+            return false;
+
+        }
+        response = client.connect(message);
+
+        if (response.get("status").equals("CONTACTING")) {
+            System.out.println("Waiting for expert to answer");
+            checkOnExpert(tokenList);
+            gui.lockGui();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Método para recibir la respuesta del experto por 2 segundos
      */
-    public void checkOnExpert() {
+    public void checkOnExpert(LinkedList<Token> tokenList) {
         Thread caller = new Thread(() -> {
             boolean check = true;
             while (check) {
@@ -394,18 +432,38 @@ public class Controller {
 
                     response = client.connect(message);
 
-                    if (response.get("status").equals("ANSWERED")) {
+                    if (response.get("status").equals("VALID")) {
                         System.out.println("El experto ya respondió");
                         check = false;
-                        showExpertAnswer(response.getString("expert_answer"));
 
-                    } else {
+                        deserialize();
+                        updatePlayers();
+                        updateInterface();
+                        gui.lockGui();
+                        waitTurn();
+
+                        showExpertAnswer(true);
+
+                    } else if(response.get("status").equals("INVALID")) {
+                        System.out.println("El experto ya respondió");
+                        check = false;
+                        returnTokens(tokenList);
+                        gui.lockGui();
+                        waitTurn();
+
+                        showExpertAnswer(false);
+
+                    } else if(response.get("status").equals("CONTACTING")) {
                         System.out.println("Aún no ha respondido el experto");
+                    } else {
+                        gui.showAlert("Se perdió la conexión con el servidor",
+                                "Error de conexión", Alert.AlertType.ERROR);
                     }
                     Thread.sleep(2000);
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    System.out.println("CheckOnExpert thread interrupted");
                 } catch (JSONException e) {
                     gui.gameDisconnected();
                 }
@@ -417,8 +475,12 @@ public class Controller {
         caller.start();
     }
 
-    private void showExpertAnswer(String answer) {
-
+    private void showExpertAnswer(boolean answer) {
+        if (answer) {
+            gui.showAlert("El experto aceptó tu palabra", "Información", Alert.AlertType.INFORMATION);
+        } else {
+            gui.showAlert("El experto rechazó tu palabra", "Información", Alert.AlertType.INFORMATION);
+        }
     }
 
     /**
@@ -450,8 +512,87 @@ public class Controller {
         }
     }
 
-    private void initialize1() {
-        client = new Client("localhost", 6307);
+    public void returnTokens(LinkedList<Token> tokenList) {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                Token token = grid[i][j];
+                if (find(token, tokenList)) {
+                    updateTokenList(true, token);
+                    removeToken(i, j);
+                    tokenList.remove(token);
+                }
+            }
+        }
+
     }
 
+    public String buildWord(LinkedList<Token> tokensPlayed) {
+
+        StringBuilder myWord = new StringBuilder();
+        System.out.println("Fichas jugadas: " + tokensPlayed.toString());
+
+        if (tokensPlayed.getSize() == 1) {
+            // Revisar las letras contiguas hasta encontrar la primer ocurrencia
+            LinkedList<Token> contiguous = findContiguous(tokensPlayed.get(0));
+
+
+        } else {
+            // Encontrar la dirección de las fichas comparando sus i y j
+
+        }
+
+        return myWord.toString();
+    }
+
+    private LinkedList<Token> checkTendence(LinkedList<Token> tokens) {
+        LinkedList<Token> allTokens = new LinkedList<>();
+
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+
+            }
+        }
+
+        return allTokens;
+    }
+
+    private LinkedList<Token> findContiguous(Token originToken) {
+        LinkedList<Token> allTokens = new LinkedList<>();
+
+        int[] coord = getTokenCoord(originToken);
+        int i = coord[0];
+        int j = coord[1];
+//        if (grid[i][j] != null) { //VU
+//
+//        } else if () {  //DU
+//
+//        } else if () {  //HR
+//
+//        } else if () { //DD
+//
+//        } else if () {  //VD
+//
+//        }
+        return allTokens;
+    }
+
+    private int[] getTokenCoord(Token tokenToSearch) {
+        for (int i=0; i<15; i++) {
+            for (int j=0; j<15; j++) {
+                if (grid[i][j] == tokenToSearch) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+    public void disconnect() {
+        message = prepare();
+        message.put("action", "DISCONNECT");
+        message.put("match_id", current_match_id);
+
+        client.connect(message);
+
+    }
 }

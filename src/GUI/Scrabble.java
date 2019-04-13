@@ -34,7 +34,6 @@ public class Scrabble extends Application {
     private HBox actualPlayerInfoContainer;
     private HBox actiosInMatch;
     private HBox tokenBox;
-    private ImageView letterSelected = null;
     private Token selectedToken = null;
 
     private boolean unlockedControls;
@@ -45,12 +44,11 @@ public class Scrabble extends Application {
     private VBox initialWindow; // Ventana inicial
     private BorderPane newMatchWindow; //Ventana de partida nueva
 
-
-    private LinkedList<Token> lettersList = new LinkedList<>();
+    private LinkedList<Token> lettersList = new LinkedList<>(); //Lista con las tokens puestas en el tablero
 
     /**
      * Este método inicializa la interfaz
-     * @param stage
+     * @param stage Es la escena principal de la aplicación
      */
     @Override
     public void start(Stage stage) {
@@ -310,48 +308,51 @@ public class Scrabble extends Application {
             //tomar palabra creada y enviarla al servidor
 //            System.out.println("The word is: ");
             if (unlockedControls) {
+                if (lettersList.getSize() > 0) {
+                    int response = controller.check_word(lettersList);
 
-                int response = controller.check_word(lettersList);
+                    if (response == 1) {
+                        controller.deactivateTokens();
+                        lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
+                        controller.updateInterface();
 
-                if (response == 1){
-                    lettersList = new LinkedList<>(); //Se resetea cuando la palabra es valida
+                    } else if (response == 0) {
+                        int option = showOptions();
 
-                } else if (response == 0){
-                    int option = showOptions();
+                        if (option == 0) {      //Llamar experto
+                            if (controller.callExpert(lettersList)) {
+                                System.out.println("Esperando la respuesta del experto");
+                                showAlert("Esperando la respuesta del experto",
+                                        "Información",
+                                        Alert.AlertType.INFORMATION);
+                            } else {
+                                System.out.println("No se puede contactar al experto en este momento");
+                                showAlert("No se puede contactar al experto en este momento",
+                                        "Error de conexión",
+                                        Alert.AlertType.ERROR);
+                            }
+                        } else if (option == 1) {
+                            //Reintentar
+                            System.out.println("Intentando nuevamente...");
 
-                    if (option == 0) {      //Llamar experto
-                        if (controller.callExpert()) {
-                            System.out.println("Esperando la respuesta del experto");
-                            showAlert("Esperando la respuesta del experto",
-                                    "Información",
-                                    Alert.AlertType.INFORMATION);
                         } else {
-                            System.out.println("No se puede contactar al experto en este momento");
-                            showAlert("No se puede contactar al experto en este momento",
-                                    "Error de conexión",
-                                    Alert.AlertType.ERROR);
-                        }
-                    } else if (option == 1) {
-                        //Reintentar
-                        System.out.println("Intentando nuevamente...");
+                            System.out.println("Pasar turno...");
+                            controller.returnTokens(lettersList);
 
+
+                            if (!controller.passTurn(lettersList)) {
+                                showAlert("Ocurrió un error al contactar con el servidor, inténtalo de nuevo",
+                                        "Error de conexión",
+                                        Alert.AlertType.ERROR);
+                            }
+                        }
                     } else {
-                        //Pasar turno
-                        // Regresar todas las fichas de la matriz al contenedor de fichas
-                        System.out.println("Pasar turno...");
-                        if (!controller.passTurn()) {
-                            showAlert("Ocurrió un error al contactar con el servidor, inténtalo de nuevo",
-                                    "Error de conexión",
-                                    Alert.AlertType.ERROR);
-                        }
+                        //colocar alert informando error
+                        showAlert("No se pudo conectar con el servidor", "Error de conexión", Alert.AlertType.ERROR);
                     }
-
-                } else{
-                    //colocar alert informando error
-                    showAlert("No se pudo conectar con el servidor", "Error de conexión", Alert.AlertType.ERROR);
-
+                } else {
+                    showAlert("Debes jugar fichas para continuar", "Error", Alert.AlertType.ERROR);
                 }
-
             }
         });
 
@@ -378,8 +379,8 @@ public class Scrabble extends Application {
 
         ImageView leaveMatch = loadImageView("/res/images/exitIcon.png", 60, 60);
         leaveMatch.setOnMouseClicked(mouseEvent -> {
+            controller.disconnect();
             initialWindow.toFront();
-            //TODO hacer que el jugador se salga de la partida
         });
 
         ImageView showInfoButton = loadImageView("/res/images/infoIcon.png", 60, 60);
@@ -468,7 +469,6 @@ public class Scrabble extends Application {
         showAlert("Se ha perdido la conexión con el servidor, regresando al menú inicial",
                 "Conexión perdida", Alert.AlertType.ERROR);
         initialWindow.toFront();
-        //TODO eliminar al jugador de la partida
         System.out.println("The client was disconnected from the server");
     }
 
@@ -478,14 +478,13 @@ public class Scrabble extends Application {
      * @param title El título del mensaje
      * @param type el tipo de la alerta
      */
-    private void showAlert(String message, String title, Alert.AlertType type) {
+    public void showAlert(String message, String title, Alert.AlertType type) {
         Alert showID = new Alert(type);
         showID.setTitle(title);
         showID.setHeaderText(null);
         showID.setContentText(message);
         showID.showAndWait();
     }
-
 
     /**
      * Método para construir la palabra que formó el jugador
@@ -499,50 +498,12 @@ public class Scrabble extends Application {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 Token token = actualMatrix[i][j];
-//                if (temp==14){
-//                    temp = 0;
-//                }
-//
-//                Token next = actualMatrix[i][temp+1];
-////                System.out.println(next);
                 if (find(token)) {
                     word.append(token.getLetter());
 //                    System.out.println("Actual token " + token.getLetter() +  "\n");
                 }
-//                else if (!find(token) && token != null){
-//                    Token down = actualMatrix[i][j+1];
-//                    System.out.println("Letra actual " + token.getLetter());
-//                    try {
-//                        System.out.println("Down " + down.getLetter());
-//                    }catch (NullPointerException e){
-//                        System.out.println("Down null");
-//                    }
-//                    if (down != null){
-//                        Token downDown = actualMatrix[i][j+2];
-//
-//                        if (find(downDown)){
-//                            System.out.println("Agregando en cruz...");
-//                            word.append(down.getLetter());
-//                        }
-//
-//                    }
-
-//                    System.out.println("Adding existing");
-//                    word.append(token.getLetter());
-
-//                else if (next==null && word.toString().length()>0){
-//
-//                    System.out.println("Exit");
-//                    break;
-//                }
-//                temp++;
-
-//                System.out.println("\n");
             }
         }
-
-
-
         System.out.println("Final word " + word.toString().toLowerCase());
         return word.toString().toLowerCase();
     }
@@ -562,7 +523,6 @@ public class Scrabble extends Application {
         }
         return false;
     }
-
 
     /**
      * Método que genera una imagen
@@ -657,189 +617,27 @@ public class Scrabble extends Application {
 
         }
     }
-//    private void playerLoader() {
-//        // instanciar widgets;
-//        ImageView userImage;
-//
-//        Text scoreLabel;
-//        Text userScore;
-//        Text userName;
-//
-//        LinkedList<ImageView> imageForUser = new LinkedList<>();
-//        imageForUser.addLast(loadImageView("/res/images/user/player_pink.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_blue.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_red.png"));
-//        imageForUser.addLast(loadImageView("/res/images/user/player_green.png"));
-//        Node<ImageView> imageTemp = imageForUser.getHead();
-//
-//        // playersList
-//
-//        LinkedList<Player> actualPlayers = controller.getActualGame().getPlayers();
-//        Node<Player> playerTemp = actualPlayers.getHead();
-//        Player actualPlayer = controller.getPlayerInstance();
-//
-//        if (actualPlayer != playerTemp.getValue()) {
-//            actualPlayers.remove(actualPlayer);
-//            actualPlayers.addFirst(actualPlayer);
-//        }
-//
-//        int i = 0;
-//        while (playerTemp != null) {
-//            userImage = imageTemp.getValue();
-//            userImage.setFitHeight(100);
-//            userImage.setFitWidth(60);
-//
-//            VBox playersBox = new VBox();
-//            playersBox.setAlignment(Pos.CENTER);
-//            userName = new Text(playerTemp.getValue().getName());
-//
-//            //puntuacion del usuario
-//            HBox userScoreBox = new HBox();
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            userScoreBox.setSpacing(10);
-//            userScoreBox.setAlignment(Pos.CENTER);
-//            scoreLabel = new Text("Puntos:");
-//            String score = String.valueOf(playerTemp.getValue().getScore());
-//            userScore = new Text(score);
-//            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-//            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-//
-//            if (i==0){
-//                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (i==1){
-//                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else if (i == 2){
-//                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
-//            } else {
-//                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
-//            }
-//
-//            imageTemp = imageTemp.getNext();
-//            playerTemp = playerTemp.getNext();
-//            i++;
-//
-//        }
-//
-////
-//
-////        int i = 0;
-////        while(temp!=null){
-////            userImage = imageForUser.acces_index(i).getValue();
-////            userImage.setFitHeight(100);
-////            userImage.setFitWidth(60);
-////
-////            VBox playersBox = new VBox();
-////            playersBox.setAlignment(Pos.CENTER);
-////            userName = new Text(temp.getValue().getName());
-////
-////            //puntuacion del usuario
-////            HBox userScoreBox = new HBox();
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            userScoreBox.setSpacing(10);
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            scoreLabel = new Text("Puntos:");
-////            String score = String.valueOf(temp.getValue().getScore());
-////            userScore = new Text(score);
-////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-////
-////        }
-//
-////
-//////         temporal, mientras se genera la lista de jugadores
-////        LinkedList<String> players =  new LinkedList<>();
-////        players.addLast("Hazel");
-////        players.addLast("Brayan");
-////        players.addLast("Marlon");
-////        players.addLast("Paola");
-////        Node<String> temp = players.getHead();
-////
-////        int cont = 0;
-////        int i = 0;
-////
-////        while(temp!=null){
-////
-////            userImage = imageForUser.acces_index(i).getValue();
-////            userImage.setFitHeight(100);
-////            userImage.setFitWidth(60);
-////
-////
-////            VBox playersBox = new VBox();
-////            playersBox.setAlignment(Pos.CENTER);
-////            userName = new Text(temp.getValue());
-////
-////            //puntuacion del usuario
-////            HBox userScoreBox = new HBox();
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            userScoreBox.setSpacing(10);
-////            userScoreBox.setAlignment(Pos.CENTER);
-////            scoreLabel = new Text("Puntos:");
-////            userScore = new Text("50");
-////            userScoreBox.getChildren().addAll(scoreLabel, userScore);
-////            playersBox.getChildren().addAll(userName, userImage, userScoreBox);
-//
-////            if (cont==0){
-////                this.actualPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else if (cont==1){
-////                this.rightPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else if (cont == 2){
-////                this.leftPlayerInfoContainer.getChildren().addAll(playersBox);
-////            } else {
-////                this.upPlayerInfoContainer.getChildren().addAll(playersBox);
-////            }
-////
-////            temp = temp.getNext();
-////            cont++;
-////            i++;
-////        }
-//
-//
-//
+
+//    /**
+//     * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
+//     */
+//    private void putOppositeNumberToken() {
 //
 //    }
-
-    /**
-     * Coloca en la interfaz una imagen a cada jugador con su cantidad de fichas
-     */
-    private void putOppositeNumberToken() {
-        //TODO colocar en imagenes la cantidad de fichas que tienen los demás jugadores
-    }
 
     /**
      * Método para cargar las imágenes de las fichas del jugador
      * @param tokenList Lista con los tokens actuales del jugador
      */
-    public void tokenLoader(LinkedList<Token> tokenList) {
-//        LinkedList<Token> tokenList = controller.getPlayerInstance().getTokenlist();
-//        Node<Token> temp = tokenLinkedList.getHead();
-
-//        while (temp!=null){
-//            Token actualToken = temp.getValue();
-//
-//            ImageView letter = loadImageView(actualToken.getImagePath());
-//            letter.setOnMouseClicked(mouseEvent -> {
-//                if (letterSelected == letter)
-//                    letterSelected = null;
-//                else
-//                    letterSelected = letter;
-//            });
-//
-//            tokenBox.getChildren().addAll(letter);
-//
-//            temp = temp.getNext();
-//        }
-
-        //TODO actualizar logica
-//        tokenBox.getChildren().clear();
-
+    public void tokenLoader(LinkedList<Token> tokenList) { //Carga las tokens disponibles del jugador (tokenbox)
         Platform.runLater(() -> tokenBox.getChildren().clear());
-//        tokenBox.getChildren().clear();
-        System.out.println("Lista de Tokens: " + tokenList);
+//        System.out.println("Lista de Tokens: " + tokenList);
+
         for (int i = 0; i < tokenList.getSize(); i++) {
             Token token = tokenList.get(i);
+            token.setActive(true);
 //            System.out.println("Adding token " + token.getLetter());
             ImageView letter = loadImageView(token.getImagePath(), 80, 80);
-
 
             letter.setOnMouseClicked(mouseEvent -> {
                 if (unlockedControls) {
@@ -851,11 +649,8 @@ public class Scrabble extends Application {
                 }
             });
             Platform.runLater(() -> tokenBox.getChildren().add(letter));
-//            tokenBox.getChildren().add(letter);
-
         }
     }
-
 
     /**
      * @param path Ruta del archivo
@@ -896,56 +691,33 @@ public class Scrabble extends Application {
                         int row = GridPane.getRowIndex(tokenContainer);
                         int column = GridPane.getColumnIndex(tokenContainer);
 
-//                    if (tokenContainer.getChildren().size()==0) {
-//                        if (letterSelected != null) {
-//                            putImageOnContainer(tokenContainer);
-//
-//                            addToActualLetters(false, row, column);
-//                        }
-//                    }
-//                    else {
-//                        ImageView child = (ImageView) tokenContainer.getChildren().get(0);
-//                        child.setFitHeight(80);
-//                        child.setFitWidth(80);
-//
-//                        tokenContainer.getChildren().remove(0);
-//                        tokenBox.getChildren().add(child);
-//                        addGestureToNewToken();
-//
-//                        if (letterSelected != null) {
-//                            putImageOnContainer(tokenContainer);
-//                            addToActualLetters(true, row, column);
-//                        }
-//                    }
-
                         if (tokenContainer.getChildren().size() == 0) {
                             if (selectedToken != null) {
 //                            putImageOnContainer(tokenContainer);
-                                controller.updateTokenList(false, selectedToken); // lo elimino de la lista del jugador
-                                controller.addToken(selectedToken, row, column); // lo agrego a la matriz
-                                lettersList.addLast(selectedToken);
-                                selectedToken = null;
-
-                            }
-                        } else {
-                            Token actualToken = controller.getToken(row, column);
-                            controller.updateTokenList(true, actualToken);
-                            System.out.println("Removing");
-                            controller.removeToken(row, column);
-                            lettersList.remove(actualToken);
-
-
-                            if (selectedToken != null) {
-//                            putImageOnContainer(tokenContainer);
-                                controller.updateTokenList(false, selectedToken);
-                                controller.addToken(selectedToken, row, column);
+                                controller.updateTokenList(false, selectedToken); // lo elimino de la lista del objeto jugador local
+                                controller.addToken(selectedToken, row, column); // lo agrego a la matriz interna local
                                 lettersList.addLast(selectedToken);
                                 selectedToken = null;
                             }
                         }
+                        else {
+                            Token actualToken = controller.getToken(row, column); // Consigue la token de la posición actual
+                            if (actualToken.isActive()) {
+                                controller.updateTokenList(true, actualToken); // Elimina la token de la lista de tokens del objeto jugador
+                                System.out.println("Removing");
+                                controller.removeToken(row, column);
+                                lettersList.remove(actualToken);
 
-                        controller.updateInterface();
-
+                                if (selectedToken != null) {
+//                            putImageOnContainer(tokenContainer);
+                                    controller.updateTokenList(false, selectedToken);
+                                    controller.addToken(selectedToken, row, column);
+                                    lettersList.addLast(selectedToken);
+                                    selectedToken = null;
+                                }
+                            }
+                            controller.updateInterface();
+                        }
                         //actualizar la interfaz
                     }
                 });
@@ -958,7 +730,7 @@ public class Scrabble extends Application {
      * Carga en la interfaz la matriz
      * @param actualMatrix Matriz interna actual
      */
-    public void matrixLoader(Token[][] actualMatrix) {
+    public void matrixLoader(Token[][] actualMatrix) { //Actualiza la matriz de la interfaz con los datos de la matriz interna
         //i columna j fila
 
         for (int i = 0; i < 15; i++) {
@@ -1016,14 +788,14 @@ public class Scrabble extends Application {
 //     * Coloca la letra de la ficha en la casilla correspondiente
 //     */
 //    private void putImageOnContainer(HBox imagecontainer){
-//        //TODO actualizar que tome la imagen de selected token, que es el token actual
+//
 //        ImageView image = loadImageView(selectedToken.getImagePath(), 30, 30);
 //        imagecontainer.getChildren().add(image);
 ////        tokenBox.getChildren().remove(letterSelected);
 ////        letterSelected = null;
 //    }
 
-    //TODO hacer métodos para actualizar la interfaz al recibir un mensaje del servidor.
+
 
     /**
      * Este método se encarga de cargar el estado actual del juego
